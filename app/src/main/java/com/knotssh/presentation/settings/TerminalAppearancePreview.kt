@@ -91,7 +91,7 @@ private val PREVIEW_SCRIPT = buildString {
     append("\u001B[34mconfig\u001B[0m  \u001B[32mdeploy.sh\u001B[0m  README.md\r\n")
     append("\u001B[1;32muser@server\u001B[0m:\u001B[1;34m~/srv\u001B[0m$ systemctl status\r\n")
     append("\u001B[32m●\u001B[0m nginx.service \u2014 \u001B[1mactive (running)\u001B[0m\r\n")
-    append("\u001B[33mwarning:\u001B[0m disco all'87%  \u001B[31merror:\u001B[0m 2 unit fallite\r\n")
-    append("\u001B[38;5;208mdocs:\u001B[0m https://example.com/guida\r\n")
+    append("\u001B[33mwarning:\u001B[0m disk at 87%  \u001B[31merror:\u001B[0m 2 units failed\r\n")
+    append("\u001B[38;5;208mdocs:\u001B[0m https://example.com/guide\r\n")
     append("\u001B[1;32muser@server\u001B[0m:\u001B[1;34m~/srv\u001B[0m$ \u001B[7m \u001B[0m")
 }

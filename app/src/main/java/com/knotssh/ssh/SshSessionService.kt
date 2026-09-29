@@ -1,5 +1,6 @@
 package com.knotssh.ssh
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -66,6 +67,8 @@ class SshSessionService : Service() {
         return START_STICKY
     }
 
+    // POST_NOTIFICATIONS may be denied; the runCatching below is the handling lint asks for.
+    @SuppressLint("MissingPermission")
     private fun render(sessions: List<SessionSummary>) {
         val manager = NotificationManagerCompat.from(this)
         startForegroundCompat(summaryNotification(sessions.size))
@@ -113,11 +116,11 @@ class SshSessionService : Service() {
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(session.label.ifBlank { session.title })
-            .setContentText("Sessione SSH attiva")
+            .setContentText(getString(R.string.notification_session_active))
             .setSmallIcon(R.drawable.ic_launcher_monochrome)
             .setContentIntent(open)
-            .addAction(0, "Riapri", open)
-            .addAction(0, "Termina", terminate)
+            .addAction(0, getString(R.string.notification_reopen), open)
+            .addAction(0, getString(R.string.notification_terminate), terminate)
             .setOngoing(true)
             .setSilent(true)
             .setGroup(GROUP_KEY)
@@ -127,11 +130,11 @@ class SshSessionService : Service() {
 
     private fun summaryNotification(count: Int): Notification =
         NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("KnotSSH")
+            .setContentTitle(getString(R.string.app_name))
             .setContentText(
                 when (count) {
-                    0, 1 -> "Sessione SSH attiva"
-                    else -> "$count sessioni SSH attive"
+                    0, 1 -> getString(R.string.notification_session_active)
+                    else -> getString(R.string.notification_sessions_active, count)
                 }
             )
             .setSmallIcon(R.drawable.ic_launcher_monochrome)
@@ -155,10 +158,10 @@ class SshSessionService : Service() {
     private fun createChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Sessioni SSH attive",
+            getString(R.string.notification_channel_name),
             NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "Una scheda silenziosa per ogni sessione lasciata aperta"
+            description = getString(R.string.notification_channel_desc)
             setSound(null, null)
             enableVibration(false)
         }

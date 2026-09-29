@@ -7,6 +7,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
+import com.knotssh.R
 import com.knotssh.data.local.preferences.AppPreferences
 import com.knotssh.data.local.preferences.BellMode
 import com.knotssh.data.local.preferences.ConnectionSettings
@@ -65,7 +66,7 @@ class SshSession(
     private val _status = MutableStateFlow<TerminalStatus>(TerminalStatus.Connecting)
     val status: StateFlow<TerminalStatus> = _status.asStateFlow()
 
-    private val _title = MutableStateFlow("Terminale SSH")
+    private val _title = MutableStateFlow(context.getString(R.string.terminal_default_title))
     val title: StateFlow<String> = _title.asStateFlow()
 
     private val _hostKeyPrompt = MutableStateFlow<HostKeyVerdict?>(null)
@@ -237,18 +238,27 @@ class SshSession(
         val generation = ++sessionGeneration
         return try {
             val server = serverRepository.getServerById(serverId)
-                ?: return IllegalStateException("Server non trovato")
+                ?: return IllegalStateException(context.getString(R.string.ssh_server_not_found))
             _title.value = server.alias
 
             val credential = credentialRepository.getCredentialById(server.credentialId)
-                ?: return IllegalStateException("Credenziale associata non trovata")
+                ?: return IllegalStateException(context.getString(R.string.ssh_credential_not_found))
             label = "${credential.username}@${server.alias}"
 
             val secret = credentialRepository.decryptSecret(credential)
             val passphrase = credentialRepository.decryptPassphrase(credential)
 
             synchronized(emulatorLock) { emulator.beginSession() }
-            writeLocal("\u001B[36m[Connessione a ${server.alias} (${server.hostname}:${server.port})…]\u001B[0m\r\n")
+            writeLocal(
+                "\u001B[36m[" +
+                    context.getString(
+                        R.string.ssh_connecting_to,
+                        server.alias,
+                        server.hostname,
+                        server.port
+                    ) +
+                    "]\u001B[0m\r\n"
+            )
 
             val established = sshManager.connect(
                 context = context,
@@ -278,7 +288,8 @@ class SshSession(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            writeLocal("\r\n\u001B[31m[${e.message ?: "Errore di connessione"}]\u001B[0m\r\n")
+            val reason = e.message ?: context.getString(R.string.ssh_connection_error)
+            writeLocal("\r\n\u001B[31m[$reason]\u001B[0m\r\n")
             e
         }
     }
@@ -325,7 +336,11 @@ class SshSession(
         }
 
         val detail = cause?.let { "${it.javaClass.simpleName}: ${it.message}" } ?: liveness
-        writeLocal("\r\n\u001B[31m[Connessione terminata: $detail]\u001B[0m\r\n")
+        writeLocal(
+            "\r\n\u001B[31m[" +
+                context.getString(R.string.ssh_connection_terminated, detail) +
+                "]\u001B[0m\r\n"
+        )
 
         val settings = appPreferences.connection.first()
 
@@ -343,7 +358,11 @@ class SshSession(
     }
 
     private fun onRemoteExit(exitStatus: Int) {
-        writeLocal("\r\n\u001B[33m[Sessione chiusa (codice $exitStatus)]\u001B[0m\r\n")
+        writeLocal(
+            "\r\n\u001B[33m[" +
+                context.getString(R.string.ssh_session_closed, exitStatus) +
+                "]\u001B[0m\r\n"
+        )
         consecutiveQuickDrops = 0
         sshManager.disconnect()
         connection = null

@@ -23,7 +23,7 @@ data class SessionSummary(
 )
 
 class SessionLimitReached(val limit: Int) :
-    IllegalStateException("Limite di $limit sessioni contemporanee raggiunto")
+    IllegalStateException("Session limit of $limit reached")
 
 /**
  * Holds every live SSH session, so a session outlives the screen that opened it.

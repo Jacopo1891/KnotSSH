@@ -1,3 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Default (fallback) language: English. Translations live in values-<lang>/strings.xml. -->
 <resources>
-    <string name="app_name">KnotSSH</string>
+    <string name="app_name" translatable="false">KnotSSH</string>
+
+    <!-- Generic actions -->
+    <string name="action_back">Back</string>
+    <string name="action_save">Save</string>
+    <string name="action_add">Add</string>
+    <string name="action_new">New</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_connect">Connect</string>
+    <string name="action_show">Show</string>
+    <string name="action_hide">Hide</string>
+    <string name="action_forget">Forget</string>
+    <string name="action_forget_all">Forget all</string>
+    <string name="action_restore">Restore</string>
+    <string name="action_restore_defaults">Restore defaults</string>
+    <string name="action_favorite">Add to favourites</string>
+    <string name="action_unfavorite">Remove from favourites</string>
+    <string name="action_got_it">Got it</string>
+
+    <!-- Units and generic values -->
+    <string name="unit_seconds" translatable="false">%1$d s</string>
+    <string name="unit_minutes" translatable="false">%1$d min</string>
+    <string name="unit_lines">%1$d lines</string>
+    <string name="value_off">Off</string>
+    <string name="value_immediately">Immediately</string>
+    <string name="port_range" translatable="false">1-65535</string>
+
+    <!-- Validation -->
+    <string name="error_required">Required field</string>
+    <string name="error_invalid_port">Invalid port (1-65535)</string>
+    <string name="error_pick_credential">Pick a credential</string>
+
+    <!-- Relative time -->
+    <string name="time_now">just now</string>
+    <string name="time_minutes_ago">%1$d min ago</string>
+    <string name="time_hours_ago">%1$d h ago</string>
+    <string name="time_days_ago">%1$d days ago</string>
+
+    <!-- Home -->
+    <string name="home_search_hint">Search servers…</string>
+    <string name="home_search">Search</string>
+    <string name="home_close_search">Close search</string>
+    <string name="home_new_server">New server</string>
+    <string name="home_add_server">Add server</string>
+    <string name="home_favorites">Favourites</string>
+    <string name="home_recents">Recent</string>
+    <string name="home_delete_title">Delete connection</string>
+    <string name="home_delete_message">Delete \"%1$s\"?</string>
+    <string name="home_last_connection">Last connection: %1$s</string>
+    <string name="home_port_forward_rules">%1$d port forward rule(s)</string>
+    <string name="home_empty_title">No connections</string>
+    <string name="home_empty_message">Add your first SSH server\nwith the button below</string>
+    <string name="home_empty_search_title">No results</string>
+    <string name="home_empty_search_message">Try a different term</string>
+
+    <!-- Server form -->
+    <string name="server_new_title">New server</string>
+    <string name="server_edit_title">Edit server</string>
+    <string name="server_general_section">General information</string>
+    <string name="server_alias_label">Server alias (e.g. Production server)</string>
+    <string name="server_host_label">IP / Hostname</string>
+    <string name="server_port_label">Port</string>
+    <string name="server_auth_section">Authentication</string>
+    <string name="server_credential_label">SSH account</string>
+    <string name="server_advanced_section">Advanced</string>
+    <string name="server_keepalive_label">KeepAlive (s)</string>
+    <string name="server_timeout_label">Timeout (s)</string>
+    <string name="server_port_forwarding" translatable="false">Port forwarding</string>
+    <string name="server_add_rule">Add rule</string>
+
+    <!-- Port forwarding dialog -->
+    <string name="forward_dialog_title">Add a port forwarding rule</string>
+    <string name="forward_local">Local (-L)</string>
+    <string name="forward_remote">Remote (-R)</string>
+    <string name="forward_local_desc">A port on this device is forwarded to a host:port reachable from the server.</string>
+    <string name="forward_remote_desc">A port on the server is forwarded to a host:port reachable from this device.</string>
+    <string name="forward_local_port">Local port</string>
+    <string name="forward_target_host">Target host</string>
+    <string name="forward_target_port">Target port</string>
+
+    <!-- Credentials -->
+    <string name="credentials_title">Accounts</string>
+    <string name="credentials_empty">No saved account</string>
+    <string name="credential_new_title">New account</string>
+    <string name="credential_edit_title">Edit account</string>
+    <string name="credential_user">User: %1$s</string>
+    <string name="credential_type">Type: %1$s</string>
+    <string name="credential_alias_label">Account alias (e.g. Admin Prod)</string>
+    <string name="credential_username_label">Username</string>
+    <string name="credential_pem_label">PEM private key</string>
+    <string name="credential_passphrase_label">Key passphrase (optional)</string>
+    <string name="credential_passphrase_hint">Only needed if the private key is encrypted</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_ssh_key">SSH key</string>
+
+    <!-- Terminal -->
+    <string name="terminal_default_title">SSH terminal</string>
+    <string name="terminal_copy_output">Copy output</string>
+    <string name="terminal_paste">Paste</string>
+    <string name="terminal_reconnect">Reconnect</string>
+    <string name="terminal_more_actions">More actions</string>
+    <string name="terminal_clear_scrollback">Clear scrollback</string>
+    <string name="terminal_reset">Reset terminal</string>
+    <string name="terminal_end_session">End session</string>
+    <string name="terminal_output_copied">Output copied to the clipboard</string>
+    <string name="terminal_clipboard_empty">Clipboard is empty</string>
+    <string name="terminal_back_hint">Press back again to close or suspend the session</string>
+    <string name="terminal_back_keep_alive">Back to the connection list, leaving the session running</string>
+    <string name="terminal_toggle_keyboard">Show or hide the keyboard</string>
+    <string name="terminal_leave_title">Leave the session?</string>
+    <string name="terminal_leave_message">You can leave it running in the background and come back from the notification, or close it for good.</string>
+    <string name="terminal_leave_message_no_background">Background sessions are disabled in Settings › Connection, so leaving closes the connection.</string>
+    <string name="terminal_keep_alive">Keep running</string>
+    <string name="terminal_terminate">Terminate</string>
+    <string name="terminal_limit_title">Too many open sessions</string>
+    <string name="terminal_limit_message">You can keep at most %1$d sessions at once. Close one from its notification, or raise the limit in the connection settings.</string>
+
+    <string name="arrow_up">Up</string>
+    <string name="arrow_down">Down</string>
+    <string name="arrow_left">Left</string>
+    <string name="arrow_right">Right</string>
+
+    <string name="status_online">ONLINE</string>
+    <string name="status_connecting">CONNECTING</string>
+    <string name="status_retry">RETRY %1$d/%2$d</string>
+    <string name="status_ended">ENDED</string>
+    <string name="status_disconnected">DISCONNECTED</string>
+
+    <!-- Host key dialog -->
+    <string name="host_key_unknown_title">Unknown host</string>
+    <string name="host_key_changed_title">Host key CHANGED</string>
+    <string name="host_key_unknown_message">First connection to %1$s:%2$d. Check that the fingerprint matches the one on the server before accepting.</string>
+    <string name="host_key_changed_message">The key of %1$s:%2$d differs from the stored one. This could be a man-in-the-middle attack, or the server was reinstalled.</string>
+    <string name="host_key_type">Type</string>
+    <string name="host_key_fingerprint">Fingerprint</string>
+    <string name="host_key_expected">Expected</string>
+    <string name="host_key_received">Received</string>
+    <string name="host_key_accept_and_store">Accept and store</string>
+    <string name="host_key_accept_anyway">Accept anyway</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Active SSH sessions</string>
+    <string name="notification_channel_desc">One silent card for every session left open</string>
+    <string name="notification_session_active">SSH session running</string>
+    <string name="notification_sessions_active">%1$d SSH sessions running</string>
+    <string name="notification_reopen">Reopen</string>
+    <string name="notification_terminate">Terminate</string>
+
+    <!-- SSH messages shown in the terminal -->
+    <string name="ssh_server_not_found">Server not found</string>
+    <string name="ssh_credential_not_found">Associated credential not found</string>
+    <string name="ssh_connection_error">Connection error</string>
+    <string name="ssh_connecting_to">Connecting to %1$s (%2$s:%3$d)…</string>
+    <string name="ssh_connection_terminated">Connection terminated: %1$s</string>
+    <string name="ssh_session_closed">Session closed (exit code %1$d)</string>
+    <string name="ssh_bad_private_key">Invalid private key or wrong passphrase: %1$s</string>
+    <string name="ssh_dynamic_forward_unsupported">Dynamic port forwarding (SOCKS) on port %1$d is not supported by the SSH library: rule ignored.</string>
+    <string name="ssh_forward_rule_failed">Rule %1$s on port %2$d was not applied: %3$s</string>
+    <string name="ssh_unknown_host">Host %1$s:%2$d is unknown (%3$s). The current host key policy does not allow trusting it automatically.</string>
+    <string name="ssh_host_key_changed">WARNING: the host key of %1$s:%2$d has changed.\nExpected: %3$s\nReceived: %4$s\nThis could be a man-in-the-middle attack.</string>
+    <string name="ssh_host_key_declined">Connection cancelled: host key not accepted.</string>
+
+    <!-- Biometric gate -->
+    <string name="biometric_title">Unlock KnotSSH</string>
+    <string name="biometric_subtitle">Authentication is required to reach your credentials</string>
+    <string name="biometric_locked">KnotSSH is locked</string>
+    <string name="biometric_unlock">Unlock</string>
+    <string name="biometric_no_method">No unlock method is configured on this device.</string>
+
+    <!-- Settings index -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_keyboard">Keyboard</string>
+    <string name="settings_connection">Connection</string>
+    <string name="settings_security">Security</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_backup">Backup and restore</string>
+    <string name="settings_backup_summary">Cloud sync and default values</string>
+
+    <string name="summary_font" translatable="false">%1$s %2$dsp</string>
+    <string name="summary_scrollback">%1$d lines</string>
+    <string name="summary_auto_size">auto size</string>
+    <string name="summary_fixed_size" translatable="false">%1$d×%2$d</string>
+    <string name="summary_key_bar_on">key bar on</string>
+    <string name="summary_key_bar_off">key bar hidden</string>
+    <string name="summary_custom_keys">%1$d custom keys</string>
+    <string name="summary_quick_commands">%1$d commands</string>
+    <string name="summary_keepalive">keep-alive %1$ds</string>
+    <string name="summary_keepalive_off">keep-alive off</string>
+    <string name="summary_reconnect_on">auto reconnect</string>
+    <string name="summary_reconnect_off">no reconnect</string>
+    <string name="summary_compression_on">compressed</string>
+    <string name="summary_compression_off">not compressed</string>
+    <string name="summary_known_hosts">%1$d known hosts</string>
+    <string name="summary_biometric_on">biometric unlock</string>
+    <string name="summary_biometric_off">no unlock</string>
+    <string name="summary_bell_off">bell off</string>
+    <string name="summary_bell_vibrate">bell vibrates</string>
+    <string name="summary_bell_sound">bell sound</string>
+    <string name="summary_hostkey_strict">strict check</string>
+    <string name="summary_hostkey_prompt">asks for confirmation</string>
+    <string name="summary_hostkey_tofu" translatable="false">TOFU</string>
+    <string name="summary_hostkey_any">⚠ no verification</string>
+
+    <!-- Shared sections -->
+    <string name="section_application">Application</string>
+    <string name="section_buffer">Buffer</string>
+    <string name="section_size">Size</string>
+    <string name="section_behaviour">Behaviour</string>
+    <string name="section_key_bar">Special key bar</string>
+    <string name="section_quick_commands">Quick commands</string>
+    <string name="section_input">Input</string>
+    <string name="section_session">Session</string>
+    <string name="section_reconnection">Reconnection</string>
+    <string name="section_background">In the background</string>
+    <string name="section_host_keys">Host keys</string>
+    <string name="section_app_access">App access</string>
+    <string name="section_privacy">Privacy</string>
+    <string name="section_backup">Backup</string>
+    <string name="section_restore">Restore</string>
+
+    <!-- Appearance -->
+    <string name="appearance_theme">Theme</string>
+    <string name="appearance_dynamic_color" translatable="false">Dynamic Color</string>
+    <string name="appearance_dynamic_color_desc">Use the system Material You palette</string>
+    <string name="appearance_terminal_theme">Terminal theme</string>
+    <string name="appearance_terminal_theme_desc">Background, text and ANSI palette</string>
+    <string name="appearance_font">Font</string>
+    <string name="appearance_font_size">Font size</string>
+    <string name="appearance_ansi_colors">ANSI colours</string>
+    <string name="appearance_ansi_colors_desc">Interpret the colour sequences sent by the server</string>
+    <string name="appearance_cursor_blink">Blinking cursor</string>
+
+    <string name="theme_mode_system">System</string>
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="font_mono" translatable="false">Mono</string>
+    <string name="font_sans" translatable="false">Sans</string>
+    <string name="font_serif" translatable="false">Serif</string>
+
+    <string name="terminal_theme_dark">Dark</string>
+    <string name="terminal_theme_light">Light</string>
+    <string name="terminal_theme_hacker" translatable="false">Hacker \'80</string>
+    <string name="terminal_theme_molokai" translatable="false">Molokai</string>
+    <string name="terminal_theme_solarized_dark" translatable="false">Solarized Dark</string>
+    <string name="terminal_theme_solarized_light" translatable="false">Solarized Light</string>
+
+    <!-- Terminal settings -->
+    <string name="terminal_scrollback">Scrollback lines</string>
+    <string name="terminal_scrollback_desc">History kept in memory. High values use more RAM.</string>
+    <string name="terminal_auto_size">Match the display size</string>
+    <string name="terminal_auto_size_desc">Report the real rows and columns of the screen to the server</string>
+    <string name="terminal_fixed_columns">Fixed columns</string>
+    <string name="terminal_fixed_rows">Fixed rows</string>
+    <string name="terminal_clickable_urls">Clickable URLs</string>
+    <string name="terminal_clickable_urls_desc">Detect http/https addresses in the output and open them in the browser</string>
+    <string name="terminal_bell">Bell (BEL)</string>
+    <string name="terminal_bell_desc">What happens when the server sends \\a</string>
+    <string name="bell_none">None</string>
+    <string name="bell_vibrate">Vibration</string>
+    <string name="bell_sound">Sound</string>
+    <string name="terminal_keep_screen_on">Keep the screen on</string>
+    <string name="terminal_keep_screen_on_desc">Only while an SSH session is active</string>
+
+    <!-- Keyboard settings -->
+    <string name="keyboard_show_bar">Show the bar</string>
+    <string name="keyboard_show_bar_desc">ESC, TAB, arrows, CTRL/ALT and custom keys</string>
+    <string name="keyboard_quick_bar_desc">Chips that send a whole command followed by a newline</string>
+    <string name="keyboard_manage_keys">Manage custom keys (%1$d)</string>
+    <string name="keyboard_manage_commands">Manage quick commands (%1$d)</string>
+    <string name="keyboard_auto_show">Open the keyboard automatically</string>
+    <string name="keyboard_auto_show_desc">On connect. Tapping the buffer opens it anyway.</string>
+    <string name="keyboard_swipe_scroll">Swipe to scroll in full-screen apps</string>
+    <string name="keyboard_swipe_scroll_desc">In vim, less and the like a vertical swipe sends up/down arrows</string>
+    <string name="keyboard_haptics">Haptic feedback</string>
+    <string name="keyboard_haptics_desc">Short vibration on the bar keys</string>
+
+    <!-- Connection settings -->
+    <string name="connection_keepalive">Keep-alive</string>
+    <string name="connection_keepalive_desc">Interval between keep-alive packets. 0 disables it.</string>
+    <string name="connection_timeout">Connection timeout</string>
+    <string name="connection_compression">Compression</string>
+    <string name="connection_compression_desc">Useful on slow networks, costs more CPU</string>
+    <string name="connection_close_on_exit">Close the terminal when the session ends</string>
+    <string name="connection_close_on_exit_desc">After an exit it returns to the connection list on its own</string>
+    <string name="connection_close_delay">Delay before closing</string>
+    <string name="connection_close_delay_desc">Time to read the closing message</string>
+    <string name="connection_auto_reconnect">Automatic reconnection</string>
+    <string name="connection_auto_reconnect_desc">Retry when the session drops for network reasons</string>
+    <string name="connection_reconnect_attempts">Reconnection attempts</string>
+    <string name="connection_max_sessions">Concurrent sessions</string>
+    <string name="connection_max_sessions_desc">How many connections you can keep open together. Each one uses a thread and its own scrollback.</string>
+    <string name="connection_background_sessions">Background sessions</string>
+    <string name="connection_background_sessions_desc">Lets you suspend a session and come back from the persistent notification</string>
+    <string name="connection_wake_lock" translatable="false">Wake lock</string>
+    <string name="connection_wake_lock_desc">Prevents the CPU from sleeping during a session</string>
+    <string name="connection_wake_lock_duration">Maximum wake lock duration</string>
+
+    <!-- Security settings -->
+    <string name="security_host_key_check">Host key verification</string>
+    <string name="security_host_key_strict_desc">Only already stored hosts. Maximum security.</string>
+    <string name="security_host_key_prompt_desc">Asks for confirmation showing the fingerprint on first access.</string>
+    <string name="security_host_key_tofu_desc">Stores it automatically on first access, blocks if the key changes.</string>
+    <string name="security_host_key_any_desc">⚠ No protection against man-in-the-middle attacks.</string>
+    <string name="host_key_strict">Strict</string>
+    <string name="host_key_prompt">Ask</string>
+    <string name="host_key_tofu" translatable="false">TOFU</string>
+    <string name="host_key_none">None</string>
+    <string name="security_known_hosts_button">Known hosts (%1$d)</string>
+    <string name="security_biometric">Biometric unlock</string>
+    <string name="security_biometric_desc">Requires fingerprint, face or PIN when opening the app</string>
+    <string name="security_relock_grace">Re-lock grace period</string>
+    <string name="security_relock_grace_desc">Time in the background before authentication is asked again</string>
+    <string name="security_allow_screenshot">Allow screenshots</string>
+    <string name="security_allow_screenshot_desc">When off, the whole app blocks screen capture and the recents preview</string>
+    <string name="security_mask_secrets">Hide secrets in forms</string>
+    <string name="security_mask_secrets_desc">Masks passwords and private keys in the accounts screen</string>
+    <string name="security_verbose_logs">Verbose SSH logs</string>
+    <string name="security_verbose_logs_desc">Debug builds only. Writes the SSH negotiation to Logcat.</string>
+
+    <!-- Dialogs -->
+    <string name="known_hosts_title">Known hosts</string>
+    <string name="known_hosts_empty">No host key stored.</string>
+    <string name="quick_commands_title">Quick commands</string>
+    <string name="quick_commands_hint">They appear as chips above the terminal keyboard and are sent with a newline.</string>
+    <string name="custom_keys_title">Custom keys</string>
+    <string name="custom_keys_hint">They appear above the special key bar and send the sequence right away, with no newline.</string>
+    <string name="field_label">Label</string>
+    <string name="field_label_optional">Label (optional)</string>
+    <string name="field_command">Command</string>
+    <string name="field_modifier">Modifier</string>
+    <string name="field_key">Key</string>
+    <string name="field_key_hint">A single character, e.g. C for Ctrl+C</string>
+    <string name="modifier_none">None</string>
+
+    <!-- Backup -->
+    <string name="backup_drive_sync">Google Drive sync</string>
+    <string name="backup_drive_sync_desc">Not available in this version yet</string>
+    <string name="backup_reset_title">Restore settings</string>
+    <string name="backup_reset_message">Every preference goes back to its default value. Servers, credentials and known hosts are left untouched.</string>
+    <string name="backup_reset_button">Restore default settings</string>
+
+    <!-- Language -->
+    <string name="language_system">System language</string>
+    <string name="language_description">Applies to the whole app. Restarting is not needed.</string>
 </resources>

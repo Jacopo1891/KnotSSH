@@ -92,6 +92,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -110,6 +111,7 @@ import com.knotssh.data.local.preferences.TerminalSettings
 import com.knotssh.domain.model.CustomKey
 import com.knotssh.domain.model.HostKeyVerdict
 import com.knotssh.ssh.TerminalStatus
+import com.knotssh.R
 import com.knotssh.presentation.common.RequestNotificationPermissionOnce
 import com.knotssh.presentation.theme.TerminalBackground
 import com.knotssh.presentation.theme.TerminalText
@@ -165,6 +167,11 @@ fun TerminalScreen(
 
     val limit by viewModel.limitReached.collectAsStateWithLifecycle()
 
+    // Snackbars are shown from coroutines, so their text is resolved up front.
+    val backHintMessage = stringResource(R.string.terminal_back_hint)
+    val copiedMessage = stringResource(R.string.terminal_output_copied)
+    val emptyClipboardMessage = stringResource(R.string.terminal_clipboard_empty)
+
     // First press only arms the gesture, so a stray back never drops a live session.
     fun onBackPressed() {
         val now = System.currentTimeMillis()
@@ -173,7 +180,7 @@ fun TerminalScreen(
         } else {
             backArmedAt = now
             scope.launch {
-                snackbarHost.showSnackbar("Premi di nuovo indietro per chiudere o sospendere la sessione")
+                snackbarHost.showSnackbar(backHintMessage)
             }
         }
     }
@@ -183,23 +190,24 @@ fun TerminalScreen(
     limit?.let { max ->
         AlertDialog(
             onDismissRequest = onBack,
-            title = { Text("Troppe sessioni aperte") },
-            text = { Text("Puoi tenere al massimo $max sessioni contemporanee. Chiudine una dalla notifica, oppure alza il limite dalle impostazioni di connessione.") },
-            confirmButton = { TextButton(onClick = onBack) { Text("Ho capito") } }
+            title = { Text(stringResource(R.string.terminal_limit_title)) },
+            text = { Text(stringResource(R.string.terminal_limit_message, max)) },
+            confirmButton = {
+                TextButton(onClick = onBack) { Text(stringResource(R.string.action_got_it)) }
+            }
         )
     }
 
     if (showLeaveDialog) {
         AlertDialog(
             onDismissRequest = { showLeaveDialog = false },
-            title = { Text("Uscire dalla sessione?") },
+            title = { Text(stringResource(R.string.terminal_leave_title)) },
             text = {
                 Text(
-                    if (backgroundSessions) {
-                        "Puoi lasciarla attiva in background e rientrarci dalla notifica, oppure chiuderla definitivamente."
-                    } else {
-                        "Le sessioni in background sono disattivate in Impostazioni \u203a Connessione, quindi uscire chiude la connessione."
-                    }
+                    stringResource(
+                        if (backgroundSessions) R.string.terminal_leave_message
+                        else R.string.terminal_leave_message_no_background
+                    )
                 )
             },
             confirmButton = {
@@ -208,7 +216,7 @@ fun TerminalScreen(
                         showLeaveDialog = false
                         viewModel.detach()
                         onBack()
-                    }) { Text("Lascia attiva") }
+                    }) { Text(stringResource(R.string.terminal_keep_alive)) }
                 }
             },
             dismissButton = {
@@ -216,7 +224,12 @@ fun TerminalScreen(
                     showLeaveDialog = false
                     viewModel.terminate()
                     onBack()
-                }) { Text("Termina", color = MaterialTheme.colorScheme.error) }
+                }) {
+                    Text(
+                        text = stringResource(R.string.terminal_terminate),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         )
     }
@@ -276,9 +289,9 @@ fun TerminalScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = if (backgroundSessions) {
-                                "Torna alle connessioni lasciando la sessione attiva"
+                                stringResource(R.string.terminal_back_keep_alive)
                             } else {
-                                "Indietro"
+                                stringResource(R.string.action_back)
                             }
                         )
                     }
@@ -287,28 +300,34 @@ fun TerminalScreen(
                     IconButton(onClick = {
                         scope.launch {
                             clipboard.setText(AnnotatedString(viewModel.bufferAsText()))
-                            snackbarHost.showSnackbar("Output copiato negli appunti")
+                            snackbarHost.showSnackbar(copiedMessage)
                         }
                     }) {
-                        Icon(Icons.Default.ContentCopy, contentDescription = "Copia output")
+                        Icon(
+                            Icons.Default.ContentCopy,
+                            contentDescription = stringResource(R.string.terminal_copy_output)
+                        )
                     }
                     IconButton(onClick = {
                         scope.launch {
                             val text = clipboard.getText()?.text
                             if (text.isNullOrEmpty()) {
-                                snackbarHost.showSnackbar("Appunti vuoti")
+                                snackbarHost.showSnackbar(emptyClipboardMessage)
                             } else {
                                 viewModel.paste(text)
                             }
                         }
                     }) {
-                        Icon(Icons.Default.ContentPaste, contentDescription = "Incolla")
+                        Icon(
+                            Icons.Default.ContentPaste,
+                            contentDescription = stringResource(R.string.terminal_paste)
+                        )
                     }
                     if (status !is TerminalStatus.Connected) {
                         IconButton(onClick = viewModel::reconnect) {
                             Icon(
                                 Icons.Default.Refresh,
-                                contentDescription = "Riconnetti",
+                                contentDescription = stringResource(R.string.terminal_reconnect),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -316,28 +335,31 @@ fun TerminalScreen(
                     StatusBadge(status)
                     Box {
                         IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Altre azioni")
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.terminal_more_actions)
+                            )
                         }
                         DropdownMenu(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Pulisci scrollback") },
+                                text = { Text(stringResource(R.string.terminal_clear_scrollback)) },
                                 onClick = {
                                     viewModel.clearScrollback()
                                     menuExpanded = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Reimposta terminale") },
+                                text = { Text(stringResource(R.string.terminal_reset)) },
                                 onClick = {
                                     viewModel.resetTerminal()
                                     menuExpanded = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Termina sessione") },
+                                text = { Text(stringResource(R.string.terminal_end_session)) },
                                 onClick = {
                                     menuExpanded = false
                                     viewModel.terminate()
@@ -635,11 +657,16 @@ private fun rememberCursorAlpha(enabled: Boolean): Float {
 @Composable
 private fun StatusBadge(status: TerminalStatus) {
     val (label, color) = when (status) {
-        TerminalStatus.Connected -> "ONLINE" to Color(0xFF34A853)
-        TerminalStatus.Connecting -> "CONNESSIONE" to Color(0xFFFBBC04)
-        is TerminalStatus.Reconnecting -> "RETRY ${status.attempt}/${status.of}" to Color(0xFFFBBC04)
-        is TerminalStatus.Ended -> "TERMINATA" to Color(0xFF5F6368)
-        is TerminalStatus.Disconnected -> "DISCONNESSO" to Color(0xFFEA4335)
+        TerminalStatus.Connected ->
+            stringResource(R.string.status_online) to Color(0xFF34A853)
+        TerminalStatus.Connecting ->
+            stringResource(R.string.status_connecting) to Color(0xFFFBBC04)
+        is TerminalStatus.Reconnecting ->
+            stringResource(R.string.status_retry, status.attempt, status.of) to Color(0xFFFBBC04)
+        is TerminalStatus.Ended ->
+            stringResource(R.string.status_ended) to Color(0xFF5F6368)
+        is TerminalStatus.Disconnected ->
+            stringResource(R.string.status_disconnected) to Color(0xFFEA4335)
     }
     Surface(color = color, shape = MaterialTheme.shapes.small) {
         Text(
@@ -704,7 +731,7 @@ private fun AccessoryBar(
                     KeyCap("|", Modifier.weight(1f)) { onText("|") }
                     KeyCap("-", Modifier.weight(1f)) { onText("-") }
                     KeyCap("HOME", Modifier.weight(1f)) { onHomeEnd(false) }
-                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, "Su") { onArrow('A') }
+                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, 'A') { onArrow('A') }
                     KeyCap("END", Modifier.weight(1f)) { onHomeEnd(true) }
                     KeyCap("PG↑", Modifier.weight(1f)) { onSequence("\u001B[5~") }
                     KeyCap("FN", Modifier.weight(1f)) { functionRow = true }
@@ -714,13 +741,13 @@ private fun AccessoryBar(
                     KeyCap("CTRL", Modifier.weight(1f), active = ctrlArmed, onClick = onToggleCtrl)
                     KeyCap("ALT", Modifier.weight(1f), active = altArmed, onClick = onToggleAlt)
                     KeyCap("~", Modifier.weight(1f)) { onText("~") }
-                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, "Sinistra") { onArrow('D') }
-                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, "Giù") { onArrow('B') }
-                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, "Destra") { onArrow('C') }
+                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, 'D') { onArrow('D') }
+                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, 'B') { onArrow('B') }
+                    RepeatingKeyCap(Modifier.weight(1f), hapticFeedback, 'C') { onArrow('C') }
                     KeyCap("PG↓", Modifier.weight(1f)) { onSequence("\u001B[6~") }
                     IconKeyCap(
                         icon = Icons.Default.Keyboard,
-                        description = "Mostra o nascondi la tastiera",
+                        description = stringResource(R.string.terminal_toggle_keyboard),
                         modifier = Modifier.weight(1f),
                         onClick = onToggleKeyboard
                     )
@@ -811,23 +838,25 @@ private fun IconKeyCap(
     }
 }
 
-/** Arrow cap that fires once on press then auto-repeats while held, like a physical key. */@Composable
+/** Arrow cap that fires once on press then auto-repeats while held, like a physical key. */
+@Composable
 private fun RepeatingKeyCap(
     modifier: Modifier,
     hapticFeedback: Boolean,
-    description: String,
+    direction: Char,
     onTrigger: () -> Unit
 ) {
     val currentTrigger by rememberUpdatedState(onTrigger)
     val haptics = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
+    val label = stringResource(ARROW_LABELS.getValue(direction))
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.extraSmall,
         modifier = modifier
             .height(34.dp)
-            .semantics { contentDescription = description }
+            .semantics { contentDescription = label }
             .pointerInput(Unit) {
                 awaitEachGesture {
                     awaitFirstDown(requireUnconsumed = false)
@@ -849,7 +878,7 @@ private fun RepeatingKeyCap(
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = ARROW_ICONS.getValue(description),
+                imageVector = ARROW_ICONS.getValue(direction),
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -893,22 +922,51 @@ private fun HostKeyDialog(
                 tint = if (changed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
             )
         },
-        title = { Text(if (changed) "Chiave host CAMBIATA" else "Host sconosciuto") },
+        title = {
+            Text(
+                stringResource(
+                    if (changed) R.string.host_key_changed_title
+                    else R.string.host_key_unknown_title
+                )
+            )
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (verdict) {
                     is HostKeyVerdict.Unknown -> {
-                        Text("Primo collegamento a ${verdict.candidate.host}:${verdict.candidate.port}. Verifica che l'impronta corrisponda a quella del server prima di accettare.")
-                        FingerprintRow("Tipo", verdict.candidate.keyType)
-                        FingerprintRow("Impronta", verdict.candidate.fingerprintSha256)
+                        Text(
+                            stringResource(
+                                R.string.host_key_unknown_message,
+                                verdict.candidate.host,
+                                verdict.candidate.port
+                            )
+                        )
+                        FingerprintRow(
+                            stringResource(R.string.host_key_type),
+                            verdict.candidate.keyType
+                        )
+                        FingerprintRow(
+                            stringResource(R.string.host_key_fingerprint),
+                            verdict.candidate.fingerprintSha256
+                        )
                     }
                     is HostKeyVerdict.Changed -> {
                         Text(
-                            "La chiave di ${verdict.candidate.host}:${verdict.candidate.port} è diversa da quella memorizzata. Potrebbe trattarsi di un attacco man-in-the-middle, oppure il server è stato reinstallato.",
+                            stringResource(
+                                R.string.host_key_changed_message,
+                                verdict.candidate.host,
+                                verdict.candidate.port
+                            ),
                             color = MaterialTheme.colorScheme.error
                         )
-                        FingerprintRow("Attesa", verdict.stored.fingerprintSha256)
-                        FingerprintRow("Ricevuta", verdict.candidate.fingerprintSha256)
+                        FingerprintRow(
+                            stringResource(R.string.host_key_expected),
+                            verdict.stored.fingerprintSha256
+                        )
+                        FingerprintRow(
+                            stringResource(R.string.host_key_received),
+                            verdict.candidate.fingerprintSha256
+                        )
                     }
                     HostKeyVerdict.Trusted -> Unit
                 }
@@ -917,13 +975,16 @@ private fun HostKeyDialog(
         confirmButton = {
             TextButton(onClick = onAccept) {
                 Text(
-                    if (changed) "Accetta comunque" else "Accetta e memorizza",
+                    stringResource(
+                        if (changed) R.string.host_key_accept_anyway
+                        else R.string.host_key_accept_and_store
+                    ),
                     color = if (changed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                 )
             }
         },
         dismissButton = {
-            TextButton(onClick = onReject) { Text("Annulla") }
+            TextButton(onClick = onReject) { Text(stringResource(R.string.action_cancel)) }
         }
     )
 }
@@ -947,10 +1008,17 @@ private const val REPEAT_INTERVAL_MS = 55L
 private const val BACK_CONFIRM_WINDOW_MS = 3_000L
 
 private val ARROW_ICONS = mapOf(
-    "Su" to Icons.Default.ArrowUpward,
-    "Giù" to Icons.Default.ArrowDownward,
-    "Sinistra" to Icons.AutoMirrored.Filled.ArrowBack,
-    "Destra" to Icons.AutoMirrored.Filled.ArrowForward
+    'A' to Icons.Default.ArrowUpward,
+    'B' to Icons.Default.ArrowDownward,
+    'D' to Icons.AutoMirrored.Filled.ArrowBack,
+    'C' to Icons.AutoMirrored.Filled.ArrowForward
+)
+
+private val ARROW_LABELS = mapOf(
+    'A' to R.string.arrow_up,
+    'B' to R.string.arrow_down,
+    'D' to R.string.arrow_left,
+    'C' to R.string.arrow_right
 )
 
 /** F1-F4 use SS3, F5 upward use CSI with the xterm numbering. */

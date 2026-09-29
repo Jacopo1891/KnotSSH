@@ -13,11 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.R
 import com.knotssh.domain.model.AuthType
 import com.knotssh.domain.model.Credential
 import com.knotssh.presentation.components.SwipeToDeleteContainer
@@ -35,10 +37,13 @@ fun CredentialsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Gestione Utenze") },
+                title = { Text(stringResource(R.string.credentials_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back)
+                        )
                     }
                 }
             )
@@ -48,13 +53,19 @@ fun CredentialsScreen(
                 onClick = onAddCredential,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Nuova Utenza")
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.credential_new_title)
+                )
             }
         }
     ) { padding ->
         if (uiState.credentials.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Nessuna utenza salvata", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(R.string.credentials_empty),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         } else {
             LazyColumn(
@@ -86,8 +97,16 @@ fun CredentialsScreen(
                                 Spacer(Modifier.width(16.dp))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(cred.alias, style = MaterialTheme.typography.titleMedium)
-                                    Text("User: ${cred.username}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Text("Tipo: ${cred.authType}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
+                                    Text(
+                                        stringResource(R.string.credential_user, cred.username),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        stringResource(R.string.credential_type, cred.authType.name),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.tertiary
+                                    )
                                 }
                                 Icon(Icons.Default.ChevronRight, contentDescription = null)
                             }
@@ -117,15 +136,28 @@ fun EditCredentialScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (credentialId == null) "Nuova Utenza" else "Modifica Utenza") },
+                title = {
+                    Text(
+                        stringResource(
+                            if (credentialId == null) R.string.credential_new_title
+                            else R.string.credential_edit_title
+                        )
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back)
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.save() }) {
-                        Icon(Icons.Default.Check, contentDescription = "Salva")
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = stringResource(R.string.action_save)
+                        )
                     }
                 }
             )
@@ -141,9 +173,9 @@ fun EditCredentialScreen(
             OutlinedTextField(
                 value = state.alias,
                 onValueChange = viewModel::onAliasChanged,
-                label = { Text("Alias Utenza (es. Admin Prod)") },
+                label = { Text(stringResource(R.string.credential_alias_label)) },
                 isError = state.aliasError != null,
-                supportingText = state.aliasError?.let { { Text(it) } },
+                supportingText = state.aliasError?.let { { Text(stringResource(it)) } },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -151,9 +183,9 @@ fun EditCredentialScreen(
             OutlinedTextField(
                 value = state.username,
                 onValueChange = viewModel::onUsernameChanged,
-                label = { Text("Username") },
+                label = { Text(stringResource(R.string.credential_username_label)) },
                 isError = state.usernameError != null,
-                supportingText = state.usernameError?.let { { Text(it) } },
+                supportingText = state.usernameError?.let { { Text(stringResource(it)) } },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -162,28 +194,37 @@ fun EditCredentialScreen(
                 FilterChip(
                     selected = state.authType == AuthType.PASSWORD,
                     onClick = { viewModel.onAuthTypeChanged(AuthType.PASSWORD) },
-                    label = { Text("Password") }
+                    label = { Text(stringResource(R.string.auth_password)) }
                 )
                 FilterChip(
                     selected = state.authType == AuthType.SSH_KEY,
                     onClick = { viewModel.onAuthTypeChanged(AuthType.SSH_KEY) },
-                    label = { Text("Chiave SSH") }
+                    label = { Text(stringResource(R.string.auth_ssh_key)) }
                 )
             }
 
             OutlinedTextField(
                 value = state.secret,
                 onValueChange = viewModel::onSecretChanged,
-                label = { Text(if (state.authType == AuthType.PASSWORD) "Password" else "Chiave Privata PEM") },
+                label = {
+                    Text(
+                        stringResource(
+                            if (state.authType == AuthType.PASSWORD) R.string.auth_password
+                            else R.string.credential_pem_label
+                        )
+                    )
+                },
                 isError = state.secretError != null,
-                supportingText = state.secretError?.let { { Text(it) } },
+                supportingText = state.secretError?.let { { Text(stringResource(it)) } },
                 visualTransformation = if (showSecret || !state.maskSecrets) VisualTransformation.None
                 else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { showSecret = !showSecret }) {
                         Icon(
                             imageVector = if (showSecret) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (showSecret) "Nascondi" else "Mostra"
+                            contentDescription = stringResource(
+                                if (showSecret) R.string.action_hide else R.string.action_show
+                            )
                         )
                     }
                 },
@@ -196,15 +237,17 @@ fun EditCredentialScreen(
                 OutlinedTextField(
                     value = state.passphrase,
                     onValueChange = viewModel::onPassphraseChanged,
-                    label = { Text("Passphrase della chiave (opzionale)") },
-                    supportingText = { Text("Necessaria solo se la chiave privata è cifrata") },
+                    label = { Text(stringResource(R.string.credential_passphrase_label)) },
+                    supportingText = { Text(stringResource(R.string.credential_passphrase_hint)) },
                     visualTransformation = if (showPassphrase || !state.maskSecrets) VisualTransformation.None
                     else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showPassphrase = !showPassphrase }) {
                             Icon(
                                 imageVector = if (showPassphrase) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (showPassphrase) "Nascondi" else "Mostra"
+                                contentDescription = stringResource(
+                                    if (showPassphrase) R.string.action_hide else R.string.action_show
+                                )
                             )
                         }
                     },

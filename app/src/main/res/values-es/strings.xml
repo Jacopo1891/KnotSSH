@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_back">Atrás</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_add">Añadir</string>
+    <string name="action_new">Nueva</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_remove">Quitar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_connect">Conectar</string>
+    <string name="action_show">Mostrar</string>
+    <string name="action_hide">Ocultar</string>
+    <string name="action_forget">Olvidar</string>
+    <string name="action_forget_all">Olvidar todos</string>
+    <string name="action_restore">Restaurar</string>
+    <string name="action_restore_defaults">Restaurar valores predeterminados</string>
+    <string name="action_favorite">Añadir a favoritos</string>
+    <string name="action_unfavorite">Quitar de favoritos</string>
+    <string name="action_got_it">Entendido</string>
+
+    <string name="unit_lines">%1$d líneas</string>
+    <string name="value_off">Off</string>
+    <string name="value_immediately">De inmediato</string>
+
+    <string name="error_required">Campo obligatorio</string>
+    <string name="error_invalid_port">Puerto no válido (1-65535)</string>
+    <string name="error_pick_credential">Selecciona una credencial</string>
+
+    <string name="time_now">ahora</string>
+    <string name="time_minutes_ago">hace %1$d min</string>
+    <string name="time_hours_ago">hace %1$d h</string>
+    <string name="time_days_ago">hace %1$d días</string>
+
+    <string name="home_search_hint">Buscar servidores…</string>
+    <string name="home_search">Buscar</string>
+    <string name="home_close_search">Cerrar búsqueda</string>
+    <string name="home_new_server">Nuevo servidor</string>
+    <string name="home_add_server">Añadir servidor</string>
+    <string name="home_favorites">Favoritos</string>
+    <string name="home_recents">Recientes</string>
+    <string name="home_delete_title">Eliminar conexión</string>
+    <string name="home_delete_message">¿Eliminar «%1$s»?</string>
+    <string name="home_last_connection">Última conexión: %1$s</string>
+    <string name="home_port_forward_rules">%1$d regla(s) de reenvío de puertos</string>
+    <string name="home_empty_title">Sin conexiones</string>
+    <string name="home_empty_message">Añade tu primer servidor SSH\ncon el botón de abajo</string>
+    <string name="home_empty_search_title">Sin resultados</string>
+    <string name="home_empty_search_message">Prueba con otro término</string>
+
+    <string name="server_new_title">Nuevo servidor</string>
+    <string name="server_edit_title">Editar servidor</string>
+    <string name="server_general_section">Información general</string>
+    <string name="server_alias_label">Alias del servidor (p. ej. Servidor Producción)</string>
+    <string name="server_host_label">IP / Nombre de host</string>
+    <string name="server_port_label">Puerto</string>
+    <string name="server_auth_section">Autenticación</string>
+    <string name="server_credential_label">Cuenta SSH</string>
+    <string name="server_advanced_section">Avanzado</string>
+    <string name="server_keepalive_label">KeepAlive (s)</string>
+    <string name="server_timeout_label">Tiempo de espera (s)</string>
+    <string name="server_add_rule">Añadir regla</string>
+
+    <string name="forward_dialog_title">Añadir regla de reenvío de puertos</string>
+    <string name="forward_local">Local (-L)</string>
+    <string name="forward_remote">Remoto (-R)</string>
+    <string name="forward_local_desc">Un puerto de este dispositivo se reenvía a un host:puerto accesible desde el servidor.</string>
+    <string name="forward_remote_desc">Un puerto del servidor se reenvía a un host:puerto accesible desde este dispositivo.</string>
+    <string name="forward_local_port">Puerto local</string>
+    <string name="forward_target_host">Host de destino</string>
+    <string name="forward_target_port">Puerto de destino</string>
+
+    <string name="credentials_title">Cuentas</string>
+    <string name="credentials_empty">No hay cuentas guardadas</string>
+    <string name="credential_new_title">Nueva cuenta</string>
+    <string name="credential_edit_title">Editar cuenta</string>
+    <string name="credential_user">Usuario: %1$s</string>
+    <string name="credential_type">Tipo: %1$s</string>
+    <string name="credential_alias_label">Alias de la cuenta (p. ej. Admin Prod)</string>
+    <string name="credential_username_label">Nombre de usuario</string>
+    <string name="credential_pem_label">Clave privada PEM</string>
+    <string name="credential_passphrase_label">Frase de contraseña de la clave (opcional)</string>
+    <string name="credential_passphrase_hint">Solo hace falta si la clave privada está cifrada</string>
+    <string name="auth_password">Contraseña</string>
+    <string name="auth_ssh_key">Clave SSH</string>
+
+    <string name="terminal_default_title">Terminal SSH</string>
+    <string name="terminal_copy_output">Copiar salida</string>
+    <string name="terminal_paste">Pegar</string>
+    <string name="terminal_reconnect">Reconectar</string>
+    <string name="terminal_more_actions">Más acciones</string>
+    <string name="terminal_clear_scrollback">Limpiar historial</string>
+    <string name="terminal_reset">Restablecer terminal</string>
+    <string name="terminal_end_session">Terminar sesión</string>
+    <string name="terminal_output_copied">Salida copiada al portapapeles</string>
+    <string name="terminal_clipboard_empty">Portapapeles vacío</string>
+    <string name="terminal_back_hint">Pulsa atrás de nuevo para cerrar o suspender la sesión</string>
+    <string name="terminal_back_keep_alive">Volver a la lista de conexiones dejando la sesión activa</string>
+    <string name="terminal_toggle_keyboard">Mostrar u ocultar el teclado</string>
+    <string name="terminal_leave_title">¿Salir de la sesión?</string>
+    <string name="terminal_leave_message">Puedes dejarla activa en segundo plano y volver desde la notificación, o cerrarla definitivamente.</string>
+    <string name="terminal_leave_message_no_background">Las sesiones en segundo plano están desactivadas en Ajustes › Conexión, así que salir cierra la conexión.</string>
+    <string name="terminal_keep_alive">Dejar activa</string>
+    <string name="terminal_terminate">Terminar</string>
+    <string name="terminal_limit_title">Demasiadas sesiones abiertas</string>
+    <string name="terminal_limit_message">Puedes mantener como máximo %1$d sesiones a la vez. Cierra una desde su notificación o sube el límite en los ajustes de conexión.</string>
+
+    <string name="arrow_up">Arriba</string>
+    <string name="arrow_down">Abajo</string>
+    <string name="arrow_left">Izquierda</string>
+    <string name="arrow_right">Derecha</string>
+
+    <string name="status_online">EN LÍNEA</string>
+    <string name="status_connecting">CONECTANDO</string>
+    <string name="status_retry">REINTENTO %1$d/%2$d</string>
+    <string name="status_ended">TERMINADA</string>
+    <string name="status_disconnected">DESCONECTADO</string>
+
+    <string name="host_key_unknown_title">Host desconocido</string>
+    <string name="host_key_changed_title">Clave de host CAMBIADA</string>
+    <string name="host_key_unknown_message">Primera conexión a %1$s:%2$d. Comprueba que la huella coincida con la del servidor antes de aceptar.</string>
+    <string name="host_key_changed_message">La clave de %1$s:%2$d es distinta de la almacenada. Podría tratarse de un ataque de intermediario, o el servidor se ha reinstalado.</string>
+    <string name="host_key_type">Tipo</string>
+    <string name="host_key_fingerprint">Huella</string>
+    <string name="host_key_expected">Esperada</string>
+    <string name="host_key_received">Recibida</string>
+    <string name="host_key_accept_and_store">Aceptar y guardar</string>
+    <string name="host_key_accept_anyway">Aceptar de todos modos</string>
+
+    <string name="notification_channel_name">Sesiones SSH activas</string>
+    <string name="notification_channel_desc">Una tarjeta silenciosa por cada sesión dejada abierta</string>
+    <string name="notification_session_active">Sesión SSH activa</string>
+    <string name="notification_sessions_active">%1$d sesiones SSH activas</string>
+    <string name="notification_reopen">Reabrir</string>
+    <string name="notification_terminate">Terminar</string>
+
+    <string name="ssh_server_not_found">Servidor no encontrado</string>
+    <string name="ssh_credential_not_found">Credencial asociada no encontrada</string>
+    <string name="ssh_connection_error">Error de conexión</string>
+    <string name="ssh_connecting_to">Conectando a %1$s (%2$s:%3$d)…</string>
+    <string name="ssh_connection_terminated">Conexión terminada: %1$s</string>
+    <string name="ssh_session_closed">Sesión cerrada (código %1$d)</string>
+    <string name="ssh_bad_private_key">Clave privada no válida o frase de contraseña incorrecta: %1$s</string>
+    <string name="ssh_dynamic_forward_unsupported">El reenvío dinámico de puertos (SOCKS) en el puerto %1$d no es compatible con la biblioteca SSH: regla ignorada.</string>
+    <string name="ssh_forward_rule_failed">La regla %1$s en el puerto %2$d no se aplicó: %3$s</string>
+    <string name="ssh_unknown_host">El host %1$s:%2$d es desconocido (%3$s). La política de claves de host actual no permite confiar en él automáticamente.</string>
+    <string name="ssh_host_key_changed">ATENCIÓN: la clave de host de %1$s:%2$d ha cambiado.\nEsperada: %3$s\nRecibida: %4$s\nPosible ataque de intermediario.</string>
+    <string name="ssh_host_key_declined">Conexión cancelada: clave de host no aceptada.</string>
+
+    <string name="biometric_title">Desbloquear KnotSSH</string>
+    <string name="biometric_subtitle">Se requiere autenticación para acceder a las credenciales</string>
+    <string name="biometric_locked">KnotSSH está bloqueado</string>
+    <string name="biometric_unlock">Desbloquear</string>
+    <string name="biometric_no_method">No hay ningún método de desbloqueo configurado en el dispositivo.</string>
+
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_appearance">Apariencia</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_keyboard">Teclado</string>
+    <string name="settings_connection">Conexión</string>
+    <string name="settings_security">Seguridad</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_backup">Copia de seguridad y restauración</string>
+    <string name="settings_backup_summary">Sincronización en la nube y valores predeterminados</string>
+
+    <string name="summary_scrollback">%1$d líneas</string>
+    <string name="summary_auto_size">tamaño automático</string>
+    <string name="summary_key_bar_on">barra de teclas activa</string>
+    <string name="summary_key_bar_off">barra de teclas oculta</string>
+    <string name="summary_custom_keys">%1$d teclas rápidas</string>
+    <string name="summary_quick_commands">%1$d comandos</string>
+    <string name="summary_keepalive">keep-alive %1$ds</string>
+    <string name="summary_keepalive_off">keep-alive off</string>
+    <string name="summary_reconnect_on">reconexión automática</string>
+    <string name="summary_reconnect_off">sin reconexión</string>
+    <string name="summary_compression_on">comprimida</string>
+    <string name="summary_compression_off">sin comprimir</string>
+    <string name="summary_known_hosts">%1$d hosts conocidos</string>
+    <string name="summary_biometric_on">desbloqueo biométrico</string>
+    <string name="summary_biometric_off">sin desbloqueo</string>
+    <string name="summary_bell_off">campana off</string>
+    <string name="summary_bell_vibrate">campana vibra</string>
+    <string name="summary_bell_sound">campana sonora</string>
+    <string name="summary_hostkey_strict">verificación estricta</string>
+    <string name="summary_hostkey_prompt">pide confirmación</string>
+    <string name="summary_hostkey_any">⚠ sin verificación</string>
+
+    <string name="section_application">Aplicación</string>
+    <string name="section_buffer">Búfer</string>
+    <string name="section_size">Dimensiones</string>
+    <string name="section_behaviour">Comportamiento</string>
+    <string name="section_key_bar">Barra de teclas especiales</string>
+    <string name="section_quick_commands">Comandos rápidos</string>
+    <string name="section_input">Entrada</string>
+    <string name="section_session">Sesión</string>
+    <string name="section_reconnection">Reconexión</string>
+    <string name="section_background">En segundo plano</string>
+    <string name="section_host_keys">Claves de host</string>
+    <string name="section_app_access">Acceso a la aplicación</string>
+    <string name="section_privacy">Privacidad</string>
+    <string name="section_backup">Copia de seguridad</string>
+    <string name="section_restore">Restauración</string>
+
+    <string name="appearance_theme">Tema</string>
+    <string name="appearance_dynamic_color_desc">Usar la paleta Material You del sistema</string>
+    <string name="appearance_terminal_theme">Tema del terminal</string>
+    <string name="appearance_terminal_theme_desc">Fondo, texto y paleta ANSI</string>
+    <string name="appearance_font">Fuente</string>
+    <string name="appearance_font_size">Tamaño de fuente</string>
+    <string name="appearance_ansi_colors">Colores ANSI</string>
+    <string name="appearance_ansi_colors_desc">Interpretar las secuencias de color enviadas por el servidor</string>
+    <string name="appearance_cursor_blink">Cursor parpadeante</string>
+
+    <string name="theme_mode_system">Sistema</string>
+    <string name="theme_mode_light">Claro</string>
+    <string name="theme_mode_dark">Oscuro</string>
+
+    <string name="terminal_theme_dark">Oscuro</string>
+    <string name="terminal_theme_light">Claro</string>
+
+    <string name="terminal_scrollback">Líneas de historial</string>
+    <string name="terminal_scrollback_desc">Historial mantenido en memoria. Valores altos consumen más RAM.</string>
+    <string name="terminal_auto_size">Adaptar al tamaño de la pantalla</string>
+    <string name="terminal_auto_size_desc">Informa al servidor de las filas y columnas reales de la pantalla</string>
+    <string name="terminal_fixed_columns">Columnas fijas</string>
+    <string name="terminal_fixed_rows">Filas fijas</string>
+    <string name="terminal_clickable_urls">URL clicables</string>
+    <string name="terminal_clickable_urls_desc">Detecta las direcciones http/https en la salida y las abre en el navegador</string>
+    <string name="terminal_bell">Campana (BEL)</string>
+    <string name="terminal_bell_desc">Comportamiento cuando el servidor envía \\a</string>
+    <string name="bell_none">Ninguno</string>
+    <string name="bell_vibrate">Vibración</string>
+    <string name="bell_sound">Sonido</string>
+    <string name="terminal_keep_screen_on">Mantener la pantalla encendida</string>
+    <string name="terminal_keep_screen_on_desc">Solo durante una sesión SSH activa</string>
+
+    <string name="keyboard_show_bar">Mostrar la barra</string>
+    <string name="keyboard_show_bar_desc">ESC, TAB, flechas, CTRL/ALT y teclas personalizadas</string>
+    <string name="keyboard_quick_bar_desc">Chips que envían un comando completo con salto de línea</string>
+    <string name="keyboard_manage_keys">Gestionar teclas rápidas (%1$d)</string>
+    <string name="keyboard_manage_commands">Gestionar comandos rápidos (%1$d)</string>
+    <string name="keyboard_auto_show">Abrir el teclado automáticamente</string>
+    <string name="keyboard_auto_show_desc">Al conectar. Tocar el búfer lo abre igualmente.</string>
+    <string name="keyboard_swipe_scroll">Desplazar con los dedos en apps a pantalla completa</string>
+    <string name="keyboard_swipe_scroll_desc">En vim, less y similares un deslizamiento vertical envía flechas arriba/abajo</string>
+    <string name="keyboard_haptics">Respuesta háptica</string>
+    <string name="keyboard_haptics_desc">Vibración breve en las teclas de la barra</string>
+
+    <string name="connection_keepalive">Keep-alive</string>
+    <string name="connection_keepalive_desc">Intervalo de los paquetes de mantenimiento. 0 lo desactiva.</string>
+    <string name="connection_timeout">Tiempo de espera de conexión</string>
+    <string name="connection_compression">Compresión</string>
+    <string name="connection_compression_desc">Útil en redes lentas, aumenta el uso de CPU</string>
+    <string name="connection_close_on_exit">Cerrar el terminal al terminar la sesión</string>
+    <string name="connection_close_on_exit_desc">Tras un exit vuelve solo a la lista de conexiones</string>
+    <string name="connection_close_delay">Espera antes de cerrar</string>
+    <string name="connection_close_delay_desc">Tiempo para leer el mensaje de cierre</string>
+    <string name="connection_auto_reconnect">Reconexión automática</string>
+    <string name="connection_auto_reconnect_desc">Reintenta cuando la sesión cae por motivos de red</string>
+    <string name="connection_reconnect_attempts">Intentos de reconexión</string>
+    <string name="connection_max_sessions">Sesiones simultáneas</string>
+    <string name="connection_max_sessions_desc">Cuántas conexiones puedes mantener abiertas a la vez. Cada una ocupa un hilo y su propio historial.</string>
+    <string name="connection_background_sessions">Sesiones en segundo plano</string>
+    <string name="connection_background_sessions_desc">Permite suspender una sesión y volver a ella desde la notificación persistente</string>
+    <string name="connection_wake_lock_desc">Impide que la CPU se suspenda durante la sesión</string>
+    <string name="connection_wake_lock_duration">Duración máxima del wake lock</string>
+
+    <string name="security_host_key_check">Verificación de la clave de host</string>
+    <string name="security_host_key_strict_desc">Solo hosts ya almacenados. Máxima seguridad.</string>
+    <string name="security_host_key_prompt_desc">Pide confirmación mostrando la huella en el primer acceso.</string>
+    <string name="security_host_key_tofu_desc">La guarda automáticamente en el primer acceso y bloquea si la clave cambia.</string>
+    <string name="security_host_key_any_desc">⚠ Ninguna protección frente a ataques de intermediario.</string>
+    <string name="host_key_strict">Estricta</string>
+    <string name="host_key_prompt">Preguntar</string>
+    <string name="host_key_none">Ninguna</string>
+    <string name="security_known_hosts_button">Hosts conocidos (%1$d)</string>
+    <string name="security_biometric">Desbloqueo biométrico</string>
+    <string name="security_biometric_desc">Pide huella, rostro o PIN al abrir la aplicación</string>
+    <string name="security_relock_grace">Margen de rebloqueo</string>
+    <string name="security_relock_grace_desc">Tiempo en segundo plano antes de volver a pedir la autenticación</string>
+    <string name="security_allow_screenshot">Permitir capturas de pantalla</string>
+    <string name="security_allow_screenshot_desc">Si está desactivado, toda la aplicación bloquea la captura de pantalla y la vista previa en recientes</string>
+    <string name="security_mask_secrets">Ocultar secretos en los formularios</string>
+    <string name="security_mask_secrets_desc">Enmascara contraseñas y claves privadas en la pantalla de cuentas</string>
+    <string name="security_verbose_logs">Registros SSH detallados</string>
+    <string name="security_verbose_logs_desc">Solo compilaciones de depuración. Escribe la negociación SSH en Logcat.</string>
+
+    <string name="known_hosts_title">Hosts conocidos</string>
+    <string name="known_hosts_empty">No hay ninguna clave de host almacenada.</string>
+    <string name="quick_commands_title">Comandos rápidos</string>
+    <string name="quick_commands_hint">Aparecen como chips sobre el teclado del terminal y se envían con salto de línea.</string>
+    <string name="custom_keys_title">Teclas rápidas</string>
+    <string name="custom_keys_hint">Aparecen sobre la barra de teclas especiales y envían la secuencia al instante, sin salto de línea.</string>
+    <string name="field_label">Etiqueta</string>
+    <string name="field_label_optional">Etiqueta (opcional)</string>
+    <string name="field_command">Comando</string>
+    <string name="field_modifier">Modificador</string>
+    <string name="field_key">Tecla</string>
+    <string name="field_key_hint">Un solo carácter, p. ej. C para Ctrl+C</string>
+    <string name="modifier_none">Ninguno</string>
+
+    <string name="backup_drive_sync">Sincronización con Google Drive</string>
+    <string name="backup_drive_sync_desc">Todavía no disponible en esta versión</string>
+    <string name="backup_reset_title">Restaurar ajustes</string>
+    <string name="backup_reset_message">Todas las preferencias vuelven a sus valores predeterminados. Los servidores, las credenciales y los hosts conocidos no se tocan.</string>
+    <string name="backup_reset_button">Restaurar ajustes predeterminados</string>
+
+    <string name="language_system">Idioma del sistema</string>
+    <string name="language_description">Se aplica a toda la aplicación. No hace falta reiniciar.</string>
+</resources>

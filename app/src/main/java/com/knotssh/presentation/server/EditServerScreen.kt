@@ -14,10 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.R
 import com.knotssh.domain.model.ForwardType
 import com.knotssh.domain.model.PortForwardRule
 
@@ -39,15 +41,28 @@ fun EditServerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (serverId == null) "Nuovo Server" else "Modifica Server") },
+                title = {
+                    Text(
+                        stringResource(
+                            if (serverId == null) R.string.server_new_title
+                            else R.string.server_edit_title
+                        )
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back)
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.save() }) {
-                        Icon(Icons.Default.Check, contentDescription = "Salva")
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = stringResource(R.string.action_save)
+                        )
                     }
                 }
             )
@@ -72,7 +87,7 @@ fun EditServerScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "Informazioni Generali",
+                            text = stringResource(R.string.server_general_section),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -80,9 +95,9 @@ fun EditServerScreen(
                         OutlinedTextField(
                             value = state.alias,
                             onValueChange = viewModel::onAliasChanged,
-                            label = { Text("Alias server (es. Server Produzione)") },
+                            label = { Text(stringResource(R.string.server_alias_label)) },
                             isError = state.aliasError != null,
-                            supportingText = state.aliasError?.let { { Text(it) } },
+                            supportingText = state.aliasError?.let { { Text(stringResource(it)) } },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -94,18 +109,18 @@ fun EditServerScreen(
                             OutlinedTextField(
                                 value = state.hostname,
                                 onValueChange = viewModel::onHostnameChanged,
-                                label = { Text("IP / Hostname") },
+                                label = { Text(stringResource(R.string.server_host_label)) },
                                 isError = state.hostnameError != null,
-                                supportingText = state.hostnameError?.let { { Text(it) } },
+                                supportingText = state.hostnameError?.let { { Text(stringResource(it)) } },
                                 singleLine = true,
                                 modifier = Modifier.weight(0.7f)
                             )
                             OutlinedTextField(
                                 value = state.port,
                                 onValueChange = viewModel::onPortChanged,
-                                label = { Text("Porta") },
+                                label = { Text(stringResource(R.string.server_port_label)) },
                                 isError = state.portError != null,
-                                supportingText = state.portError?.let { { Text(it) } },
+                                supportingText = state.portError?.let { { Text(stringResource(it)) } },
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(0.3f)
@@ -131,14 +146,14 @@ fun EditServerScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Autenticazione",
+                                text = stringResource(R.string.server_auth_section),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             TextButton(onClick = onNavigateToAddCredential) {
                                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(Modifier.width(4.dp))
-                                Text("Nuova")
+                                Text(stringResource(R.string.action_new))
                             }
                         }
 
@@ -153,10 +168,10 @@ fun EditServerScreen(
                                 value = selectedCred?.let { "${it.alias} (${it.username})" } ?: "",
                                 onValueChange = {},
                                 readOnly = true,
-                                label = { Text("Utenza SSH") },
+                                label = { Text(stringResource(R.string.server_credential_label)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded) },
                                 isError = state.credentialError != null,
-                                supportingText = state.credentialError?.let { { Text(it) } },
+                                supportingText = state.credentialError?.let { { Text(stringResource(it)) } },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .menuAnchor()
@@ -191,7 +206,7 @@ fun EditServerScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = "Avanzate",
+                            text = stringResource(R.string.server_advanced_section),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -199,14 +214,14 @@ fun EditServerScreen(
                             OutlinedTextField(
                                 value = state.keepAliveSeconds,
                                 onValueChange = viewModel::onKeepAliveChanged,
-                                label = { Text("KeepAlive (s)") },
+                                label = { Text(stringResource(R.string.server_keepalive_label)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(0.5f)
                             )
                             OutlinedTextField(
                                 value = state.connectTimeoutSeconds,
                                 onValueChange = viewModel::onTimeoutChanged,
-                                label = { Text("Timeout (s)") },
+                                label = { Text(stringResource(R.string.server_timeout_label)) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.weight(0.5f)
                             )
@@ -223,12 +238,15 @@ fun EditServerScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Port Forwarding",
+                        text = stringResource(R.string.server_port_forwarding),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                     IconButton(onClick = { showAddRuleDialog = true }) {
-                        Icon(Icons.Default.AddCircle, contentDescription = "Aggiungi regola")
+                        Icon(
+                            Icons.Default.AddCircle,
+                            contentDescription = stringResource(R.string.server_add_rule)
+                        )
                     }
                 }
             }
@@ -252,7 +270,11 @@ fun EditServerScreen(
                             )
                         }
                         IconButton(onClick = { viewModel.removePortForwardRule(rule) }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Rimuovi", tint = MaterialTheme.colorScheme.error)
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.action_remove),
+                                tint = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                 }
@@ -289,36 +311,36 @@ fun AddPortForwardDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Aggiungi regola di port forwarding") },
+        title = { Text(stringResource(R.string.forward_dialog_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(
                         selected = type == ForwardType.LOCAL,
                         onClick = { type = ForwardType.LOCAL },
-                        label = { Text("Locale (-L)") }
+                        label = { Text(stringResource(R.string.forward_local)) }
                     )
                     FilterChip(
                         selected = type == ForwardType.REMOTE,
                         onClick = { type = ForwardType.REMOTE },
-                        label = { Text("Remoto (-R)") }
+                        label = { Text(stringResource(R.string.forward_remote)) }
                     )
                 }
                 Text(
-                    text = if (type == ForwardType.LOCAL)
-                        "Una porta di questo dispositivo viene inoltrata verso host:porta raggiungibili dal server."
-                    else
-                        "Una porta del server viene inoltrata verso host:porta raggiungibili da questo dispositivo.",
+                    text = stringResource(
+                        if (type == ForwardType.LOCAL) R.string.forward_local_desc
+                        else R.string.forward_remote_desc
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 OutlinedTextField(
                     value = localPort,
                     onValueChange = { localPort = it.filter(Char::isDigit).take(5) },
-                    label = { Text("Porta locale") },
+                    label = { Text(stringResource(R.string.forward_local_port)) },
                     isError = localPort.isNotEmpty() && !localPortValid,
                     supportingText = if (localPort.isNotEmpty() && !localPortValid) {
-                        { Text("1-65535") }
+                        { Text(stringResource(R.string.port_range)) }
                     } else null,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -326,16 +348,16 @@ fun AddPortForwardDialog(
                 OutlinedTextField(
                     value = remoteHost,
                     onValueChange = { remoteHost = it },
-                    label = { Text("Host di destinazione") },
+                    label = { Text(stringResource(R.string.forward_target_host)) },
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = remotePort,
                     onValueChange = { remotePort = it.filter(Char::isDigit).take(5) },
-                    label = { Text("Porta di destinazione") },
+                    label = { Text(stringResource(R.string.forward_target_port)) },
                     isError = remotePort.isNotEmpty() && !remotePortValid,
                     supportingText = if (remotePort.isNotEmpty() && !remotePortValid) {
-                        { Text("1-65535") }
+                        { Text(stringResource(R.string.port_range)) }
                     } else null,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -355,10 +377,10 @@ fun AddPortForwardDialog(
                         )
                     )
                 }
-            ) { Text("Aggiungi") }
+            ) { Text(stringResource(R.string.action_add)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Annulla") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         }
     )
 }

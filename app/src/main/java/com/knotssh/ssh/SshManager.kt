@@ -10,6 +10,7 @@ import com.jcraft.jsch.Session
 import com.jcraft.jsch.UIKeyboardInteractive
 import com.jcraft.jsch.UserInfo
 import com.knotssh.BuildConfig
+import com.knotssh.R
 import com.knotssh.data.local.preferences.ConnectionSettings
 import com.knotssh.data.local.preferences.HostKeyPolicy
 import com.knotssh.domain.model.AuthType
@@ -143,7 +144,7 @@ class SshManager @Inject constructor(
             } catch (e: JSchException) {
                 releaseWakeLock()
                 throw IllegalArgumentException(
-                    "Chiave privata non valida o passphrase errata: ${e.message}", e
+                    context.getString(R.string.ssh_bad_private_key, e.message.orEmpty()), e
                 )
             } finally {
                 keyBytes.fill(0)
@@ -186,11 +187,11 @@ class SshManager @Inject constructor(
             throw e
         } catch (e: Exception) {
             releaseWakeLock()
-            gate.rejection?.let { throw HostKeyException(it, describe(it, server)) }
+            gate.rejection?.let { throw HostKeyException(it, describe(context, it, server)) }
             throw e
         }
 
-        applyPortForwarding(session, server)
+        applyPortForwarding(context, session, server)
 
         val channel = session.openChannel("shell") as ChannelShell
         channel.setPty(true)
@@ -208,7 +209,7 @@ class SshManager @Inject constructor(
             .also { connection = it }
     }
 
-    private fun applyPortForwarding(session: Session, server: Server) {
+    private fun applyPortForwarding(context: Context, session: Session, server: Server) {
         server.portForwardRules.forEach { rule ->
             try {
                 when (rule.type) {
@@ -224,10 +225,15 @@ class SshManager @Inject constructor(
                     )
                     // JSch ships no SOCKS server, so this rule cannot be honoured.
                     ForwardType.DYNAMIC -> _warnings +=
-                        "Port forwarding dinamico (SOCKS) sulla porta ${rule.localPort} non è supportato dalla libreria SSH: regola ignorata."
+                        context.getString(R.string.ssh_dynamic_forward_unsupported, rule.localPort)
                 }
             } catch (e: JSchException) {
-                _warnings += "Regola ${rule.type} porta ${rule.localPort} non applicata: ${e.message}"
+                _warnings += context.getString(
+                    R.string.ssh_forward_rule_failed,
+                    rule.type.name,
+                    rule.localPort,
+                    e.message.orEmpty()
+                )
             }
         }
     }
@@ -272,13 +278,25 @@ class SshManager @Inject constructor(
         }
     }
 
-    private fun describe(rejection: HostKeyRejection, server: Server): String = when (rejection) {
-        is HostKeyRejection.UnknownHost ->
-            "Host ${server.hostname}:${server.port} sconosciuto (${rejection.fingerprint}). La politica chiavi host attuale non consente di fidarsi automaticamente."
-        is HostKeyRejection.KeyChanged ->
-            "ATTENZIONE: la chiave host di ${server.hostname}:${server.port} è cambiata.\nAttesa:   ${rejection.expected}\nRicevuta: ${rejection.actual}\nPossibile attacco man-in-the-middle."
-        HostKeyRejection.UserDeclined ->
-            "Connessione annullata: chiave host non accettata."
+    private fun describe(
+        context: Context,
+        rejection: HostKeyRejection,
+        server: Server
+    ): String = when (rejection) {
+        is HostKeyRejection.UnknownHost -> context.getString(
+            R.string.ssh_unknown_host,
+            server.hostname,
+            server.port,
+            rejection.fingerprint
+        )
+        is HostKeyRejection.KeyChanged -> context.getString(
+            R.string.ssh_host_key_changed,
+            server.hostname,
+            server.port,
+            rejection.expected,
+            rejection.actual
+        )
+        HostKeyRejection.UserDeclined -> context.getString(R.string.ssh_host_key_declined)
     }
 
     private fun configureLogging(verbose: Boolean) {
@@ -316,8 +334,8 @@ class SshManager @Inject constructor(
 
     /** Distinguishes "the shell closed" from "the transport went down". */
     fun livenessReport(): String {
-        val current = connection ?: return "nessuna sessione"
-        return "sessione=${current.sessionAlive} canale=${current.channelAlive}"
+        val current = connection ?: return "no session"
+        return "session=${current.sessionAlive} channel=${current.channelAlive}"
     }
 
     fun disconnect() {

@@ -28,7 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.knotssh.R
 import com.knotssh.domain.model.CustomKey
 import com.knotssh.domain.model.KeyModifier
 import com.knotssh.domain.model.KnownHost
@@ -43,10 +45,10 @@ internal fun KnownHostsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Host conosciuti") },
+        title = { Text(stringResource(R.string.known_hosts_title)) },
         text = {
             if (hosts.isEmpty()) {
-                Text("Nessuna chiave host memorizzata.")
+                Text(stringResource(R.string.known_hosts_empty))
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(hosts.size, key = { hosts[it].id }) { index ->
@@ -69,7 +71,7 @@ internal fun KnownHostsDialog(
                             IconButton(onClick = { onForget(host.id) }) {
                                 Icon(
                                     Icons.Default.Delete,
-                                    contentDescription = "Dimentica",
+                                    contentDescription = stringResource(R.string.action_forget),
                                     tint = MaterialTheme.colorScheme.error
                                 )
                             }
@@ -78,11 +80,16 @@ internal fun KnownHostsDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Chiudi") } },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
+        },
         dismissButton = {
             if (hosts.isNotEmpty()) {
                 TextButton(onClick = onForgetAll) {
-                    Text("Dimentica tutti", color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = stringResource(R.string.action_forget_all),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
@@ -102,25 +109,25 @@ internal fun QuickCommandsDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Comandi rapidi") },
+        title = { Text(stringResource(R.string.quick_commands_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "Appaiono come chip sopra la tastiera del terminale e vengono inviati con a capo.",
+                    stringResource(R.string.quick_commands_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 OutlinedTextField(
                     value = label,
                     onValueChange = { label = it },
-                    label = { Text("Etichetta") },
+                    label = { Text(stringResource(R.string.field_label)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = command,
                     onValueChange = { command = it },
-                    label = { Text("Comando") },
+                    label = { Text(stringResource(R.string.field_command)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -132,7 +139,7 @@ internal fun QuickCommandsDialog(
                     },
                     enabled = canAdd,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Aggiungi") }
+                ) { Text(stringResource(R.string.action_add)) }
 
                 if (commands.isNotEmpty()) {
                     HorizontalDivider()
@@ -157,7 +164,7 @@ internal fun QuickCommandsDialog(
                                 IconButton(onClick = { onDelete(item.id) }) {
                                     Icon(
                                         Icons.Default.Delete,
-                                        contentDescription = "Elimina",
+                                        contentDescription = stringResource(R.string.action_delete),
                                         tint = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -167,7 +174,9 @@ internal fun QuickCommandsDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Chiudi") } }
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
+        }
     )
 }
 
@@ -189,21 +198,21 @@ internal fun CustomKeysDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Tasti rapidi") },
+        title = { Text(stringResource(R.string.custom_keys_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    "Compaiono sopra la barra dei tasti speciali e inviano la sequenza subito, senza a capo.",
+                    stringResource(R.string.custom_keys_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 ChoiceRow(
-                    title = "Modificatore",
+                    title = stringResource(R.string.field_modifier),
                     options = listOf(
                         KeyModifier.CTRL to "Ctrl",
                         KeyModifier.ALT to "Alt",
                         KeyModifier.CTRL_ALT to "Ctrl+Alt",
-                        KeyModifier.NONE to "Nessuno"
+                        KeyModifier.NONE to stringResource(R.string.modifier_none)
                     ),
                     selected = modifier,
                     onSelected = { modifier = it }
@@ -211,15 +220,15 @@ internal fun CustomKeysDialog(
                 OutlinedTextField(
                     value = base,
                     onValueChange = { base = it.takeLast(1) },
-                    label = { Text("Tasto") },
-                    supportingText = { Text("Un solo carattere, es. C per Ctrl+C") },
+                    label = { Text(stringResource(R.string.field_key)) },
+                    supportingText = { Text(stringResource(R.string.field_key_hint)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
                     value = label,
                     onValueChange = { label = it },
-                    label = { Text("Etichetta (opzionale)") },
+                    label = { Text(stringResource(R.string.field_label_optional)) },
                     placeholder = { Text(if (canAdd) defaultLabel(modifier, base) else "") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -232,7 +241,7 @@ internal fun CustomKeysDialog(
                     },
                     enabled = canAdd,
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("Aggiungi") }
+                ) { Text(stringResource(R.string.action_add)) }
 
                 if (keys.isNotEmpty()) {
                     HorizontalDivider()
@@ -254,7 +263,7 @@ internal fun CustomKeysDialog(
                                 IconButton(onClick = { onDelete(key.id) }) {
                                     Icon(
                                         Icons.Default.Delete,
-                                        contentDescription = "Elimina",
+                                        contentDescription = stringResource(R.string.action_delete),
                                         tint = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -264,9 +273,13 @@ internal fun CustomKeysDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Chiudi") } },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
+        },
         dismissButton = {
-            TextButton(onClick = onRestoreDefaults) { Text("Ripristina predefiniti") }
+            TextButton(onClick = onRestoreDefaults) {
+                Text(stringResource(R.string.action_restore_defaults))
+            }
         }
     )
 }

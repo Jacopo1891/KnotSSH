@@ -13,7 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.knotssh.R
 
 /**
  * A swipe-to-reveal container that shows a red delete background on swipe.
@@ -58,7 +60,7 @@ fun SwipeToDeleteContainer(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Elimina",
+                    contentDescription = stringResource(R.string.action_delete),
                     tint = MaterialTheme.colorScheme.onErrorContainer
                 )
             }

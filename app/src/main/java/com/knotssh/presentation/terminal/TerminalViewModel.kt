@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.knotssh.R
 import com.knotssh.data.local.preferences.AppPreferences
 import com.knotssh.data.local.preferences.ConnectionSettings
 import com.knotssh.data.local.preferences.TerminalSettings
@@ -52,6 +53,8 @@ class TerminalViewModel @Inject constructor(
 
     private val _session = MutableStateFlow<SshSession?>(null)
 
+    private val defaultTitle = context.getString(R.string.terminal_default_title)
+
     private val _limitReached = MutableStateFlow<Int?>(null)
     val limitReached: StateFlow<Int?> = _limitReached.asStateFlow()
 
@@ -81,8 +84,8 @@ class TerminalViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, TerminalStatus.Connecting)
 
     val title: StateFlow<String> = _session
-        .flatMapLatest { it?.title ?: flowOf("Terminale SSH") }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, "Terminale SSH")
+        .flatMapLatest { it?.title ?: flowOf(defaultTitle) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, defaultTitle)
 
     val hostKeyPrompt: StateFlow<HostKeyVerdict?> = _session
         .flatMapLatest { it?.hostKeyPrompt ?: flowOf(null) }

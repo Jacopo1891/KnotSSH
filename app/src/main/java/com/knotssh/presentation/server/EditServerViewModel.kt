@@ -1,8 +1,10 @@
 package com.knotssh.presentation.server
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.knotssh.R
 import com.knotssh.domain.model.*
 import com.knotssh.domain.repository.CredentialRepository
 import com.knotssh.domain.repository.ServerRepository
@@ -22,11 +24,11 @@ data class EditServerUiState(
     val credentials: List<Credential> = emptyList(),
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
-    // Validation errors
-    val aliasError: String? = null,
-    val hostnameError: String? = null,
-    val portError: String? = null,
-    val credentialError: String? = null,
+    // Validation errors, as string resources so they follow the app language
+    @StringRes val aliasError: Int? = null,
+    @StringRes val hostnameError: Int? = null,
+    @StringRes val portError: Int? = null,
+    @StringRes val credentialError: Int? = null,
     val testConnectionResult: TestResult? = null
 )
 
@@ -92,11 +94,19 @@ class EditServerViewModel @Inject constructor(
         val s = _state.value
         var hasError = false
 
-        if (s.alias.isBlank()) { _state.update { it.copy(aliasError = "Campo obbligatorio") }; hasError = true }
-        if (s.hostname.isBlank()) { _state.update { it.copy(hostnameError = "Campo obbligatorio") }; hasError = true }
+        if (s.alias.isBlank()) {
+            _state.update { it.copy(aliasError = R.string.error_required) }; hasError = true
+        }
+        if (s.hostname.isBlank()) {
+            _state.update { it.copy(hostnameError = R.string.error_required) }; hasError = true
+        }
         val portInt = s.port.toIntOrNull()
-        if (portInt == null || portInt !in 1..65535) { _state.update { it.copy(portError = "Porta non valida (1-65535)") }; hasError = true }
-        if (s.selectedCredentialId == null) { _state.update { it.copy(credentialError = "Seleziona una credenziale") }; hasError = true }
+        if (portInt == null || portInt !in 1..65535) {
+            _state.update { it.copy(portError = R.string.error_invalid_port) }; hasError = true
+        }
+        if (s.selectedCredentialId == null) {
+            _state.update { it.copy(credentialError = R.string.error_pick_credential) }; hasError = true
+        }
         if (hasError) return
 
         viewModelScope.launch {

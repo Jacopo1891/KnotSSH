@@ -12,8 +12,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.R
 
 @Composable
 fun BackupSettingsScreen(
@@ -26,39 +28,46 @@ fun BackupSettingsScreen(
     if (showResetConfirm) {
         AlertDialog(
             onDismissRequest = { showResetConfirm = false },
-            title = { Text("Ripristina impostazioni") },
-            text = { Text("Tutte le preferenze tornano ai valori predefiniti. Server, credenziali e host conosciuti non vengono toccati.") },
+            title = { Text(stringResource(R.string.backup_reset_title)) },
+            text = { Text(stringResource(R.string.backup_reset_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.resetToDefaults()
                     showResetConfirm = false
-                }) { Text("Ripristina", color = MaterialTheme.colorScheme.error) }
+                }) {
+                    Text(
+                        text = stringResource(R.string.action_restore),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             },
             dismissButton = {
-                TextButton(onClick = { showResetConfirm = false }) { Text("Annulla") }
+                TextButton(onClick = { showResetConfirm = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             }
         )
     }
 
-    SettingsScaffold(title = "Backup e ripristino", onBack = onBack) {
-        item { SettingsSection("Backup") }
+    SettingsScaffold(title = stringResource(R.string.settings_backup), onBack = onBack) {
+        item { SettingsSection(stringResource(R.string.section_backup)) }
         item {
             SwitchRow(
-                title = "Sincronizzazione Google Drive",
-                description = "Non ancora disponibile in questa versione",
+                title = stringResource(R.string.backup_drive_sync),
+                description = stringResource(R.string.backup_drive_sync_desc),
                 checked = driveSync,
                 enabled = false,
                 onCheckedChange = viewModel::setGoogleDriveSync
             )
         }
 
-        item { SettingsSection("Ripristino") }
+        item { SettingsSection(stringResource(R.string.section_restore)) }
         item {
             OutlinedButton(
                 onClick = { showResetConfirm = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ripristina impostazioni predefinite")
+                Text(stringResource(R.string.backup_reset_button))
             }
         }
     }

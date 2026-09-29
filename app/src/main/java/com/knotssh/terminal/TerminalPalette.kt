@@ -1,5 +1,8 @@
 package com.knotssh.terminal
 
+import androidx.annotation.StringRes
+import com.knotssh.R
+
 /**
  * A resolved colour scheme for the terminal: background, default foreground and the full
  * 256-entry ANSI table.
@@ -16,13 +19,13 @@ class TerminalPalette(
     fun color(index: Int): Int = colors[index.coerceIn(0, 255)]
 }
 
-enum class TerminalTheme(val displayName: String) {
-    DARK("Scuro"),
-    LIGHT("Chiaro"),
-    HACKER("Hacker '80"),
-    MOLOKAI("Molokai"),
-    SOLARIZED_DARK("Solarized Dark"),
-    SOLARIZED_LIGHT("Solarized Light");
+enum class TerminalTheme(@StringRes val labelRes: Int) {
+    DARK(R.string.terminal_theme_dark),
+    LIGHT(R.string.terminal_theme_light),
+    HACKER(R.string.terminal_theme_hacker),
+    MOLOKAI(R.string.terminal_theme_molokai),
+    SOLARIZED_DARK(R.string.terminal_theme_solarized_dark),
+    SOLARIZED_LIGHT(R.string.terminal_theme_solarized_light);
 
     val palette: TerminalPalette by lazy { AnsiPalette.build(background, foreground, base16) }
 

@@ -1,8 +1,10 @@
 package com.knotssh.presentation.credentials
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.knotssh.R
 import com.knotssh.data.local.preferences.AppPreferences
 import com.knotssh.domain.model.AuthType
 import com.knotssh.domain.model.Credential
@@ -49,9 +51,9 @@ data class EditCredentialUiState(
     val maskSecrets: Boolean = true,
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
-    val aliasError: String? = null,
-    val usernameError: String? = null,
-    val secretError: String? = null
+    @StringRes val aliasError: Int? = null,
+    @StringRes val usernameError: Int? = null,
+    @StringRes val secretError: Int? = null
 )
 
 @HiltViewModel
@@ -100,15 +102,15 @@ class EditCredentialViewModel @Inject constructor(
         val current = _state.value
         var hasError = false
         if (current.alias.isBlank()) {
-            _state.update { it.copy(aliasError = "Campo obbligatorio") }
+            _state.update { it.copy(aliasError = R.string.error_required) }
             hasError = true
         }
         if (current.username.isBlank()) {
-            _state.update { it.copy(usernameError = "Campo obbligatorio") }
+            _state.update { it.copy(usernameError = R.string.error_required) }
             hasError = true
         }
         if (current.secret.isBlank()) {
-            _state.update { it.copy(secretError = "Campo obbligatorio") }
+            _state.update { it.copy(secretError = R.string.error_required) }
             hasError = true
         }
         if (hasError) return

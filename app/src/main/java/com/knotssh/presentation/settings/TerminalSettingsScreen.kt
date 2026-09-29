@@ -2,8 +2,11 @@ package com.knotssh.presentation.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.R
 import com.knotssh.data.local.preferences.BellMode
 import com.knotssh.data.local.preferences.Defaults
 
@@ -13,33 +16,35 @@ fun TerminalSettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val terminal by viewModel.terminal.collectAsStateWithLifecycle()
+    // valueLabel is a plain lambda, so the formatted string is resolved outside composition.
+    val resources = LocalContext.current.resources
 
-    SettingsScaffold(title = "Terminale", onBack = onBack) {
-        item { SettingsSection("Buffer") }
+    SettingsScaffold(title = stringResource(R.string.settings_terminal), onBack = onBack) {
+        item { SettingsSection(stringResource(R.string.section_buffer)) }
         item {
             SliderRow(
-                title = "Righe di scrollback",
-                description = "Storico mantenuto in memoria. Valori alti consumano più RAM.",
+                title = stringResource(R.string.terminal_scrollback),
+                description = stringResource(R.string.terminal_scrollback_desc),
                 value = terminal.scrollbackLines,
                 range = Defaults.SCROLLBACK_MIN..Defaults.SCROLLBACK_MAX,
                 step = 500,
-                valueLabel = { "$it righe" },
+                valueLabel = { resources.getString(R.string.unit_lines, it) },
                 onValueChange = viewModel::setScrollbackLines
             )
         }
 
-        item { SettingsSection("Dimensioni") }
+        item { SettingsSection(stringResource(R.string.section_size)) }
         item {
             SwitchRow(
-                title = "Adatta dimensione al display",
-                description = "Comunica al server righe e colonne reali dello schermo",
+                title = stringResource(R.string.terminal_auto_size),
+                description = stringResource(R.string.terminal_auto_size_desc),
                 checked = terminal.autoSizePty,
                 onCheckedChange = viewModel::setAutoSizePty
             )
         }
         item {
             SliderRow(
-                title = "Colonne fisse",
+                title = stringResource(R.string.terminal_fixed_columns),
                 value = terminal.fallbackColumns,
                 range = 40..200,
                 step = 10,
@@ -49,7 +54,7 @@ fun TerminalSettingsScreen(
         }
         item {
             SliderRow(
-                title = "Righe fisse",
+                title = stringResource(R.string.terminal_fixed_rows),
                 value = terminal.fallbackRows,
                 range = 10..80,
                 step = 5,
@@ -58,23 +63,23 @@ fun TerminalSettingsScreen(
             )
         }
 
-        item { SettingsSection("Comportamento") }
+        item { SettingsSection(stringResource(R.string.section_behaviour)) }
         item {
             SwitchRow(
-                title = "URL cliccabili",
-                description = "Riconosce gli indirizzi http/https nell'output e li apre nel browser",
+                title = stringResource(R.string.terminal_clickable_urls),
+                description = stringResource(R.string.terminal_clickable_urls_desc),
                 checked = terminal.clickableUrls,
                 onCheckedChange = viewModel::setClickableUrls
             )
         }
         item {
             ChoiceRow(
-                title = "Campanella (BEL)",
-                description = "Comportamento quando il server invia \\a",
+                title = stringResource(R.string.terminal_bell),
+                description = stringResource(R.string.terminal_bell_desc),
                 options = listOf(
-                    BellMode.OFF to "Nessuno",
-                    BellMode.VIBRATE to "Vibrazione",
-                    BellMode.SOUND to "Suono"
+                    BellMode.OFF to stringResource(R.string.bell_none),
+                    BellMode.VIBRATE to stringResource(R.string.bell_vibrate),
+                    BellMode.SOUND to stringResource(R.string.bell_sound)
                 ),
                 selected = terminal.bellMode,
                 onSelected = viewModel::setBellMode
@@ -82,8 +87,8 @@ fun TerminalSettingsScreen(
         }
         item {
             SwitchRow(
-                title = "Mantieni schermo acceso",
-                description = "Solo durante una sessione SSH attiva",
+                title = stringResource(R.string.terminal_keep_screen_on),
+                description = stringResource(R.string.terminal_keep_screen_on_desc),
                 checked = terminal.keepScreenOn,
                 onCheckedChange = viewModel::setKeepScreenOn
             )

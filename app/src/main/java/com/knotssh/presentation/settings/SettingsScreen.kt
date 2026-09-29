@@ -4,13 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.R
 import com.knotssh.data.local.preferences.BellMode
 import com.knotssh.data.local.preferences.HostKeyPolicy
 import com.knotssh.data.local.preferences.TerminalFont
@@ -24,6 +27,7 @@ fun SettingsScreen(
     onOpenKeyboard: () -> Unit,
     onOpenConnection: () -> Unit,
     onOpenSecurity: () -> Unit,
+    onOpenLanguage: () -> Unit,
     onOpenBackup: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
@@ -35,101 +39,155 @@ fun SettingsScreen(
     val customKeys by viewModel.customKeyList.collectAsStateWithLifecycle()
     val quickCommands by viewModel.quickCommandList.collectAsStateWithLifecycle()
 
-    SettingsScaffold(title = "Impostazioni", onBack = onBack) {
+    SettingsScaffold(title = stringResource(R.string.settings_title), onBack = onBack) {
         item {
             SettingsCategoryRow(
                 icon = Icons.Default.Palette,
-                title = "Aspetto",
+                title = stringResource(R.string.settings_appearance),
                 summary = listOf(
                     appearance.themeMode.label(),
-                    terminal.theme.displayName,
-                    "${terminal.font.label()} ${terminal.fontSize}sp"
-                ).joinToString(" · "),
+                    stringResource(terminal.theme.labelRes),
+                    stringResource(R.string.summary_font, terminal.font.label(), terminal.fontSize)
+                ).joinToString(SUMMARY_SEPARATOR),
                 onClick = onOpenAppearance
             )
         }
         item {
             SettingsCategoryRow(
                 icon = Icons.Default.Terminal,
-                title = "Terminale",
+                title = stringResource(R.string.settings_terminal),
                 summary = listOf(
-                    "${terminal.scrollbackLines} righe",
-                    if (terminal.autoSizePty) "auto-dimensione"
-                    else "${terminal.fallbackColumns}×${terminal.fallbackRows}",
+                    stringResource(R.string.summary_scrollback, terminal.scrollbackLines),
+                    if (terminal.autoSizePty) {
+                        stringResource(R.string.summary_auto_size)
+                    } else {
+                        stringResource(
+                            R.string.summary_fixed_size,
+                            terminal.fallbackColumns,
+                            terminal.fallbackRows
+                        )
+                    },
                     terminal.bellMode.label()
-                ).joinToString(" · "),
+                ).joinToString(SUMMARY_SEPARATOR),
                 onClick = onOpenTerminal
             )
         }
         item {
             SettingsCategoryRow(
                 icon = Icons.Default.Keyboard,
-                title = "Tastiera",
+                title = stringResource(R.string.settings_keyboard),
                 summary = listOf(
-                    if (terminal.showAccessoryBar) "barra tasti attiva" else "barra tasti nascosta",
-                    "${customKeys.size} tasti rapidi",
-                    "${quickCommands.size} comandi"
-                ).joinToString(" · "),
+                    if (terminal.showAccessoryBar) {
+                        stringResource(R.string.summary_key_bar_on)
+                    } else {
+                        stringResource(R.string.summary_key_bar_off)
+                    },
+                    stringResource(R.string.summary_custom_keys, customKeys.size),
+                    stringResource(R.string.summary_quick_commands, quickCommands.size)
+                ).joinToString(SUMMARY_SEPARATOR),
                 onClick = onOpenKeyboard
             )
         }
         item {
             SettingsCategoryRow(
                 icon = Icons.Default.Wifi,
-                title = "Connessione",
+                title = stringResource(R.string.settings_connection),
                 summary = listOf(
-                    if (connection.keepAliveSeconds == 0) "keep-alive off"
-                    else "keep-alive ${connection.keepAliveSeconds}s",
-                    if (connection.autoReconnect) "riconnessione automatica" else "nessuna riconnessione",
-                    if (connection.compression) "compressa" else "non compressa"
-                ).joinToString(" · "),
+                    if (connection.keepAliveSeconds == 0) {
+                        stringResource(R.string.summary_keepalive_off)
+                    } else {
+                        stringResource(R.string.summary_keepalive, connection.keepAliveSeconds)
+                    },
+                    if (connection.autoReconnect) {
+                        stringResource(R.string.summary_reconnect_on)
+                    } else {
+                        stringResource(R.string.summary_reconnect_off)
+                    },
+                    if (connection.compression) {
+                        stringResource(R.string.summary_compression_on)
+                    } else {
+                        stringResource(R.string.summary_compression_off)
+                    }
+                ).joinToString(SUMMARY_SEPARATOR),
                 onClick = onOpenConnection
             )
         }
         item {
             SettingsCategoryRow(
                 icon = Icons.Default.Lock,
-                title = "Sicurezza",
+                title = stringResource(R.string.settings_security),
                 summary = listOf(
                     security.hostKeyPolicy.label(),
-                    "${knownHosts.size} host noti",
-                    if (security.biometricEnabled) "sblocco biometrico" else "nessuno sblocco"
-                ).joinToString(" · "),
+                    stringResource(R.string.summary_known_hosts, knownHosts.size),
+                    if (security.biometricEnabled) {
+                        stringResource(R.string.summary_biometric_on)
+                    } else {
+                        stringResource(R.string.summary_biometric_off)
+                    }
+                ).joinToString(SUMMARY_SEPARATOR),
                 onClick = onOpenSecurity
             )
         }
         item {
             SettingsCategoryRow(
+                icon = Icons.Default.Language,
+                title = stringResource(R.string.settings_language),
+                summary = LocaleManager.current().let {
+                    if (it == AppLanguage.SYSTEM) {
+                        stringResource(R.string.language_system)
+                    } else {
+                        it.displayName
+                    }
+                },
+                onClick = onOpenLanguage
+            )
+        }
+        item {
+            SettingsCategoryRow(
                 icon = Icons.Default.SettingsBackupRestore,
-                title = "Backup e ripristino",
-                summary = "Sincronizzazione cloud e valori predefiniti",
+                title = stringResource(R.string.settings_backup),
+                summary = stringResource(R.string.settings_backup_summary),
                 onClick = onOpenBackup
             )
         }
     }
 }
 
-private fun ThemeMode.label() = when (this) {
-    ThemeMode.SYSTEM -> "Sistema"
-    ThemeMode.LIGHT -> "Chiaro"
-    ThemeMode.DARK -> "Scuro"
-}
+private const val SUMMARY_SEPARATOR = " · "
 
-private fun TerminalFont.label() = when (this) {
-    TerminalFont.MONOSPACE -> "Mono"
-    TerminalFont.SANS_SERIF -> "Sans"
-    TerminalFont.SERIF -> "Serif"
-}
+@Composable
+private fun ThemeMode.label() = stringResource(
+    when (this) {
+        ThemeMode.SYSTEM -> R.string.theme_mode_system
+        ThemeMode.LIGHT -> R.string.theme_mode_light
+        ThemeMode.DARK -> R.string.theme_mode_dark
+    }
+)
 
-private fun BellMode.label() = when (this) {
-    BellMode.OFF -> "campanella off"
-    BellMode.VIBRATE -> "campanella vibra"
-    BellMode.SOUND -> "campanella sonora"
-}
+@Composable
+private fun TerminalFont.label() = stringResource(
+    when (this) {
+        TerminalFont.MONOSPACE -> R.string.font_mono
+        TerminalFont.SANS_SERIF -> R.string.font_sans
+        TerminalFont.SERIF -> R.string.font_serif
+    }
+)
 
-private fun HostKeyPolicy.label() = when (this) {
-    HostKeyPolicy.STRICT -> "verifica rigida"
-    HostKeyPolicy.PROMPT -> "chiede conferma"
-    HostKeyPolicy.TRUST_ON_FIRST_USE -> "TOFU"
-    HostKeyPolicy.ACCEPT_ANY -> "⚠ nessuna verifica"
-}
+@Composable
+private fun BellMode.label() = stringResource(
+    when (this) {
+        BellMode.OFF -> R.string.summary_bell_off
+        BellMode.VIBRATE -> R.string.summary_bell_vibrate
+        BellMode.SOUND -> R.string.summary_bell_sound
+    }
+)
+
+@Composable
+private fun HostKeyPolicy.label() = stringResource(
+    when (this) {
+        HostKeyPolicy.STRICT -> R.string.summary_hostkey_strict
+        HostKeyPolicy.PROMPT -> R.string.summary_hostkey_prompt
+        HostKeyPolicy.TRUST_ON_FIRST_USE -> R.string.summary_hostkey_tofu
+        HostKeyPolicy.ACCEPT_ANY -> R.string.summary_hostkey_any
+    }
+)

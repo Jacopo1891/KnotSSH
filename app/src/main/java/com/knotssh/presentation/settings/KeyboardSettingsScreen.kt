@@ -9,8 +9,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.R
 
 @Composable
 fun KeyboardSettingsScreen(
@@ -43,12 +45,12 @@ fun KeyboardSettingsScreen(
         )
     }
 
-    SettingsScaffold(title = "Tastiera", onBack = onBack) {
-        item { SettingsSection("Barra tasti speciali") }
+    SettingsScaffold(title = stringResource(R.string.settings_keyboard), onBack = onBack) {
+        item { SettingsSection(stringResource(R.string.section_key_bar)) }
         item {
             SwitchRow(
-                title = "Mostra la barra",
-                description = "ESC, TAB, frecce, CTRL/ALT e tasti personalizzati",
+                title = stringResource(R.string.keyboard_show_bar),
+                description = stringResource(R.string.keyboard_show_bar_desc),
                 checked = terminal.showAccessoryBar,
                 onCheckedChange = viewModel::setShowAccessoryBar
             )
@@ -59,15 +61,15 @@ fun KeyboardSettingsScreen(
                 enabled = terminal.showAccessoryBar,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Gestisci tasti rapidi (${customKeys.size})")
+                Text(stringResource(R.string.keyboard_manage_keys, customKeys.size))
             }
         }
 
-        item { SettingsSection("Comandi rapidi") }
+        item { SettingsSection(stringResource(R.string.section_quick_commands)) }
         item {
             SwitchRow(
-                title = "Mostra la barra",
-                description = "Chip che inviano un comando completo con a capo",
+                title = stringResource(R.string.keyboard_show_bar),
+                description = stringResource(R.string.keyboard_quick_bar_desc),
                 checked = terminal.showQuickCommandsBar,
                 onCheckedChange = viewModel::setShowQuickCommandsBar
             )
@@ -78,31 +80,31 @@ fun KeyboardSettingsScreen(
                 enabled = terminal.showQuickCommandsBar,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Gestisci comandi rapidi (${quickCommands.size})")
+                Text(stringResource(R.string.keyboard_manage_commands, quickCommands.size))
             }
         }
 
-        item { SettingsSection("Input") }
+        item { SettingsSection(stringResource(R.string.section_input)) }
         item {
             SwitchRow(
-                title = "Apri tastiera automaticamente",
-                description = "Alla connessione. Un tocco sul buffer la apre comunque.",
+                title = stringResource(R.string.keyboard_auto_show),
+                description = stringResource(R.string.keyboard_auto_show_desc),
                 checked = terminal.autoShowKeyboard,
                 onCheckedChange = viewModel::setAutoShowKeyboard
             )
         }
         item {
             SwitchRow(
-                title = "Scorri con le dita nelle app a schermo intero",
-                description = "In vim, less e simili lo swipe verticale invia frecce su/giù",
+                title = stringResource(R.string.keyboard_swipe_scroll),
+                description = stringResource(R.string.keyboard_swipe_scroll_desc),
                 checked = terminal.swipeScrollsFullScreenApps,
                 onCheckedChange = viewModel::setSwipeScrollsFullScreenApps
             )
         }
         item {
             SwitchRow(
-                title = "Feedback aptico",
-                description = "Vibrazione breve sui tasti della barra",
+                title = stringResource(R.string.keyboard_haptics),
+                description = stringResource(R.string.keyboard_haptics_desc),
                 checked = terminal.hapticFeedback,
                 onCheckedChange = viewModel::setHapticFeedback
             )

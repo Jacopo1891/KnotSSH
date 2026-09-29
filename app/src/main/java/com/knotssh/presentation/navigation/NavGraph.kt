@@ -19,6 +19,7 @@ import com.knotssh.presentation.settings.AppearanceSettingsScreen
 import com.knotssh.presentation.settings.BackupSettingsScreen
 import com.knotssh.presentation.settings.ConnectionSettingsScreen
 import com.knotssh.presentation.settings.KeyboardSettingsScreen
+import com.knotssh.presentation.settings.LanguageSettingsScreen
 import com.knotssh.presentation.settings.SecuritySettingsScreen
 import com.knotssh.presentation.settings.SettingsScreen
 import com.knotssh.presentation.settings.TerminalSettingsScreen
@@ -134,6 +135,7 @@ fun NavGraph(
                 onOpenKeyboard = { navController.navigate(Screen.KeyboardSettings.route) },
                 onOpenConnection = { navController.navigate(Screen.ConnectionSettings.route) },
                 onOpenSecurity = { navController.navigate(Screen.SecuritySettings.route) },
+                onOpenLanguage = { navController.navigate(Screen.LanguageSettings.route) },
                 onOpenBackup = { navController.navigate(Screen.BackupSettings.route) }
             )
         }
@@ -152,6 +154,9 @@ fun NavGraph(
         }
         composable(Screen.SecuritySettings.route) {
             SecuritySettingsScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.LanguageSettings.route) {
+            LanguageSettingsScreen(onBack = { navController.popBackStack() })
         }
         composable(Screen.BackupSettings.route) {
             BackupSettingsScreen(onBack = { navController.popBackStack() })

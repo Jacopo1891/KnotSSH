@@ -29,5 +29,6 @@ sealed class Screen(val route: String) {
     data object KeyboardSettings : Screen("settings/keyboard")
     data object ConnectionSettings : Screen("settings/connection")
     data object SecuritySettings : Screen("settings/security")
+    data object LanguageSettings : Screen("settings/language")
     data object BackupSettings : Screen("settings/backup")
 }

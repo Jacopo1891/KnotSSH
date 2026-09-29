@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.knotssh.R
 
 private const val ALLOWED_AUTHENTICATORS =
     BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -99,7 +101,7 @@ fun BiometricGate(
         if (manager.canAuthenticate(ALLOWED_AUTHENTICATORS) != BiometricManager.BIOMETRIC_SUCCESS) {
             // No enrolled authenticator: failing open here would silently disable the setting,
             // so surface the reason instead.
-            error = "Nessun metodo di sblocco configurato sul dispositivo."
+            error = context.getString(R.string.biometric_no_method)
             return
         }
         val prompt = BiometricPrompt(
@@ -117,8 +119,8 @@ fun BiometricGate(
         )
         prompt.authenticate(
             BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Sblocca KnotSSH")
-                .setSubtitle("Autenticazione richiesta per accedere alle credenziali")
+                .setTitle(context.getString(R.string.biometric_title))
+                .setSubtitle(context.getString(R.string.biometric_subtitle))
                 .setAllowedAuthenticators(ALLOWED_AUTHENTICATORS)
                 .build()
         )
@@ -144,7 +146,10 @@ fun BiometricGate(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
-                Text("KnotSSH è bloccato", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.biometric_locked),
+                    style = MaterialTheme.typography.titleMedium
+                )
                 error?.let {
                     Text(
                         text = it,
@@ -153,7 +158,7 @@ fun BiometricGate(
                         textAlign = TextAlign.Center
                     )
                 }
-                Button(onClick = ::authenticate) { Text("Sblocca") }
+                Button(onClick = ::authenticate) { Text(stringResource(R.string.biometric_unlock)) }
             }
         }
     }

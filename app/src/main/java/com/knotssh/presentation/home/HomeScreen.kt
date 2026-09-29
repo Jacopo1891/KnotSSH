@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,16 +57,23 @@ fun HomeScreen(
         AlertDialog(
             onDismissRequest = { serverToDelete = null },
             icon = { Icon(Icons.Default.Delete, contentDescription = null) },
-            title = { Text("Elimina connessione") },
-            text = { Text("Vuoi eliminare \"${server.alias}\"?") },
+            title = { Text(stringResource(R.string.home_delete_title)) },
+            text = { Text(stringResource(R.string.home_delete_message, server.alias)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteServer(server.id)
                     serverToDelete = null
-                }) { Text("Elimina", color = MaterialTheme.colorScheme.error) }
+                }) {
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             },
             dismissButton = {
-                TextButton(onClick = { serverToDelete = null }) { Text("Annulla") }
+                TextButton(onClick = { serverToDelete = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
             }
         )
     }
@@ -84,8 +92,13 @@ fun HomeScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onAddServer,
-                icon = { Icon(Icons.Default.Add, contentDescription = "Aggiungi server") },
-                text = { Text("Nuovo server") },
+                icon = {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.home_add_server)
+                    )
+                },
+                text = { Text(stringResource(R.string.home_new_server)) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
@@ -148,7 +161,7 @@ private fun HomeTopBar(
                         OutlinedTextField(
                             value = searchQuery,
                             onValueChange = onSearchQueryChanged,
-                            placeholder = { Text("Cerca server…") },
+                            placeholder = { Text(stringResource(R.string.home_search_hint)) },
                             singleLine = true,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -193,14 +206,24 @@ private fun HomeTopBar(
                 }) {
                     Icon(
                         imageVector = if (searchExpanded) Icons.Default.Close else Icons.Default.Search,
-                        contentDescription = if (searchExpanded) "Chiudi ricerca" else "Cerca"
+                        contentDescription = if (searchExpanded) {
+                            stringResource(R.string.home_close_search)
+                        } else {
+                            stringResource(R.string.home_search)
+                        }
                     )
                 }
                 IconButton(onClick = onNavigateCredentials) {
-                    Icon(Icons.Default.Key, contentDescription = "Credenziali")
+                    Icon(
+                        Icons.Default.Key,
+                        contentDescription = stringResource(R.string.credentials_title)
+                    )
                 }
                 IconButton(onClick = onNavigateSettings) {
-                    Icon(Icons.Default.Settings, contentDescription = "Impostazioni")
+                    Icon(
+                        Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.settings_title)
+                    )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -231,7 +254,7 @@ private fun ServerList(
     ) {
         if (favorites.isNotEmpty()) {
             item {
-                SectionHeader(title = "Preferiti", icon = Icons.Default.Star)
+                SectionHeader(title = stringResource(R.string.home_favorites), icon = Icons.Default.Star)
             }
             items(favorites, key = { it.id }) { server ->
                 ServerItemWithSwipe(
@@ -249,7 +272,7 @@ private fun ServerList(
         if (recents.isNotEmpty()) {
             item {
                 SectionHeader(
-                    title = "Recenti",
+                    title = stringResource(R.string.home_recents),
                     icon = Icons.Default.History,
                     modifier = Modifier.padding(top = if (favorites.isNotEmpty()) 8.dp else 0.dp)
                 )
@@ -447,7 +470,7 @@ private fun ServerCard(
                 server.lastConnectedMs?.let { ms ->
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Ultima connessione: ${formatLastConnected(ms)}",
+                        text = stringResource(R.string.home_last_connection, formatLastConnected(ms)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -455,7 +478,10 @@ private fun ServerCard(
                 if (server.portForwardRules.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "${server.portForwardRules.size} regola/e port forward",
+                        text = stringResource(
+                            R.string.home_port_forward_rules,
+                            server.portForwardRules.size
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary
                     )
@@ -467,7 +493,11 @@ private fun ServerCard(
                 IconButton(onClick = onToggleFavorite, modifier = Modifier.size(36.dp)) {
                     Icon(
                         imageVector = if (server.isFavorite) Icons.Default.Star else Icons.Outlined.StarOutline,
-                        contentDescription = if (server.isFavorite) "Rimuovi dai preferiti" else "Aggiungi ai preferiti",
+                        contentDescription = if (server.isFavorite) {
+                            stringResource(R.string.action_unfavorite)
+                        } else {
+                            stringResource(R.string.action_favorite)
+                        },
                         tint = if (server.isFavorite) SshAmber else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
@@ -483,7 +513,7 @@ private fun ServerCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Terminal,
-                        contentDescription = "Connetti",
+                        contentDescription = stringResource(R.string.action_connect),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -532,17 +562,25 @@ private fun ServerContextMenu(
 ) {
     DropdownMenu(expanded = true, onDismissRequest = onDismiss) {
         DropdownMenuItem(
-            text = { Text("Connetti") },
+            text = { Text(stringResource(R.string.action_connect)) },
             leadingIcon = { Icon(Icons.Default.Terminal, null) },
             onClick = onConnect
         )
         DropdownMenuItem(
-            text = { Text("Modifica") },
+            text = { Text(stringResource(R.string.action_edit)) },
             leadingIcon = { Icon(Icons.Default.Edit, null) },
             onClick = onEdit
         )
         DropdownMenuItem(
-            text = { Text(if (server.isFavorite) "Rimuovi dai preferiti" else "Aggiungi ai preferiti") },
+            text = {
+                Text(
+                    if (server.isFavorite) {
+                        stringResource(R.string.action_unfavorite)
+                    } else {
+                        stringResource(R.string.action_favorite)
+                    }
+                )
+            },
             leadingIcon = {
                 Icon(
                     if (server.isFavorite) Icons.Default.StarBorder else Icons.Default.Star,
@@ -553,7 +591,12 @@ private fun ServerContextMenu(
         )
         HorizontalDivider()
         DropdownMenuItem(
-            text = { Text("Elimina", color = MaterialTheme.colorScheme.error) },
+            text = {
+                Text(
+                    text = stringResource(R.string.action_delete),
+                    color = MaterialTheme.colorScheme.error
+                )
+            },
             leadingIcon = {
                 Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error)
             },
@@ -588,13 +631,20 @@ private fun EmptyState(
             )
         }
         Text(
-            text = if (hasSearch) "Nessun risultato" else "Nessuna connessione",
+            text = if (hasSearch) {
+                stringResource(R.string.home_empty_search_title)
+            } else {
+                stringResource(R.string.home_empty_title)
+            },
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            text = if (hasSearch) "Prova con un termine diverso"
-            else "Aggiungi il tuo primo server SSH\ncon il pulsante in basso",
+            text = if (hasSearch) {
+                stringResource(R.string.home_empty_search_message)
+            } else {
+                stringResource(R.string.home_empty_message)
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -603,20 +653,22 @@ private fun EmptyState(
             FilledTonalButton(onClick = onAddServer) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Aggiungi server")
+                Text(stringResource(R.string.home_add_server))
             }
         }
     }
 }
 
+@Composable
 private fun formatLastConnected(ms: Long): String {
-    val now = System.currentTimeMillis()
-    val diff = now - ms
+    val diff = System.currentTimeMillis() - ms
     return when {
-        diff < 60_000 -> "ora"
-        diff < 3_600_000 -> "${diff / 60_000} min fa"
-        diff < 86_400_000 -> "${diff / 3_600_000} ore fa"
-        diff < 604_800_000 -> "${diff / 86_400_000} giorni fa"
-        else -> SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(ms))
+        diff < 60_000 -> stringResource(R.string.time_now)
+        diff < 3_600_000 -> stringResource(R.string.time_minutes_ago, diff / 60_000)
+        diff < 86_400_000 -> stringResource(R.string.time_hours_ago, diff / 3_600_000)
+        diff < 604_800_000 -> stringResource(R.string.time_days_ago, diff / 86_400_000)
+        else -> remember(ms) {
+            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(ms))
+        }
     }
 }
