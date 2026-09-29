@@ -516,7 +516,10 @@ class SshSession(
         readerJob = null
         sshManager.disconnect()
         connection = null
-        _status.value = TerminalStatus.Disconnected(null)
+        // A remote logout already reported its exit status; don't downgrade it to a plain drop.
+        if (_status.value !is TerminalStatus.Ended) {
+            _status.value = TerminalStatus.Disconnected(null)
+        }
         readerDispatcher.close()
     }
 
