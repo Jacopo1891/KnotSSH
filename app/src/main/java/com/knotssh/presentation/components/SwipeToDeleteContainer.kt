@@ -19,21 +19,20 @@ import com.knotssh.R
 
 /**
  * A swipe-to-reveal container that shows a red delete background on swipe.
- * Wraps any content composable.
+ *
+ * [onDelete] returns whether the row should stay dismissed: callers that only open a
+ * confirmation dialog return false, so the row snaps back instead of vanishing behind it.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwipeToDeleteContainer(
-    onDelete: () -> Unit,
+    onDelete: () -> Boolean,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-                true
-            } else false
+            value == SwipeToDismissBoxValue.EndToStart && onDelete()
         }
     )
 

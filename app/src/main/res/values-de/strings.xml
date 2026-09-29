@@ -1,5 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <plurals name="lines">
+        <item quantity="one">%1$d Zeile</item>
+        <item quantity="other">%1$d Zeilen</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">vor %1$d Tag</item>
+        <item quantity="other">vor %1$d Tagen</item>
+    </plurals>
+    <plurals name="port_forward_rules">
+        <item quantity="one">%1$d Portweiterleitungsregel</item>
+        <item quantity="other">%1$d Portweiterleitungsregeln</item>
+    </plurals>
+    <plurals name="session_limit_message">
+        <item quantity="one">Du kannst höchstens %1$d Sitzung gleichzeitig offen halten. Schließe sie über ihre Benachrichtigung oder erhöhe das Limit in den Verbindungseinstellungen.</item>
+        <item quantity="other">Du kannst höchstens %1$d Sitzungen gleichzeitig offen halten. Schließe eine über ihre Benachrichtigung oder erhöhe das Limit in den Verbindungseinstellungen.</item>
+    </plurals>
+    <plurals name="custom_keys_count">
+        <item quantity="one">%1$d eigene Taste</item>
+        <item quantity="other">%1$d eigene Tasten</item>
+    </plurals>
+    <plurals name="commands_count">
+        <item quantity="one">%1$d Befehl</item>
+        <item quantity="other">%1$d Befehle</item>
+    </plurals>
+    <plurals name="known_hosts_count">
+        <item quantity="one">%1$d bekannter Host</item>
+        <item quantity="other">%1$d bekannte Hosts</item>
+    </plurals>
+    <plurals name="sessions_active">
+        <item quantity="one">%1$d SSH-Sitzung aktiv</item>
+        <item quantity="other">%1$d SSH-Sitzungen aktiv</item>
+    </plurals>
+    <plurals name="credential_delete_orphans">
+        <item quantity="one">%1$d Server verwendet ihn und bleibt ohne Zugang zurück. Er wird behalten, aber du musst ihm vor dem Verbinden einen neuen zuweisen.</item>
+        <item quantity="other">%1$d Server verwenden ihn und bleiben ohne Zugang zurück. Sie werden behalten, aber du musst ihnen vor dem Verbinden einen neuen zuweisen.</item>
+    </plurals>
+
     <string name="action_back">Zurück</string>
     <string name="action_save">Speichern</string>
     <string name="action_add">Hinzufügen</string>
@@ -20,7 +57,6 @@
     <string name="action_unfavorite">Aus Favoriten entfernen</string>
     <string name="action_got_it">Verstanden</string>
 
-    <string name="unit_lines">%1$d Zeilen</string>
     <string name="value_off">Aus</string>
     <string name="value_immediately">Sofort</string>
 
@@ -31,7 +67,6 @@
     <string name="time_now">gerade eben</string>
     <string name="time_minutes_ago">vor %1$d Min.</string>
     <string name="time_hours_ago">vor %1$d Std.</string>
-    <string name="time_days_ago">vor %1$d Tagen</string>
 
     <string name="home_search_hint">Server suchen…</string>
     <string name="home_search">Suchen</string>
@@ -43,7 +78,7 @@
     <string name="home_delete_title">Verbindung löschen</string>
     <string name="home_delete_message">„%1$s“ löschen?</string>
     <string name="home_last_connection">Letzte Verbindung: %1$s</string>
-    <string name="home_port_forward_rules">%1$d Portweiterleitungsregel(n)</string>
+    <string name="home_no_credential">Kein Zugang</string>
     <string name="home_empty_title">Keine Verbindungen</string>
     <string name="home_empty_message">Füge deinen ersten SSH-Server\nmit der Schaltfläche unten hinzu</string>
     <string name="home_empty_search_title">Keine Ergebnisse</string>
@@ -82,6 +117,8 @@
     <string name="credential_pem_label">Privater PEM-Schlüssel</string>
     <string name="credential_passphrase_label">Passphrase des Schlüssels (optional)</string>
     <string name="credential_passphrase_hint">Nur nötig, wenn der private Schlüssel verschlüsselt ist</string>
+    <string name="credential_delete_title">Zugang löschen</string>
+    <string name="credential_delete_message">„%1$s“ löschen?</string>
     <string name="auth_password">Passwort</string>
     <string name="auth_ssh_key">SSH-Schlüssel</string>
 
@@ -104,7 +141,6 @@
     <string name="terminal_keep_alive">Aktiv lassen</string>
     <string name="terminal_terminate">Beenden</string>
     <string name="terminal_limit_title">Zu viele offene Sitzungen</string>
-    <string name="terminal_limit_message">Du kannst höchstens %1$d Sitzungen gleichzeitig offen halten. Schließe eine über ihre Benachrichtigung oder erhöhe das Limit in den Verbindungseinstellungen.</string>
 
     <string name="arrow_up">Oben</string>
     <string name="arrow_down">Unten</string>
@@ -131,7 +167,6 @@
     <string name="notification_channel_name">Aktive SSH-Sitzungen</string>
     <string name="notification_channel_desc">Eine stille Karte für jede offen gelassene Sitzung</string>
     <string name="notification_session_active">SSH-Sitzung aktiv</string>
-    <string name="notification_sessions_active">%1$d SSH-Sitzungen aktiv</string>
     <string name="notification_reopen">Wieder öffnen</string>
     <string name="notification_terminate">Beenden</string>
 
@@ -164,19 +199,15 @@
     <string name="settings_backup">Sicherung und Wiederherstellung</string>
     <string name="settings_backup_summary">Cloud-Synchronisierung und Standardwerte</string>
 
-    <string name="summary_scrollback">%1$d Zeilen</string>
     <string name="summary_auto_size">automatische Größe</string>
     <string name="summary_key_bar_on">Tastenleiste aktiv</string>
     <string name="summary_key_bar_off">Tastenleiste verborgen</string>
-    <string name="summary_custom_keys">%1$d eigene Tasten</string>
-    <string name="summary_quick_commands">%1$d Befehle</string>
     <string name="summary_keepalive">Keep-alive %1$ds</string>
     <string name="summary_keepalive_off">Keep-alive aus</string>
     <string name="summary_reconnect_on">automatische Neuverbindung</string>
     <string name="summary_reconnect_off">keine Neuverbindung</string>
     <string name="summary_compression_on">komprimiert</string>
     <string name="summary_compression_off">unkomprimiert</string>
-    <string name="summary_known_hosts">%1$d bekannte Hosts</string>
     <string name="summary_biometric_on">biometrisches Entsperren</string>
     <string name="summary_biometric_off">kein Entsperren</string>
     <string name="summary_bell_off">Glocke aus</string>
@@ -184,7 +215,6 @@
     <string name="summary_bell_sound">Glocke mit Ton</string>
     <string name="summary_hostkey_strict">strenge Prüfung</string>
     <string name="summary_hostkey_prompt">fragt nach</string>
-    <string name="summary_hostkey_any">⚠ keine Prüfung</string>
 
     <string name="section_application">Anwendung</string>
     <string name="section_buffer">Puffer</string>
@@ -270,10 +300,8 @@
     <string name="security_host_key_strict_desc">Nur bereits gespeicherte Hosts. Maximale Sicherheit.</string>
     <string name="security_host_key_prompt_desc">Fragt beim ersten Zugriff nach und zeigt den Fingerabdruck.</string>
     <string name="security_host_key_tofu_desc">Speichert beim ersten Zugriff automatisch, blockiert bei Schlüsseländerung.</string>
-    <string name="security_host_key_any_desc">⚠ Kein Schutz gegen Man-in-the-Middle-Angriffe.</string>
     <string name="host_key_strict">Streng</string>
     <string name="host_key_prompt">Fragen</string>
-    <string name="host_key_none">Keine</string>
     <string name="security_known_hosts_button">Bekannte Hosts (%1$d)</string>
     <string name="security_biometric">Biometrisches Entsperren</string>
     <string name="security_biometric_desc">Verlangt Fingerabdruck, Gesicht oder PIN beim Öffnen der App</string>

@@ -28,7 +28,7 @@ fun TerminalSettingsScreen(
                 value = terminal.scrollbackLines,
                 range = Defaults.SCROLLBACK_MIN..Defaults.SCROLLBACK_MAX,
                 step = 500,
-                valueLabel = { resources.getString(R.string.unit_lines, it) },
+                valueLabel = { resources.getQuantityString(R.plurals.lines, it, it) },
                 onValueChange = viewModel::setScrollbackLines
             )
         }

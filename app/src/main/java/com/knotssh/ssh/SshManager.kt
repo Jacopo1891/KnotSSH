@@ -134,12 +134,13 @@ class SshManager @Inject constructor(
 
         if (credential.authType == AuthType.SSH_KEY) {
             val keyBytes = plainSecret.toByteArray(Charsets.UTF_8)
+            val passphraseBytes = passphrase?.takeIf { it.isNotEmpty() }?.toByteArray(Charsets.UTF_8)
             try {
                 jsch.addIdentity(
                     credential.alias.ifBlank { "knotssh_key" },
                     keyBytes,
                     null,
-                    passphrase?.takeIf { it.isNotEmpty() }?.toByteArray(Charsets.UTF_8)
+                    passphraseBytes
                 )
             } catch (e: JSchException) {
                 releaseWakeLock()
@@ -148,6 +149,7 @@ class SshManager @Inject constructor(
                 )
             } finally {
                 keyBytes.fill(0)
+                passphraseBytes?.fill(0)
             }
         }
 

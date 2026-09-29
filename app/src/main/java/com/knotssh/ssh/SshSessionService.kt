@@ -134,7 +134,7 @@ class SshSessionService : Service() {
             .setContentText(
                 when (count) {
                     0, 1 -> getString(R.string.notification_session_active)
-                    else -> getString(R.string.notification_sessions_active, count)
+                    else -> resources.getQuantityString(R.plurals.sessions_active, count, count)
                 }
             )
             .setSmallIcon(R.drawable.ic_launcher_monochrome)

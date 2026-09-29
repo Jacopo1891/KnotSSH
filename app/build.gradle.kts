@@ -24,8 +24,38 @@ android {
         }
     }
 
+    /**
+     * Release signing is driven by four Gradle properties. Keep them out of the repository:
+     * put them in ~/.gradle/gradle.properties locally, or pass them as -P flags / environment
+     * variables (ORG_GRADLE_PROJECT_KNOTSSH_STORE_FILE, ...) from CI.
+     *
+     *   KNOTSSH_STORE_FILE=/absolute/path/to/knotssh-release.jks
+     *   KNOTSSH_STORE_PASSWORD=...
+     *   KNOTSSH_KEY_ALIAS=knotssh
+     *   KNOTSSH_KEY_PASSWORD=...
+     *
+     * When they are missing the release build still runs and produces an unsigned APK, so a
+     * plain `assembleRelease` never silently falls back to the shared debug key.
+     */
+    val releaseKeystore = providers.gradleProperty("KNOTSSH_STORE_FILE").orNull?.let(::file)
+
+    signingConfigs {
+        if (releaseKeystore?.exists() == true) {
+            create("release") {
+                storeFile = releaseKeystore
+                storePassword = providers.gradleProperty("KNOTSSH_STORE_PASSWORD").get()
+                keyAlias = providers.gradleProperty("KNOTSSH_KEY_ALIAS").get()
+                keyPassword = providers.gradleProperty("KNOTSSH_KEY_PASSWORD").get()
+                enableV1Signing = false
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -102,7 +132,6 @@ dependencies {
     implementation(libs.datastore.preferences)
 
     // Security
-    implementation(libs.security.crypto)
     implementation(libs.biometric)
 
     // Coroutines
@@ -111,11 +140,6 @@ dependencies {
 
     // SSH
     implementation(libs.jsch)
-
-    // Google Auth & Drive
-    implementation(libs.google.auth)
-    implementation(libs.google.drive)
-    implementation(libs.google.http.client)
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)

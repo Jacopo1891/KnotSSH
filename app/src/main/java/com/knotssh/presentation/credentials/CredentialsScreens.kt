@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -33,6 +34,46 @@ fun CredentialsScreen(
     viewModel: CredentialsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var credentialToDelete by remember { mutableStateOf<Credential?>(null) }
+
+    credentialToDelete?.let { credential ->
+        val affected = uiState.serversPerCredential[credential.id] ?: 0
+        AlertDialog(
+            onDismissRequest = { credentialToDelete = null },
+            title = { Text(stringResource(R.string.credential_delete_title)) },
+            text = {
+                Text(
+                    if (affected == 0) {
+                        stringResource(R.string.credential_delete_message, credential.alias)
+                    } else {
+                        stringResource(R.string.credential_delete_message, credential.alias) +
+                            "\n\n" +
+                            pluralStringResource(
+                                R.plurals.credential_delete_orphans,
+                                affected,
+                                affected
+                            )
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteCredential(credential.id)
+                    credentialToDelete = null
+                }) {
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { credentialToDelete = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -77,7 +118,7 @@ fun CredentialsScreen(
                 contentPadding = PaddingValues(vertical = 12.dp)
             ) {
                 items(uiState.credentials, key = { it.id }) { cred ->
-                    SwipeToDeleteContainer(onDelete = { viewModel.deleteCredential(cred.id) }) {
+                    SwipeToDeleteContainer(onDelete = { credentialToDelete = cred; false }) {
                         Card(
                             onClick = { onEditCredential(cred.id) },
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),

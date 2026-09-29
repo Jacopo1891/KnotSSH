@@ -19,9 +19,7 @@
 # Room entities are instantiated reflectively by generated DAO code.
 -keep class com.knotssh.data.local.db.** { *; }
 
-# Google API client is pulled in for the planned Drive backup and uses reflective model binding.
--dontwarn com.google.api.client.**
--dontwarn com.google.api.services.**
+# JSch reaches these optional JDK APIs that Android does not ship.
 -dontwarn javax.naming.**
 -dontwarn java.lang.management.**
 

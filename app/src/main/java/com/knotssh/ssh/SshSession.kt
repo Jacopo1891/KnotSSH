@@ -23,7 +23,9 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -60,9 +62,17 @@ class SshSession(
     private val credentialRepository: CredentialRepository,
     private val appPreferences: AppPreferences,
     private val sshManager: SshManager,
-    private val scope: CoroutineScope,
+    parentScope: CoroutineScope,
     private val onFinished: (Long) -> Unit
 ) {
+    /**
+     * Child of the application scope: every coroutine this session starts — reader, settings
+     * collectors, snapshot sharing — dies with [close] instead of outliving the connection.
+     */
+    private val scope = CoroutineScope(
+        parentScope.coroutineContext + SupervisorJob(parentScope.coroutineContext[Job])
+    )
+
     private val _status = MutableStateFlow<TerminalStatus>(TerminalStatus.Connecting)
     val status: StateFlow<TerminalStatus> = _status.asStateFlow()
 
@@ -539,6 +549,7 @@ class SshSession(
         if (_status.value !is TerminalStatus.Ended) {
             _status.value = TerminalStatus.Disconnected(null)
         }
+        scope.cancel()
         readerDispatcher.close()
     }
 

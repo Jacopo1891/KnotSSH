@@ -36,6 +36,11 @@ class CryptoManager @Inject constructor() {
     private fun getOrCreateKey(): SecretKey {
         keyStore.getKey(KEY_ALIAS, null)?.let { return it as SecretKey }
 
+        // StrongBox is absent on plenty of devices, so a TEE-backed key is the fallback.
+        return generateKey(strongBox = true) ?: checkNotNull(generateKey(strongBox = false))
+    }
+
+    private fun generateKey(strongBox: Boolean): SecretKey? = runCatching {
         val keyGenerator = KeyGenerator.getInstance(ALGORITHM, KEYSTORE_PROVIDER)
         val spec = KeyGenParameterSpec.Builder(
             KEY_ALIAS,
@@ -44,11 +49,14 @@ class CryptoManager @Inject constructor() {
             .setBlockModes(BLOCK_MODE)
             .setEncryptionPaddings(PADDING)
             .setKeySize(256)
-            .setUserAuthenticationRequired(false) // Biometric is optional at app level
+            // The app lock is a UI gate; tying the key to it would lock out background sessions.
+            .setUserAuthenticationRequired(false)
+            .setRandomizedEncryptionRequired(true)
+            .setIsStrongBoxBacked(strongBox)
             .build()
         keyGenerator.init(spec)
-        return keyGenerator.generateKey()
-    }
+        keyGenerator.generateKey()
+    }.getOrNull()
 
     /**
      * Encrypts [plaintext] and returns a Base64-encoded string containing IV + ciphertext.
@@ -58,7 +66,12 @@ class CryptoManager @Inject constructor() {
         val cipher = Cipher.getInstance(TRANSFORMATION)
         cipher.init(Cipher.ENCRYPT_MODE, key)
         val iv = cipher.iv
-        val ciphertext = cipher.doFinal(plaintext.toByteArray(Charsets.UTF_8))
+        val plainBytes = plaintext.toByteArray(Charsets.UTF_8)
+        val ciphertext = try {
+            cipher.doFinal(plainBytes)
+        } finally {
+            plainBytes.fill(0)
+        }
 
         // Prepend IV to ciphertext: [IV (12 bytes)] + [ciphertext]
         val combined = ByteArray(IV_SIZE + ciphertext.size)

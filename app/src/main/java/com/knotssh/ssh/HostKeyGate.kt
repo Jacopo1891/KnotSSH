@@ -29,7 +29,6 @@ class HostKeyGate(
 
     override fun check(host: String, key: ByteArray): Int {
         val keyType = parseKeyType(key)
-        if (policy == HostKeyPolicy.ACCEPT_ANY) return HostKeyRepository.OK
 
         val verdict = runBlocking { knownHosts.verify(this@HostKeyGate.host, port, keyType, key) }
         return when (verdict) {

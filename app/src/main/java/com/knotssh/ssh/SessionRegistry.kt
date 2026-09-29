@@ -8,6 +8,7 @@ import com.knotssh.domain.repository.KnownHostRepository
 import com.knotssh.domain.repository.ServerRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,6 +42,7 @@ class SessionRegistry @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope
 ) {
     private val sessions = linkedMapOf<Long, SshSession>()
+    private val labelJobs = mutableMapOf<Long, Job>()
 
     private val _active = MutableStateFlow<List<SessionSummary>>(emptyList())
     val active: StateFlow<List<SessionSummary>> = _active.asStateFlow()
@@ -61,7 +63,7 @@ class SessionRegistry @Inject constructor(
             credentialRepository = credentialRepository,
             appPreferences = appPreferences,
             sshManager = SshManager(knownHostRepository),
-            scope = scope,
+            parentScope = scope,
             onFinished = ::onSessionFinished
         )
         sessions[serverId] = session
@@ -72,12 +74,15 @@ class SessionRegistry @Inject constructor(
 
     @Synchronized
     fun close(serverId: Long) {
+        labelJobs.remove(serverId)?.cancel()
         sessions.remove(serverId)?.close()
         publish()
     }
 
     @Synchronized
     fun closeAll() {
+        labelJobs.values.forEach { it.cancel() }
+        labelJobs.clear()
         sessions.values.forEach { it.close() }
         sessions.clear()
         publish()
@@ -89,7 +94,7 @@ class SessionRegistry @Inject constructor(
     }
 
     private fun observeLabel(session: SshSession) {
-        scope.launch {
+        labelJobs[session.serverId] = scope.launch {
             session.title.collect { publish() }
         }
     }

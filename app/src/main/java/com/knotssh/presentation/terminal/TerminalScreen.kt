@@ -92,6 +92,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -191,7 +192,7 @@ fun TerminalScreen(
         AlertDialog(
             onDismissRequest = onBack,
             title = { Text(stringResource(R.string.terminal_limit_title)) },
-            text = { Text(stringResource(R.string.terminal_limit_message, max)) },
+            text = { Text(pluralStringResource(R.plurals.session_limit_message, max, max)) },
             confirmButton = {
                 TextButton(onClick = onBack) { Text(stringResource(R.string.action_got_it)) }
             }

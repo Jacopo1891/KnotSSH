@@ -46,14 +46,12 @@ fun SecuritySettingsScreen(
                         HostKeyPolicy.STRICT -> R.string.security_host_key_strict_desc
                         HostKeyPolicy.PROMPT -> R.string.security_host_key_prompt_desc
                         HostKeyPolicy.TRUST_ON_FIRST_USE -> R.string.security_host_key_tofu_desc
-                        HostKeyPolicy.ACCEPT_ANY -> R.string.security_host_key_any_desc
                     }
                 ),
                 options = listOf(
                     HostKeyPolicy.STRICT to stringResource(R.string.host_key_strict),
                     HostKeyPolicy.PROMPT to stringResource(R.string.host_key_prompt),
-                    HostKeyPolicy.TRUST_ON_FIRST_USE to stringResource(R.string.host_key_tofu),
-                    HostKeyPolicy.ACCEPT_ANY to stringResource(R.string.host_key_none)
+                    HostKeyPolicy.TRUST_ON_FIRST_USE to stringResource(R.string.host_key_tofu)
                 ),
                 selected = security.hostKeyPolicy,
                 onSelected = viewModel::setHostKeyPolicy

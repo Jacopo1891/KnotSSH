@@ -56,6 +56,29 @@ class TerminalLine(
 
     fun text(): String = String(chars, 0, length)
 
+    /**
+     * Content equality, not identity: the screen rows are re-frozen on every frame, and without
+     * this the UI would rebuild the annotated text of every visible row 60 times a second even
+     * when nothing on that row changed.
+     */
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TerminalLine || other.length != length) return false
+        for (i in 0 until length) {
+            if (chars[i] != other.chars[i] || styles[i] != other.styles[i]) return false
+        }
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = length
+        for (i in 0 until length) {
+            result = 31 * result + chars[i].code
+            result = 31 * result + styles[i]
+        }
+        return result
+    }
+
     companion object {
         val EMPTY = TerminalLine(CharArray(0), IntArray(0), 0)
     }

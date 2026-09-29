@@ -1,7 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Default (fallback) language: English. Translations live in values-<lang>/strings.xml. -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">KnotSSH</string>
+
+    <!-- Counted values. %d followed by a noun must inflect, so these are plurals. -->
+    <plurals name="lines">
+        <item quantity="one">%1$d line</item>
+        <item quantity="other">%1$d lines</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+    <plurals name="port_forward_rules">
+        <item quantity="one">%1$d port forward rule</item>
+        <item quantity="other">%1$d port forward rules</item>
+    </plurals>
+    <plurals name="session_limit_message">
+        <item quantity="one">You can keep at most %1$d session at a time. Close it from its notification, or raise the limit in the connection settings.</item>
+        <item quantity="other">You can keep at most %1$d sessions at a time. Close one from its notification, or raise the limit in the connection settings.</item>
+    </plurals>
+    <plurals name="custom_keys_count">
+        <item quantity="one">%1$d custom key</item>
+        <item quantity="other">%1$d custom keys</item>
+    </plurals>
+    <plurals name="commands_count">
+        <item quantity="one">%1$d command</item>
+        <item quantity="other">%1$d commands</item>
+    </plurals>
+    <plurals name="known_hosts_count">
+        <item quantity="one">%1$d known host</item>
+        <item quantity="other">%1$d known hosts</item>
+    </plurals>
+    <plurals name="sessions_active">
+        <item quantity="one">%1$d SSH session running</item>
+        <item quantity="other">%1$d SSH sessions running</item>
+    </plurals>
+    <plurals name="credential_delete_orphans">
+        <item quantity="one">%1$d server uses it and will be left without an account. It is kept, but you will have to assign a new one before connecting.</item>
+        <item quantity="other">%1$d servers use it and will be left without an account. They are kept, but you will have to assign a new one before connecting.</item>
+    </plurals>
 
     <!-- Generic actions -->
     <string name="action_back">Back</string>
@@ -27,7 +65,6 @@
     <!-- Units and generic values -->
     <string name="unit_seconds" translatable="false">%1$d s</string>
     <string name="unit_minutes" translatable="false">%1$d min</string>
-    <string name="unit_lines">%1$d lines</string>
     <string name="value_off">Off</string>
     <string name="value_immediately">Immediately</string>
     <string name="port_range" translatable="false">1-65535</string>
@@ -41,7 +78,6 @@
     <string name="time_now">just now</string>
     <string name="time_minutes_ago">%1$d min ago</string>
     <string name="time_hours_ago">%1$d h ago</string>
-    <string name="time_days_ago">%1$d days ago</string>
 
     <!-- Home -->
     <string name="home_search_hint">Search servers…</string>
@@ -54,7 +90,7 @@
     <string name="home_delete_title">Delete connection</string>
     <string name="home_delete_message">Delete \"%1$s\"?</string>
     <string name="home_last_connection">Last connection: %1$s</string>
-    <string name="home_port_forward_rules">%1$d port forward rule(s)</string>
+    <string name="home_no_credential">No account</string>
     <string name="home_empty_title">No connections</string>
     <string name="home_empty_message">Add your first SSH server\nwith the button below</string>
     <string name="home_empty_search_title">No results</string>
@@ -97,6 +133,8 @@
     <string name="credential_pem_label">PEM private key</string>
     <string name="credential_passphrase_label">Key passphrase (optional)</string>
     <string name="credential_passphrase_hint">Only needed if the private key is encrypted</string>
+    <string name="credential_delete_title">Delete account</string>
+    <string name="credential_delete_message">Delete \"%1$s\"?</string>
     <string name="auth_password">Password</string>
     <string name="auth_ssh_key">SSH key</string>
 
@@ -120,7 +158,6 @@
     <string name="terminal_keep_alive">Keep running</string>
     <string name="terminal_terminate">Terminate</string>
     <string name="terminal_limit_title">Too many open sessions</string>
-    <string name="terminal_limit_message">You can keep at most %1$d sessions at once. Close one from its notification, or raise the limit in the connection settings.</string>
 
     <string name="arrow_up">Up</string>
     <string name="arrow_down">Down</string>
@@ -137,7 +174,7 @@
     <string name="host_key_unknown_title">Unknown host</string>
     <string name="host_key_changed_title">Host key CHANGED</string>
     <string name="host_key_unknown_message">First connection to %1$s:%2$d. Check that the fingerprint matches the one on the server before accepting.</string>
-    <string name="host_key_changed_message">The key of %1$s:%2$d differs from the stored one. This could be a man-in-the-middle attack, or the server was reinstalled.</string>
+    <string name="host_key_changed_message" tools:ignore="PluralsCandidate">The key of %1$s:%2$d differs from the stored one. This could be a man-in-the-middle attack, or the server was reinstalled.</string>
     <string name="host_key_type">Type</string>
     <string name="host_key_fingerprint">Fingerprint</string>
     <string name="host_key_expected">Expected</string>
@@ -149,7 +186,6 @@
     <string name="notification_channel_name">Active SSH sessions</string>
     <string name="notification_channel_desc">One silent card for every session left open</string>
     <string name="notification_session_active">SSH session running</string>
-    <string name="notification_sessions_active">%1$d SSH sessions running</string>
     <string name="notification_reopen">Reopen</string>
     <string name="notification_terminate">Terminate</string>
 
@@ -161,10 +197,11 @@
     <string name="ssh_connection_terminated">Connection terminated: %1$s</string>
     <string name="ssh_session_closed">Session closed (exit code %1$d)</string>
     <string name="ssh_bad_private_key">Invalid private key or wrong passphrase: %1$s</string>
-    <string name="ssh_dynamic_forward_unsupported">Dynamic port forwarding (SOCKS) on port %1$d is not supported by the SSH library: rule ignored.</string>
-    <string name="ssh_forward_rule_failed">Rule %1$s on port %2$d was not applied: %3$s</string>
-    <string name="ssh_unknown_host">Host %1$s:%2$d is unknown (%3$s). The current host key policy does not allow trusting it automatically.</string>
-    <string name="ssh_host_key_changed">WARNING: the host key of %1$s:%2$d has changed.\nExpected: %3$s\nReceived: %4$s\nThis could be a man-in-the-middle attack.</string>
+    <!-- The %d here are port numbers, not counts. -->
+    <string name="ssh_dynamic_forward_unsupported" tools:ignore="PluralsCandidate">Dynamic port forwarding (SOCKS) on port %1$d is not supported by the SSH library: rule ignored.</string>
+    <string name="ssh_forward_rule_failed" tools:ignore="PluralsCandidate">Rule %1$s on port %2$d was not applied: %3$s</string>
+    <string name="ssh_unknown_host" tools:ignore="PluralsCandidate">Host %1$s:%2$d is unknown (%3$s). The current host key policy does not allow trusting it automatically.</string>
+    <string name="ssh_host_key_changed" tools:ignore="PluralsCandidate">WARNING: the host key of %1$s:%2$d has changed.\nExpected: %3$s\nReceived: %4$s\nThis could be a man-in-the-middle attack.</string>
     <string name="ssh_host_key_declined">Connection cancelled: host key not accepted.</string>
 
     <!-- Biometric gate -->
@@ -186,20 +223,16 @@
     <string name="settings_backup_summary">Cloud sync and default values</string>
 
     <string name="summary_font" translatable="false">%1$s %2$dsp</string>
-    <string name="summary_scrollback">%1$d lines</string>
     <string name="summary_auto_size">auto size</string>
     <string name="summary_fixed_size" translatable="false">%1$d×%2$d</string>
     <string name="summary_key_bar_on">key bar on</string>
     <string name="summary_key_bar_off">key bar hidden</string>
-    <string name="summary_custom_keys">%1$d custom keys</string>
-    <string name="summary_quick_commands">%1$d commands</string>
     <string name="summary_keepalive">keep-alive %1$ds</string>
     <string name="summary_keepalive_off">keep-alive off</string>
     <string name="summary_reconnect_on">auto reconnect</string>
     <string name="summary_reconnect_off">no reconnect</string>
     <string name="summary_compression_on">compressed</string>
     <string name="summary_compression_off">not compressed</string>
-    <string name="summary_known_hosts">%1$d known hosts</string>
     <string name="summary_biometric_on">biometric unlock</string>
     <string name="summary_biometric_off">no unlock</string>
     <string name="summary_bell_off">bell off</string>
@@ -208,7 +241,6 @@
     <string name="summary_hostkey_strict">strict check</string>
     <string name="summary_hostkey_prompt">asks for confirmation</string>
     <string name="summary_hostkey_tofu" translatable="false">TOFU</string>
-    <string name="summary_hostkey_any">⚠ no verification</string>
 
     <!-- Shared sections -->
     <string name="section_application">Application</string>
@@ -309,11 +341,9 @@
     <string name="security_host_key_strict_desc">Only already stored hosts. Maximum security.</string>
     <string name="security_host_key_prompt_desc">Asks for confirmation showing the fingerprint on first access.</string>
     <string name="security_host_key_tofu_desc">Stores it automatically on first access, blocks if the key changes.</string>
-    <string name="security_host_key_any_desc">⚠ No protection against man-in-the-middle attacks.</string>
     <string name="host_key_strict">Strict</string>
     <string name="host_key_prompt">Ask</string>
     <string name="host_key_tofu" translatable="false">TOFU</string>
-    <string name="host_key_none">None</string>
     <string name="security_known_hosts_button">Known hosts (%1$d)</string>
     <string name="security_biometric">Biometric unlock</string>
     <string name="security_biometric_desc">Requires fingerprint, face or PIN when opening the app</string>

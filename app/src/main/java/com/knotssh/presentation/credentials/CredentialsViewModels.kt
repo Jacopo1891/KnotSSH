@@ -10,11 +10,13 @@ import com.knotssh.domain.model.AuthType
 import com.knotssh.domain.model.Credential
 import com.knotssh.domain.model.SshKeyType
 import com.knotssh.domain.repository.CredentialRepository
+import com.knotssh.domain.repository.ServerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -23,17 +25,27 @@ import javax.inject.Inject
 
 data class CredentialsUiState(
     val credentials: List<Credential> = emptyList(),
+    /** Servers that would be left without an account if the credential were deleted. */
+    val serversPerCredential: Map<Long, Int> = emptyMap(),
     val isLoading: Boolean = true
 )
 
 @HiltViewModel
 class CredentialsViewModel @Inject constructor(
-    private val repository: CredentialRepository
+    private val repository: CredentialRepository,
+    serverRepository: ServerRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<CredentialsUiState> = repository.getAllCredentials()
-        .map { CredentialsUiState(credentials = it, isLoading = false) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CredentialsUiState())
+    val uiState: StateFlow<CredentialsUiState> = combine(
+        repository.getAllCredentials(),
+        serverRepository.getAllServers()
+    ) { credentials, servers ->
+        CredentialsUiState(
+            credentials = credentials,
+            serversPerCredential = servers.groupingBy { it.credentialId }.eachCount(),
+            isLoading = false
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CredentialsUiState())
 
     fun deleteCredential(id: Long) {
         viewModelScope.launch { repository.deleteCredential(id) }

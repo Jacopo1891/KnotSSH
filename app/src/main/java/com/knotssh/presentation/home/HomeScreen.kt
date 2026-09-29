@@ -21,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -332,12 +334,13 @@ private fun ServerItemWithSwipe(
 ) {
     var showContextMenu by remember { mutableStateOf(false) }
 
-    SwipeToDeleteContainer(onDelete = onDelete) {
+    SwipeToDeleteContainer(onDelete = { onDelete(); false }) {
         ServerCard(
             server = server,
             credential = credential,
             hasActiveSession = hasActiveSession,
             onConnect = onConnect,
+            onFixCredential = onEdit,
             onLongPress = { showContextMenu = true },
             onToggleFavorite = onToggleFavorite,
             modifier = Modifier.fillMaxWidth()
@@ -363,17 +366,25 @@ private fun ServerCard(
     credential: Credential?,
     hasActiveSession: Boolean,
     onConnect: () -> Unit,
+    onFixCredential: () -> Unit,
     onLongPress: () -> Unit,
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val accentColor = MaterialTheme.colorScheme.primary
+    // The credential it referenced was deleted: connecting would only fail, so the card sends
+    // the user to the editor instead.
+    val orphaned = credential == null
+    val accentColor = if (orphaned) {
+        MaterialTheme.colorScheme.error
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
 
     Card(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .combinedClickable(
-                onClick = onConnect,
+                onClick = if (orphaned) onFixCredential else onConnect,
                 onLongClick = onLongPress
             ),
         shape = RoundedCornerShape(16.dp),
@@ -465,6 +476,13 @@ private fun ServerCard(
                             icon = Icons.Default.Person,
                             text = credential.username
                         )
+                    } else {
+                        ServerChip(
+                            icon = Icons.Default.PersonOff,
+                            text = stringResource(R.string.home_no_credential),
+                            container = MaterialTheme.colorScheme.errorContainer,
+                            content = MaterialTheme.colorScheme.onErrorContainer
+                        )
                     }
                 }
                 server.lastConnectedMs?.let { ms ->
@@ -478,8 +496,9 @@ private fun ServerCard(
                 if (server.portForwardRules.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = stringResource(
-                            R.string.home_port_forward_rules,
+                        text = pluralStringResource(
+                            R.plurals.port_forward_rules,
+                            server.portForwardRules.size,
                             server.portForwardRules.size
                         ),
                         style = MaterialTheme.typography.labelSmall,
@@ -505,15 +524,17 @@ private fun ServerCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 // Connect button
                 FilledIconButton(
-                    onClick = onConnect,
+                    onClick = if (orphaned) onFixCredential else onConnect,
                     modifier = Modifier.size(36.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = accentColor
                     )
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Terminal,
-                        contentDescription = stringResource(R.string.action_connect),
+                        imageVector = if (orphaned) Icons.Default.Edit else Icons.Default.Terminal,
+                        contentDescription = stringResource(
+                            if (orphaned) R.string.action_edit else R.string.action_connect
+                        ),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -525,26 +546,28 @@ private fun ServerCard(
 @Composable
 private fun ServerChip(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String
+    text: String,
+    container: Color = MaterialTheme.colorScheme.surfaceVariant,
+    content: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         modifier = Modifier
             .clip(RoundedCornerShape(6.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(container)
             .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(10.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = content
         )
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = content,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -666,7 +689,10 @@ private fun formatLastConnected(ms: Long): String {
         diff < 60_000 -> stringResource(R.string.time_now)
         diff < 3_600_000 -> stringResource(R.string.time_minutes_ago, diff / 60_000)
         diff < 86_400_000 -> stringResource(R.string.time_hours_ago, diff / 3_600_000)
-        diff < 604_800_000 -> stringResource(R.string.time_days_ago, diff / 86_400_000)
+        diff < 604_800_000 -> {
+            val days = (diff / 86_400_000).toInt()
+            pluralStringResource(R.plurals.days_ago, days, days)
+        }
         else -> remember(ms) {
             SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(ms))
         }

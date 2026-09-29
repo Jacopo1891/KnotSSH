@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- `many` copre i milioni nelle regole CLDR italiane: irraggiungibile qui, ma richiesto. -->
+    <plurals name="lines">
+        <item quantity="one">%1$d riga</item>
+        <item quantity="many">%1$d di righe</item>
+        <item quantity="other">%1$d righe</item>
+    </plurals>
+    <plurals name="days_ago">
+        <item quantity="one">%1$d giorno fa</item>
+        <item quantity="many">%1$d di giorni fa</item>
+        <item quantity="other">%1$d giorni fa</item>
+    </plurals>
+    <plurals name="port_forward_rules">
+        <item quantity="one">%1$d regola port forward</item>
+        <item quantity="many">%1$d di regole port forward</item>
+        <item quantity="other">%1$d regole port forward</item>
+    </plurals>
+    <plurals name="session_limit_message">
+        <item quantity="one">Puoi tenere al massimo %1$d sessione per volta. Chiudila dalla notifica, oppure alza il limite dalle impostazioni di connessione.</item>
+        <item quantity="many">Puoi tenere al massimo %1$d di sessioni contemporanee. Chiudine una dalla notifica, oppure alza il limite dalle impostazioni di connessione.</item>
+        <item quantity="other">Puoi tenere al massimo %1$d sessioni contemporanee. Chiudine una dalla notifica, oppure alza il limite dalle impostazioni di connessione.</item>
+    </plurals>
+    <plurals name="custom_keys_count">
+        <item quantity="one">%1$d tasto rapido</item>
+        <item quantity="many">%1$d di tasti rapidi</item>
+        <item quantity="other">%1$d tasti rapidi</item>
+    </plurals>
+    <plurals name="commands_count">
+        <item quantity="one">%1$d comando</item>
+        <item quantity="many">%1$d di comandi</item>
+        <item quantity="other">%1$d comandi</item>
+    </plurals>
+    <plurals name="known_hosts_count">
+        <item quantity="one">%1$d host noto</item>
+        <item quantity="many">%1$d di host noti</item>
+        <item quantity="other">%1$d host noti</item>
+    </plurals>
+    <plurals name="sessions_active">
+        <item quantity="one">%1$d sessione SSH attiva</item>
+        <item quantity="many">%1$d di sessioni SSH attive</item>
+        <item quantity="other">%1$d sessioni SSH attive</item>
+    </plurals>
+    <plurals name="credential_delete_orphans">
+        <item quantity="one">%1$d server la usa e resterà senza utenza. Non viene eliminato, ma dovrai assegnargliene una nuova prima di connetterti.</item>
+        <item quantity="many">%1$d di server la usano e resteranno senza utenza. Non vengono eliminati, ma dovrai assegnarne una nuova prima di connetterti.</item>
+        <item quantity="other">%1$d server la usano e resteranno senza utenza. Non vengono eliminati, ma dovrai assegnarne una nuova prima di connetterti.</item>
+    </plurals>
+
     <string name="action_back">Indietro</string>
     <string name="action_save">Salva</string>
     <string name="action_add">Aggiungi</string>
@@ -20,7 +67,6 @@
     <string name="action_unfavorite">Rimuovi dai preferiti</string>
     <string name="action_got_it">Ho capito</string>
 
-    <string name="unit_lines">%1$d righe</string>
     <string name="value_off">Off</string>
     <string name="value_immediately">Subito</string>
 
@@ -31,7 +77,6 @@
     <string name="time_now">ora</string>
     <string name="time_minutes_ago">%1$d min fa</string>
     <string name="time_hours_ago">%1$d ore fa</string>
-    <string name="time_days_ago">%1$d giorni fa</string>
 
     <string name="home_search_hint">Cerca server…</string>
     <string name="home_search">Cerca</string>
@@ -43,7 +88,7 @@
     <string name="home_delete_title">Elimina connessione</string>
     <string name="home_delete_message">Vuoi eliminare \"%1$s\"?</string>
     <string name="home_last_connection">Ultima connessione: %1$s</string>
-    <string name="home_port_forward_rules">%1$d regola/e port forward</string>
+    <string name="home_no_credential">Nessuna utenza</string>
     <string name="home_empty_title">Nessuna connessione</string>
     <string name="home_empty_message">Aggiungi il tuo primo server SSH\ncon il pulsante in basso</string>
     <string name="home_empty_search_title">Nessun risultato</string>
@@ -82,6 +127,8 @@
     <string name="credential_pem_label">Chiave privata PEM</string>
     <string name="credential_passphrase_label">Passphrase della chiave (opzionale)</string>
     <string name="credential_passphrase_hint">Necessaria solo se la chiave privata è cifrata</string>
+    <string name="credential_delete_title">Elimina utenza</string>
+    <string name="credential_delete_message">Vuoi eliminare \"%1$s\"?</string>
     <string name="auth_password">Password</string>
     <string name="auth_ssh_key">Chiave SSH</string>
 
@@ -104,7 +151,6 @@
     <string name="terminal_keep_alive">Lascia attiva</string>
     <string name="terminal_terminate">Termina</string>
     <string name="terminal_limit_title">Troppe sessioni aperte</string>
-    <string name="terminal_limit_message">Puoi tenere al massimo %1$d sessioni contemporanee. Chiudine una dalla notifica, oppure alza il limite dalle impostazioni di connessione.</string>
 
     <string name="arrow_up">Su</string>
     <string name="arrow_down">Giù</string>
@@ -131,7 +177,6 @@
     <string name="notification_channel_name">Sessioni SSH attive</string>
     <string name="notification_channel_desc">Una scheda silenziosa per ogni sessione lasciata aperta</string>
     <string name="notification_session_active">Sessione SSH attiva</string>
-    <string name="notification_sessions_active">%1$d sessioni SSH attive</string>
     <string name="notification_reopen">Riapri</string>
     <string name="notification_terminate">Termina</string>
 
@@ -164,19 +209,15 @@
     <string name="settings_backup">Backup e ripristino</string>
     <string name="settings_backup_summary">Sincronizzazione cloud e valori predefiniti</string>
 
-    <string name="summary_scrollback">%1$d righe</string>
     <string name="summary_auto_size">auto-dimensione</string>
     <string name="summary_key_bar_on">barra tasti attiva</string>
     <string name="summary_key_bar_off">barra tasti nascosta</string>
-    <string name="summary_custom_keys">%1$d tasti rapidi</string>
-    <string name="summary_quick_commands">%1$d comandi</string>
     <string name="summary_keepalive">keep-alive %1$ds</string>
     <string name="summary_keepalive_off">keep-alive off</string>
     <string name="summary_reconnect_on">riconnessione automatica</string>
     <string name="summary_reconnect_off">nessuna riconnessione</string>
     <string name="summary_compression_on">compressa</string>
     <string name="summary_compression_off">non compressa</string>
-    <string name="summary_known_hosts">%1$d host noti</string>
     <string name="summary_biometric_on">sblocco biometrico</string>
     <string name="summary_biometric_off">nessuno sblocco</string>
     <string name="summary_bell_off">campanella off</string>
@@ -184,7 +225,6 @@
     <string name="summary_bell_sound">campanella sonora</string>
     <string name="summary_hostkey_strict">verifica rigida</string>
     <string name="summary_hostkey_prompt">chiede conferma</string>
-    <string name="summary_hostkey_any">⚠ nessuna verifica</string>
 
     <string name="section_application">Applicazione</string>
     <string name="section_buffer">Buffer</string>
@@ -270,10 +310,8 @@
     <string name="security_host_key_strict_desc">Solo host già memorizzati. Massima sicurezza.</string>
     <string name="security_host_key_prompt_desc">Chiede conferma mostrando l\'impronta al primo accesso.</string>
     <string name="security_host_key_tofu_desc">Memorizza in automatico al primo accesso, blocca se la chiave cambia.</string>
-    <string name="security_host_key_any_desc">⚠ Nessuna protezione contro attacchi man-in-the-middle.</string>
     <string name="host_key_strict">Rigida</string>
     <string name="host_key_prompt">Chiedi</string>
-    <string name="host_key_none">Nessuna</string>
     <string name="security_known_hosts_button">Host conosciuti (%1$d)</string>
     <string name="security_biometric">Sblocco biometrico</string>
     <string name="security_biometric_desc">Richiede impronta, volto o PIN all\'apertura dell\'app</string>

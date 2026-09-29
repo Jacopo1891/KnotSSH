@@ -25,7 +25,10 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 enum class TerminalFont { MONOSPACE, SANS_SERIF, SERIF }
 
-/** How unknown or changed SSH host keys are handled. */
+/**
+ * How unknown or changed SSH host keys are handled. Every option blocks on a changed key:
+ * that is the signal of a man-in-the-middle, and no setting may silence it.
+ */
 enum class HostKeyPolicy {
     /** Refuse any host that is not already in the local known-hosts store. */
     STRICT,
@@ -34,10 +37,7 @@ enum class HostKeyPolicy {
     PROMPT,
 
     /** Silently trust the first key seen, but still block on a mismatch. */
-    TRUST_ON_FIRST_USE,
-
-    /** Accept anything. Disables MITM protection entirely. */
-    ACCEPT_ANY
+    TRUST_ON_FIRST_USE
 }
 
 enum class BellMode { OFF, VIBRATE, SOUND }

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,7 +58,11 @@ fun SettingsScreen(
                 icon = Icons.Default.Terminal,
                 title = stringResource(R.string.settings_terminal),
                 summary = listOf(
-                    stringResource(R.string.summary_scrollback, terminal.scrollbackLines),
+                    pluralStringResource(
+                        R.plurals.lines,
+                        terminal.scrollbackLines,
+                        terminal.scrollbackLines
+                    ),
                     if (terminal.autoSizePty) {
                         stringResource(R.string.summary_auto_size)
                     } else {
@@ -82,8 +87,16 @@ fun SettingsScreen(
                     } else {
                         stringResource(R.string.summary_key_bar_off)
                     },
-                    stringResource(R.string.summary_custom_keys, customKeys.size),
-                    stringResource(R.string.summary_quick_commands, quickCommands.size)
+                    pluralStringResource(
+                        R.plurals.custom_keys_count,
+                        customKeys.size,
+                        customKeys.size
+                    ),
+                    pluralStringResource(
+                        R.plurals.commands_count,
+                        quickCommands.size,
+                        quickCommands.size
+                    )
                 ).joinToString(SUMMARY_SEPARATOR),
                 onClick = onOpenKeyboard
             )
@@ -118,7 +131,11 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_security),
                 summary = listOf(
                     security.hostKeyPolicy.label(),
-                    stringResource(R.string.summary_known_hosts, knownHosts.size),
+                    pluralStringResource(
+                        R.plurals.known_hosts_count,
+                        knownHosts.size,
+                        knownHosts.size
+                    ),
                     if (security.biometricEnabled) {
                         stringResource(R.string.summary_biometric_on)
                     } else {
@@ -188,6 +205,5 @@ private fun HostKeyPolicy.label() = stringResource(
         HostKeyPolicy.STRICT -> R.string.summary_hostkey_strict
         HostKeyPolicy.PROMPT -> R.string.summary_hostkey_prompt
         HostKeyPolicy.TRUST_ON_FIRST_USE -> R.string.summary_hostkey_tofu
-        HostKeyPolicy.ACCEPT_ANY -> R.string.summary_hostkey_any
     }
 )
