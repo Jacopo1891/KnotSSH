@@ -368,32 +368,35 @@ private fun ServerCard(
             Spacer(modifier = Modifier.width(12.dp))
 
             // Server icon
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Dns,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(22.dp)
-                )
+            Box(contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Dns,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
                 if (hasActiveSession) {
-                    // Ringed so the dot stays visible against the icon underneath.
+                    // Sits outside the icon's clip so the ring reads against any background.
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .size(12.dp)
+                            .offset(x = 5.dp, y = (-5).dp)
+                            .size(18.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                            .background(MaterialTheme.colorScheme.surface),
                         contentAlignment = Alignment.Center
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(8.dp)
+                                .size(13.dp)
                                 .clip(CircleShape)
                                 .background(SshGreen)
                         )
