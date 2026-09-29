@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme using Material Component's DayNight style -->
+    <style name="Theme.KnotSSH" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Without this the window is letterboxed away from the camera cutout in landscape,
+             leaving a black band no drawing can cover. Content is kept clear of it with
+             safeDrawing insets. -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

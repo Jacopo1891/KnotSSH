@@ -1,0 +1,41 @@
+# Shared formatting rules, honoured natively by both Android Studio and VS Code.
+# Kept in the repo instead of .idea/ so the two editors stay in sync on every machine.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+# Mirrors kotlin.code.style=official in gradle.properties.
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+max_line_length = 120
+ij_continuation_indent_size = 4
+# Never collapse imports into wildcards: the threshold differs between IDE installs and
+# silently produces import churn when two machines touch the same file.
+ij_kotlin_name_count_to_use_star_import = 2147483647
+ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
+ij_kotlin_packages_to_use_import_on_demand = unset
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+[*.xml]
+ij_xml_keep_blank_lines = 1
+ij_continuation_indent_size = 4
+
+[*.{yml,yaml,json}]
+indent_size = 2
+
+[*.toml]
+indent_size = 2
+
+[*.md]
+# Two trailing spaces are a hard line break in Markdown.
+trim_trailing_whitespace = false
+
+[*.{bat,cmd}]
+end_of_line = crlf

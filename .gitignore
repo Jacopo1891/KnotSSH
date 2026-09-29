@@ -1,0 +1,58 @@
+# --- Build output -------------------------------------------------------------
+# app/build alone is ~350 MB of regenerable artifacts.
+build/
+.gradle/
+.cxx/
+.externalNativeBuild/
+
+# Kotlin compiler session data (Kotlin 2.x)
+.kotlin/
+
+# --- Local machine configuration ----------------------------------------------
+# Contains the absolute path to the Android SDK: it is different on every machine
+# and must never be shared.
+local.properties
+
+# --- IDE ----------------------------------------------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# --- Packaged artifacts -------------------------------------------------------
+# These are produced by the build; releases belong in tags, not in the history.
+*.apk
+*.aab
+*.ap_
+*.aar
+*.dex
+output.json
+
+# --- Signing material: never commit -------------------------------------------
+# A leaked release keystore cannot be revoked; it would let anyone publish
+# updates impersonating this app.
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+key.properties
+
+# --- Secrets and service configuration ----------------------------------------
+google-services.json
+secrets.properties
+*.p8
+*.p12
+*.pem
+
+# --- Diagnostics --------------------------------------------------------------
+*.hprof
+*.log
+captures/
+lint-results*.html
+lint-results*.xml
+
+# --- OS noise -----------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*~
