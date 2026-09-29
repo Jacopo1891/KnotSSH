@@ -23,11 +23,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.R
 import com.knotssh.domain.model.Credential
 import com.knotssh.domain.model.Server
 import com.knotssh.presentation.components.SwipeToDeleteContainer
@@ -165,11 +167,22 @@ private fun HomeTopBar(
                             shape = RoundedCornerShape(12.dp)
                         )
                     } else {
-                        Text(
-                            text = "KnotSSH",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_launcher_monochrome),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                // The knot only fills the adaptive-icon safe zone, so the box
+                                // must be oversized for the glyph to read at title scale.
+                                modifier = Modifier.size(38.dp)
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Text(
+                                text = "KnotSSH",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             },
