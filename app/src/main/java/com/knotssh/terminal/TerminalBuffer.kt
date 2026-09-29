@@ -68,7 +68,9 @@ class TerminalSnapshot(
     val cursorRow: Int,
     val cursorCol: Int,
     val cursorVisible: Boolean,
-    val revision: Long
+    val revision: Long,
+    /** Full-screen app (vim, less, ...): there is no scrollback to pan through. */
+    val altScreen: Boolean = false
 ) {
     val totalLines: Int get() = scrollback.size + screen.size
 

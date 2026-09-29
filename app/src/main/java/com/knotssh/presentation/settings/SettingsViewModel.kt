@@ -82,6 +82,8 @@ class SettingsViewModel @Inject constructor(
     fun setBellMode(value: BellMode) = update { prefs.setBellMode(value) }
     fun setKeepScreenOn(value: Boolean) = update { prefs.setKeepScreenOn(value) }
     fun setAutoShowKeyboard(value: Boolean) = update { prefs.setAutoShowKeyboard(value) }
+    fun setSwipeScrollsFullScreenApps(value: Boolean) =
+        update { prefs.setSwipeScrollsFullScreenApps(value) }
 
     // Connection
     fun setKeepAliveSeconds(value: Int) = update { prefs.setKeepAliveSeconds(value) }

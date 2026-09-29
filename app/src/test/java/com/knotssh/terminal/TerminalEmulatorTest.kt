@@ -1,6 +1,7 @@
 package com.knotssh.terminal
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -133,6 +134,16 @@ class TerminalEmulatorTest {
         assertEquals("OVERLAY", emulator.screenText()[0])
         emulator.feed("\u001B[?1049l")
         assertEquals("main", emulator.screenText()[0])
+    }
+
+    @Test
+    fun `snapshot reports the alternate screen`() {
+        val emulator = emulator()
+        assertFalse(emulator.snapshot().altScreen)
+        emulator.feed("\u001B[?1049h")
+        assertTrue(emulator.snapshot().altScreen)
+        emulator.feed("\u001B[?1049l")
+        assertFalse(emulator.snapshot().altScreen)
     }
 
     @Test

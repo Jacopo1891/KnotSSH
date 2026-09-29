@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
@@ -371,6 +372,7 @@ fun TerminalScreen(
                 snapshots = viewModel.snapshot,
                 onMeasured = viewModel::onViewportMeasured,
                 onTap = ::refocus,
+                onScrollLine = viewModel::sendArrow,
                 focusRequester = focusRequester,
                 onInput = viewModel::sendText,
                 modifier = Modifier.weight(1f)
@@ -427,6 +429,7 @@ private fun TerminalViewport(
     snapshots: StateFlow<TerminalSnapshot>,
     onMeasured: (columns: Int, rows: Int, widthPx: Int, heightPx: Int) -> Unit,
     onTap: () -> Unit,
+    onScrollLine: (Char) -> Unit,
     focusRequester: FocusRequester,
     onInput: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -475,14 +478,38 @@ private fun TerminalViewport(
             onMeasured(columns, rows, widthPx.toInt(), heightPx.toInt())
         }
 
+        // A full-screen app owns the whole grid, so there is nothing for the list to scroll;
+        // the drag is translated into cursor keys instead, one per line of travel.
+        val swipeSendsArrows = snapshot.altScreen && settings.swipeScrollsFullScreenApps
+
         LazyColumn(
             state = listState,
             // Reversed layout keeps the newest line pinned to the bottom without manual scrolling.
             reverseLayout = true,
+            userScrollEnabled = !swipeSendsArrows,
             modifier = Modifier
                 .fillMaxSize()
                 // Tap gestures do not consume drags, so the buffer stays scrollable.
                 .pointerInput(Unit) { detectTapGestures { onTap() } }
+                .pointerInput(swipeSendsArrows, cellSize.second) {
+                    if (!swipeSendsArrows) return@pointerInput
+                    val step = cellSize.second.coerceAtLeast(1f)
+                    var travel = 0f
+                    detectVerticalDragGestures(
+                        onDragEnd = { travel = 0f },
+                        onDragCancel = { travel = 0f }
+                    ) { _, delta ->
+                        travel += delta
+                        while (travel <= -step) {
+                            travel += step
+                            onScrollLine('B')
+                        }
+                        while (travel >= step) {
+                            travel -= step
+                            onScrollLine('A')
+                        }
+                    }
+                }
             // No content padding: the row count is derived from the viewport height, and any
             // padding would make the grid taller than what actually fits.
         ) {

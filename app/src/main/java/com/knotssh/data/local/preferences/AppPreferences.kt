@@ -63,7 +63,8 @@ data class TerminalSettings(
     val hapticFeedback: Boolean = true,
     val bellMode: BellMode = BellMode.VIBRATE,
     val keepScreenOn: Boolean = true,
-    val autoShowKeyboard: Boolean = true
+    val autoShowKeyboard: Boolean = true,
+    val swipeScrollsFullScreenApps: Boolean = true
 )
 
 data class ConnectionSettings(
@@ -133,6 +134,7 @@ class AppPreferences @Inject constructor(
         val BELL_MODE = stringPreferencesKey("bell_mode")
         val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
         val AUTO_SHOW_KEYBOARD = booleanPreferencesKey("auto_show_keyboard")
+        val SWIPE_SCROLLS_FULLSCREEN = booleanPreferencesKey("swipe_scrolls_fullscreen")
 
         val KEEP_ALIVE_SECONDS = intPreferencesKey("keep_alive_seconds")
         val CONNECT_TIMEOUT_SECONDS = intPreferencesKey("connect_timeout_seconds")
@@ -186,7 +188,8 @@ class AppPreferences @Inject constructor(
             hapticFeedback = p[Keys.HAPTIC_FEEDBACK] ?: true,
             bellMode = p[Keys.BELL_MODE].toEnum(BellMode.VIBRATE),
             keepScreenOn = p[Keys.KEEP_SCREEN_ON] ?: true,
-            autoShowKeyboard = p[Keys.AUTO_SHOW_KEYBOARD] ?: true
+            autoShowKeyboard = p[Keys.AUTO_SHOW_KEYBOARD] ?: true,
+            swipeScrollsFullScreenApps = p[Keys.SWIPE_SCROLLS_FULLSCREEN] ?: true
         )
     }.distinctUntilChanged()
 
@@ -247,6 +250,8 @@ class AppPreferences @Inject constructor(
     suspend fun setBellMode(value: BellMode) = put(Keys.BELL_MODE, value.name)
     suspend fun setKeepScreenOn(value: Boolean) = put(Keys.KEEP_SCREEN_ON, value)
     suspend fun setAutoShowKeyboard(value: Boolean) = put(Keys.AUTO_SHOW_KEYBOARD, value)
+    suspend fun setSwipeScrollsFullScreenApps(value: Boolean) =
+        put(Keys.SWIPE_SCROLLS_FULLSCREEN, value)
 
     suspend fun setKeepAliveSeconds(value: Int) = put(Keys.KEEP_ALIVE_SECONDS, value.coerceIn(0, 600))
     suspend fun setConnectTimeoutSeconds(value: Int) = put(Keys.CONNECT_TIMEOUT_SECONDS, value.coerceIn(5, 120))

@@ -93,6 +93,14 @@ fun KeyboardSettingsScreen(
         }
         item {
             SwitchRow(
+                title = "Scorri con le dita nelle app a schermo intero",
+                description = "In vim, less e simili lo swipe verticale invia frecce su/giù",
+                checked = terminal.swipeScrollsFullScreenApps,
+                onCheckedChange = viewModel::setSwipeScrollsFullScreenApps
+            )
+        }
+        item {
+            SwitchRow(
                 title = "Feedback aptico",
                 description = "Vibrazione breve sui tasti della barra",
                 checked = terminal.hapticFeedback,

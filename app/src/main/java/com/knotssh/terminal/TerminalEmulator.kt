@@ -732,7 +732,8 @@ class TerminalEmulator(
             cursorRow = scrollbackView.size + cursorRow,
             cursorCol = cursorCol,
             cursorVisible = cursorVisible,
-            revision = revision
+            revision = revision,
+            altScreen = altScreenActive
         )
     }
 
