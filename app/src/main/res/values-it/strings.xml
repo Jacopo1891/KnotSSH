@@ -128,11 +128,18 @@
     <string name="credential_passphrase_label">Passphrase della chiave (opzionale)</string>
     <string name="credential_passphrase_hint">Necessaria solo se la chiave privata è cifrata</string>
     <string name="credential_delete_title">Elimina utenza</string>
+    <string name="credential_ask_each_time">Chiedi ogni volta</string>
+    <string name="credential_ask_each_time_password_desc">La password non viene salvata sul dispositivo: la digiti a ogni connessione</string>
+    <string name="credential_ask_each_time_key_desc">La chiave privata viene salvata, la sua passphrase no: la digiti a ogni connessione</string>
+    <string name="credential_prompts">chiede ogni volta</string>
     <string name="credential_delete_message">Vuoi eliminare \"%1$s\"?</string>
     <string name="auth_password">Password</string>
     <string name="auth_ssh_key">Chiave SSH</string>
 
     <string name="terminal_default_title">Terminale SSH</string>
+    <string name="secret_prompt_password_title">Password richiesta</string>
+    <string name="secret_prompt_passphrase_title">Passphrase richiesta</string>
+    <string name="secret_prompt_message">Questa utenza non memorizza il suo segreto. Viene usato solo per questa connessione e non viene mai scritto sul dispositivo.\n\nUtente: %1$s</string>
     <string name="terminal_copy_output">Copia output</string>
     <string name="terminal_paste">Incolla</string>
     <string name="terminal_reconnect">Riconnetti</string>
@@ -183,6 +190,7 @@
     <string name="ssh_server_not_found">Server non trovato</string>
     <string name="ssh_credential_not_found">Credenziale associata non trovata</string>
     <string name="ssh_connection_error">Errore di connessione</string>
+    <string name="ssh_auth_cancelled">Connessione annullata: nessuna credenziale inserita.</string>
     <string name="ssh_connecting_to">Connessione a %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connessione terminata: %1$s</string>
     <string name="ssh_session_closed">Sessione chiusa (codice %1$d)</string>

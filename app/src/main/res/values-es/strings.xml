@@ -128,11 +128,18 @@
     <string name="credential_passphrase_label">Frase de contraseña de la clave (opcional)</string>
     <string name="credential_passphrase_hint">Solo hace falta si la clave privada está cifrada</string>
     <string name="credential_delete_title">Eliminar cuenta</string>
+    <string name="credential_ask_each_time">Preguntar cada vez</string>
+    <string name="credential_ask_each_time_password_desc">La contraseña no se guarda en el dispositivo: la escribes en cada conexión</string>
+    <string name="credential_ask_each_time_key_desc">La clave privada se guarda, su frase de contraseña no: la escribes en cada conexión</string>
+    <string name="credential_prompts">pregunta cada vez</string>
     <string name="credential_delete_message">¿Eliminar «%1$s»?</string>
     <string name="auth_password">Contraseña</string>
     <string name="auth_ssh_key">Clave SSH</string>
 
     <string name="terminal_default_title">Terminal SSH</string>
+    <string name="secret_prompt_password_title">Contraseña requerida</string>
+    <string name="secret_prompt_passphrase_title">Frase de contraseña requerida</string>
+    <string name="secret_prompt_message">Esta cuenta no guarda su secreto. Se usa solo para esta conexión y nunca se escribe en el dispositivo.\n\nUsuario: %1$s</string>
     <string name="terminal_copy_output">Copiar salida</string>
     <string name="terminal_paste">Pegar</string>
     <string name="terminal_reconnect">Reconectar</string>
@@ -183,6 +190,7 @@
     <string name="ssh_server_not_found">Servidor no encontrado</string>
     <string name="ssh_credential_not_found">Credencial asociada no encontrada</string>
     <string name="ssh_connection_error">Error de conexión</string>
+    <string name="ssh_auth_cancelled">Conexión cancelada: no se ha introducido ninguna credencial.</string>
     <string name="ssh_connecting_to">Conectando a %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Conexión terminada: %1$s</string>
     <string name="ssh_session_closed">Sesión cerrada (código %1$d)</string>

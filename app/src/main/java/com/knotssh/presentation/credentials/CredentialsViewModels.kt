@@ -61,6 +61,7 @@ data class EditCredentialUiState(
     val publicKey: String? = null,
     val keyType: SshKeyType? = null,
     val maskSecrets: Boolean = true,
+    val askEachTime: Boolean = false,
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     @StringRes val aliasError: Int? = null,
@@ -96,7 +97,8 @@ class EditCredentialViewModel @Inject constructor(
                             secret = repository.decryptSecret(credential),
                             passphrase = repository.decryptPassphrase(credential).orEmpty(),
                             publicKey = credential.publicKey,
-                            keyType = credential.keyType
+                            keyType = credential.keyType,
+                            askEachTime = credential.askEachTime
                         )
                     }
                 }
@@ -110,6 +112,10 @@ class EditCredentialViewModel @Inject constructor(
     fun onSecretChanged(value: String) = _state.update { it.copy(secret = value, secretError = null) }
     fun onPassphraseChanged(value: String) = _state.update { it.copy(passphrase = value) }
 
+    fun onAskEachTimeChanged(value: Boolean) = _state.update {
+        it.copy(askEachTime = value, secretError = null)
+    }
+
     fun save() {
         val current = _state.value
         var hasError = false
@@ -121,7 +127,10 @@ class EditCredentialViewModel @Inject constructor(
             _state.update { it.copy(usernameError = R.string.error_required) }
             hasError = true
         }
-        if (current.secret.isBlank()) {
+        // A password that is typed at every connection is never stored, so there is nothing
+        // to validate here.
+        val secretRequired = !(current.askEachTime && current.authType == AuthType.PASSWORD)
+        if (secretRequired && current.secret.isBlank()) {
             _state.update { it.copy(secretError = R.string.error_required) }
             hasError = true
         }
@@ -136,7 +145,8 @@ class EditCredentialViewModel @Inject constructor(
                     username = current.username.trim(),
                     authType = current.authType,
                     publicKey = current.publicKey,
-                    keyType = current.keyType
+                    keyType = current.keyType,
+                    askEachTime = current.askEachTime
                 ),
                 plainSecret = current.secret,
                 plainPassphrase = current.passphrase.takeIf { current.authType == AuthType.SSH_KEY }

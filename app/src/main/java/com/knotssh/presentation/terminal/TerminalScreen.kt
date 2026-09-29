@@ -41,6 +41,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -50,8 +51,11 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -60,6 +64,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -102,7 +107,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,6 +119,7 @@ import com.knotssh.data.local.preferences.TerminalSettings
 import com.knotssh.domain.model.CustomKey
 import com.knotssh.domain.model.HostKeyVerdict
 import com.knotssh.ssh.TerminalStatus
+import com.knotssh.ssh.SecretPrompt
 import com.knotssh.R
 import com.knotssh.presentation.common.RequestNotificationPermissionOnce
 import com.knotssh.presentation.theme.TerminalBackground
@@ -139,6 +147,7 @@ fun TerminalScreen(
     val ctrlArmed by viewModel.ctrlArmed.collectAsStateWithLifecycle()
     val altArmed by viewModel.altArmed.collectAsStateWithLifecycle()
     val hostKeyPrompt by viewModel.hostKeyPrompt.collectAsStateWithLifecycle()
+    val secretPrompt by viewModel.secretPrompt.collectAsStateWithLifecycle()
     val connection by viewModel.connectionSettings.collectAsStateWithLifecycle()
     val backgroundSessions by viewModel.backgroundSessionsEnabled.collectAsStateWithLifecycle()
 
@@ -255,6 +264,14 @@ fun TerminalScreen(
             verdict = verdict,
             onAccept = { viewModel.resolveHostKeyPrompt(true) },
             onReject = { viewModel.resolveHostKeyPrompt(false) }
+        )
+    }
+
+    secretPrompt?.let { prompt ->
+        SecretPromptDialog(
+            prompt = prompt,
+            onSubmit = { viewModel.resolveSecretPrompt(it) },
+            onDismiss = { viewModel.resolveSecretPrompt(null) }
         )
     }
 
@@ -996,6 +1013,79 @@ private fun FingerprintRow(label: String, value: String) {
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(value, style = MaterialTheme.typography.bodySmall, fontSize = 12.sp)
     }
+}
+
+@Composable
+private fun SecretPromptDialog(
+    prompt: SecretPrompt,
+    onSubmit: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var secret by remember { mutableStateOf("") }
+    var visible by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) { runCatching { focusRequester.requestFocus() } }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Default.Lock, contentDescription = null) },
+        title = {
+            Text(
+                stringResource(
+                    if (prompt.passphrase) R.string.secret_prompt_passphrase_title
+                    else R.string.secret_prompt_password_title
+                )
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.secret_prompt_message, prompt.username),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = secret,
+                    onValueChange = { secret = it },
+                    singleLine = true,
+                    visualTransformation = if (visible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Go
+                    ),
+                    keyboardActions = KeyboardActions(onGo = { onSubmit(secret) }),
+                    trailingIcon = {
+                        IconButton(onClick = { visible = !visible }) {
+                            Icon(
+                                imageVector = if (visible) {
+                                    Icons.Default.VisibilityOff
+                                } else {
+                                    Icons.Default.Visibility
+                                },
+                                contentDescription = stringResource(
+                                    if (visible) R.string.action_hide else R.string.action_show
+                                )
+                            )
+                        }
+                    },
+                    modifier = Modifier.focusRequester(focusRequester)
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = secret.isNotEmpty(), onClick = { onSubmit(secret) }) {
+                Text(stringResource(R.string.action_connect))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        }
+    )
 }
 
 /** Headroom on both sides of the hidden buffer so key-repeat can run without a re-centre. */

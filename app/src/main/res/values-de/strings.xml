@@ -118,11 +118,18 @@
     <string name="credential_passphrase_label">Passphrase des Schlüssels (optional)</string>
     <string name="credential_passphrase_hint">Nur nötig, wenn der private Schlüssel verschlüsselt ist</string>
     <string name="credential_delete_title">Zugang löschen</string>
+    <string name="credential_ask_each_time">Jedes Mal fragen</string>
+    <string name="credential_ask_each_time_password_desc">Das Passwort wird nicht auf dem Gerät gespeichert: du gibst es bei jeder Verbindung ein</string>
+    <string name="credential_ask_each_time_key_desc">Der private Schlüssel wird gespeichert, seine Passphrase nicht: du gibst sie bei jeder Verbindung ein</string>
+    <string name="credential_prompts">fragt jedes Mal</string>
     <string name="credential_delete_message">„%1$s“ löschen?</string>
     <string name="auth_password">Passwort</string>
     <string name="auth_ssh_key">SSH-Schlüssel</string>
 
     <string name="terminal_default_title">SSH-Terminal</string>
+    <string name="secret_prompt_password_title">Passwort erforderlich</string>
+    <string name="secret_prompt_passphrase_title">Passphrase erforderlich</string>
+    <string name="secret_prompt_message">Dieser Zugang speichert sein Geheimnis nicht. Es gilt nur für diese Verbindung und wird nie auf das Gerät geschrieben.\n\nBenutzer: %1$s</string>
     <string name="terminal_copy_output">Ausgabe kopieren</string>
     <string name="terminal_paste">Einfügen</string>
     <string name="terminal_reconnect">Neu verbinden</string>
@@ -173,6 +180,7 @@
     <string name="ssh_server_not_found">Server nicht gefunden</string>
     <string name="ssh_credential_not_found">Zugehöriger Zugang nicht gefunden</string>
     <string name="ssh_connection_error">Verbindungsfehler</string>
+    <string name="ssh_auth_cancelled">Verbindung abgebrochen: keine Zugangsdaten eingegeben.</string>
     <string name="ssh_connecting_to">Verbinde mit %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Verbindung beendet: %1$s</string>
     <string name="ssh_session_closed">Sitzung geschlossen (Code %1$d)</string>

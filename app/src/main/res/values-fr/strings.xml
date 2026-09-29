@@ -128,11 +128,18 @@
     <string name="credential_passphrase_label">Phrase secrète de la clé (facultatif)</string>
     <string name="credential_passphrase_hint">Nécessaire uniquement si la clé privée est chiffrée</string>
     <string name="credential_delete_title">Supprimer le compte</string>
+    <string name="credential_ask_each_time">Demander à chaque fois</string>
+    <string name="credential_ask_each_time_password_desc">Le mot de passe n\'est pas enregistré sur l\'appareil : vous le saisissez à chaque connexion</string>
+    <string name="credential_ask_each_time_key_desc">La clé privée est enregistrée, sa phrase secrète non : vous la saisissez à chaque connexion</string>
+    <string name="credential_prompts">demande à chaque fois</string>
     <string name="credential_delete_message">Supprimer « %1$s » ?</string>
     <string name="auth_password">Mot de passe</string>
     <string name="auth_ssh_key">Clé SSH</string>
 
     <string name="terminal_default_title">Terminal SSH</string>
+    <string name="secret_prompt_password_title">Mot de passe requis</string>
+    <string name="secret_prompt_passphrase_title">Phrase secrète requise</string>
+    <string name="secret_prompt_message">Ce compte n\'enregistre pas son secret. Il sert uniquement à cette connexion et n\'est jamais écrit sur l\'appareil.\n\nUtilisateur : %1$s</string>
     <string name="terminal_copy_output">Copier la sortie</string>
     <string name="terminal_paste">Coller</string>
     <string name="terminal_reconnect">Reconnecter</string>
@@ -183,6 +190,7 @@
     <string name="ssh_server_not_found">Serveur introuvable</string>
     <string name="ssh_credential_not_found">Compte associé introuvable</string>
     <string name="ssh_connection_error">Erreur de connexion</string>
+    <string name="ssh_auth_cancelled">Connexion annulée : aucun identifiant saisi.</string>
     <string name="ssh_connecting_to">Connexion à %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connexion terminée : %1$s</string>
     <string name="ssh_session_closed">Session fermée (code %1$d)</string>

@@ -144,7 +144,12 @@ fun CredentialsScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        stringResource(R.string.credential_type, cred.authType.name),
+                                        stringResource(R.string.credential_type, cred.authType.name) +
+                                            if (cred.askEachTime) {
+                                                " · " + stringResource(R.string.credential_prompts)
+                                            } else {
+                                                ""
+                                            },
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.tertiary
                                     )
@@ -244,37 +249,69 @@ fun EditCredentialScreen(
                 )
             }
 
-            OutlinedTextField(
-                value = state.secret,
-                onValueChange = viewModel::onSecretChanged,
-                label = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.credential_ask_each_time),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                     Text(
                         stringResource(
-                            if (state.authType == AuthType.PASSWORD) R.string.auth_password
-                            else R.string.credential_pem_label
-                        )
+                            if (state.authType == AuthType.PASSWORD) {
+                                R.string.credential_ask_each_time_password_desc
+                            } else {
+                                R.string.credential_ask_each_time_key_desc
+                            }
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                },
-                isError = state.secretError != null,
-                supportingText = state.secretError?.let { { Text(stringResource(it)) } },
-                visualTransformation = if (showSecret || !state.maskSecrets) VisualTransformation.None
-                else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(onClick = { showSecret = !showSecret }) {
-                        Icon(
-                            imageVector = if (showSecret) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = stringResource(
-                                if (showSecret) R.string.action_hide else R.string.action_show
+                }
+                Spacer(Modifier.width(12.dp))
+                Switch(
+                    checked = state.askEachTime,
+                    onCheckedChange = viewModel::onAskEachTimeChanged
+                )
+            }
+
+            // With a prompt-every-time password there is nothing left to type here.
+            if (!(state.askEachTime && state.authType == AuthType.PASSWORD)) {
+                OutlinedTextField(
+                    value = state.secret,
+                    onValueChange = viewModel::onSecretChanged,
+                    label = {
+                        Text(
+                            stringResource(
+                                if (state.authType == AuthType.PASSWORD) R.string.auth_password
+                                else R.string.credential_pem_label
                             )
                         )
-                    }
-                },
-                maxLines = if (state.authType == AuthType.SSH_KEY) 8 else 1,
-                singleLine = state.authType == AuthType.PASSWORD,
-                modifier = Modifier.fillMaxWidth()
-            )
+                    },
+                    isError = state.secretError != null,
+                    supportingText = state.secretError?.let { { Text(stringResource(it)) } },
+                    visualTransformation = if (showSecret || !state.maskSecrets) VisualTransformation.None
+                    else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { showSecret = !showSecret }) {
+                            Icon(
+                                imageVector = if (showSecret) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                contentDescription = stringResource(
+                                    if (showSecret) R.string.action_hide else R.string.action_show
+                                )
+                            )
+                        }
+                    },
+                    maxLines = if (state.authType == AuthType.SSH_KEY) 8 else 1,
+                    singleLine = state.authType == AuthType.PASSWORD,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-            if (state.authType == AuthType.SSH_KEY) {
+            if (state.authType == AuthType.SSH_KEY && !state.askEachTime) {
                 OutlinedTextField(
                     value = state.passphrase,
                     onValueChange = viewModel::onPassphraseChanged,

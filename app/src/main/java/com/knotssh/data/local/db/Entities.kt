@@ -30,7 +30,8 @@ data class CredentialEntity(
     val encryptedSecret: String = "",
     val encryptedPassphrase: String? = null,
     val publicKey: String? = null,
-    val keyType: SshKeyType? = null
+    val keyType: SshKeyType? = null,
+    val askEachTime: Boolean = false
 )
 
 @Entity(tableName = "quick_commands")

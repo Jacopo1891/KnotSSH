@@ -15,7 +15,12 @@ data class Credential(
     // For SSH keys: the public key portion (not encrypted)
     val publicKey: String? = null,
     // Key type for SSH key auth
-    val keyType: SshKeyType? = null
+    val keyType: SshKeyType? = null,
+    /**
+     * Nothing secret is persisted: the password (or, for a key, its passphrase) is asked at
+     * every connection and only lives in memory for the duration of the handshake.
+     */
+    val askEachTime: Boolean = false
 )
 
 @Serializable

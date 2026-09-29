@@ -13,6 +13,8 @@ import com.knotssh.data.local.preferences.BellMode
 import com.knotssh.data.local.preferences.ConnectionSettings
 import com.knotssh.data.local.preferences.SecuritySettings
 import com.knotssh.data.local.preferences.TerminalSettings
+import com.knotssh.domain.model.AuthType
+import com.knotssh.domain.model.Credential
 import com.knotssh.domain.model.HostKeyVerdict
 import com.knotssh.domain.repository.CredentialRepository
 import com.knotssh.domain.repository.ServerRepository
@@ -49,6 +51,12 @@ sealed interface TerminalStatus {
     data class Ended(val exitStatus: Int) : TerminalStatus
 }
 
+/** Asks the user for a secret the credential deliberately does not store. */
+data class SecretPrompt(val username: String, val passphrase: Boolean)
+
+/** Dismissing the secret prompt is a deliberate abort, so it must not trigger a retry. */
+class AuthCancelledException(message: String) : Exception(message)
+
 /**
  * One live SSH session, owned by [SessionRegistry] rather than by a screen.
  *
@@ -81,6 +89,9 @@ class SshSession(
 
     private val _hostKeyPrompt = MutableStateFlow<HostKeyVerdict?>(null)
     val hostKeyPrompt: StateFlow<HostKeyVerdict?> = _hostKeyPrompt.asStateFlow()
+
+    private val _secretPrompt = MutableStateFlow<SecretPrompt?>(null)
+    val secretPrompt: StateFlow<SecretPrompt?> = _secretPrompt.asStateFlow()
 
     private val _ctrlArmed = MutableStateFlow(false)
     val ctrlArmed: StateFlow<Boolean> = _ctrlArmed.asStateFlow()
@@ -145,6 +156,11 @@ class SshSession(
     private var readerJob: Job? = null
     private var resizeJob: Job? = null
     private var hostKeyDecision: CompletableDeferred<Boolean>? = null
+    private var secretDecision: CompletableDeferred<String?>? = null
+
+    /** Typed secret for a prompt-every-time credential; in memory only, never persisted. */
+    @Volatile
+    private var promptedSecret: String? = null
     private var closedByUser = false
     private var measuredColumns = TerminalSettings().fallbackColumns
     private var measuredRows = TerminalSettings().fallbackRows
@@ -225,6 +241,7 @@ class SshSession(
 
                 // A host key problem is never retried: retrying would only re-expose credentials.
                 val retryable = failure !is HostKeyException &&
+                        failure !is AuthCancelledException &&
                         connectionSettings.autoReconnect &&
                         !closedByUser &&
                         attempt < connectionSettings.autoReconnectAttempts
@@ -255,8 +272,17 @@ class SshSession(
                 ?: return IllegalStateException(context.getString(R.string.ssh_credential_not_found))
             label = "${credential.username}@${server.alias}"
 
-            val secret = credentialRepository.decryptSecret(credential)
-            val passphrase = credentialRepository.decryptPassphrase(credential)
+            var secret = credentialRepository.decryptSecret(credential)
+            var passphrase = credentialRepository.decryptPassphrase(credential)
+            var typed: String? = null
+
+            if (credential.askEachTime) {
+                typed = promptedSecret ?: requestSecret(credential)
+                    ?: return AuthCancelledException(
+                        context.getString(R.string.ssh_auth_cancelled)
+                    )
+                if (credential.authType == AuthType.PASSWORD) secret = typed else passphrase = typed
+            }
 
             synchronized(emulatorLock) { emulator.beginSession() }
             writeLocal(
@@ -287,6 +313,9 @@ class SshSession(
             connection = established
             sessionStartedAt = System.currentTimeMillis()
             _status.value = TerminalStatus.Connected
+            // Held only now that it is known to work: a wrong password must prompt again, a
+            // dropped connection must not.
+            promptedSecret = typed
             serverRepository.updateLastConnected(server.id, System.currentTimeMillis())
 
             sshManager.warnings.forEach {
@@ -298,6 +327,8 @@ class SshSession(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            // The handshake failed, so a typed secret may simply be wrong: ask again next time.
+            promptedSecret = null
             val reason = e.message ?: context.getString(R.string.ssh_connection_error)
             writeLocal("\r\n\u001B[31m[$reason]\u001B[0m\r\n")
             e
@@ -409,6 +440,28 @@ class SshSession(
 
     fun resolveHostKeyPrompt(accepted: Boolean) {
         hostKeyDecision?.complete(accepted)
+    }
+
+    // --- Interactive credentials -------------------------------------------------------------
+
+    /** Returns the typed secret, or null if the user dismissed the prompt. */
+    private suspend fun requestSecret(credential: Credential): String? {
+        val deferred = CompletableDeferred<String?>()
+        secretDecision = deferred
+        _secretPrompt.value = SecretPrompt(
+            username = credential.username,
+            passphrase = credential.authType != AuthType.PASSWORD
+        )
+        return try {
+            deferred.await()
+        } finally {
+            _secretPrompt.value = null
+            secretDecision = null
+        }
+    }
+
+    fun resolveSecretPrompt(secret: String?) {
+        secretDecision?.complete(secret)
     }
 
     // --- Input -------------------------------------------------------------------------------
@@ -539,6 +592,8 @@ class SshSession(
         closedByUser = true
         sessionGeneration++
         hostKeyDecision?.complete(false)
+        secretDecision?.complete(null)
+        promptedSecret = null
         connectJob?.cancel()
         connectJob = null
         readerJob?.cancel()

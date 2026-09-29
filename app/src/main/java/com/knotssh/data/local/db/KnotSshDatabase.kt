@@ -12,7 +12,7 @@ import androidx.room.TypeConverters
         KnownHostEntity::class,
         CustomKeyEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

@@ -134,12 +134,19 @@
     <string name="credential_passphrase_label">Key passphrase (optional)</string>
     <string name="credential_passphrase_hint">Only needed if the private key is encrypted</string>
     <string name="credential_delete_title">Delete account</string>
+    <string name="credential_ask_each_time">Ask every time</string>
+    <string name="credential_ask_each_time_password_desc">The password is not stored on the device: you type it at every connection</string>
+    <string name="credential_ask_each_time_key_desc">The private key is stored, its passphrase is not: you type it at every connection</string>
+    <string name="credential_prompts">asks every time</string>
     <string name="credential_delete_message">Delete \"%1$s\"?</string>
     <string name="auth_password">Password</string>
     <string name="auth_ssh_key">SSH key</string>
 
     <!-- Terminal -->
     <string name="terminal_default_title">SSH terminal</string>
+    <string name="secret_prompt_password_title">Password required</string>
+    <string name="secret_prompt_passphrase_title">Passphrase required</string>
+    <string name="secret_prompt_message">This account does not store its secret. It is used for this connection only and never written to the device.\n\nUser: %1$s</string>
     <string name="terminal_copy_output">Copy output</string>
     <string name="terminal_paste">Paste</string>
     <string name="terminal_reconnect">Reconnect</string>
@@ -193,6 +200,7 @@
     <string name="ssh_server_not_found">Server not found</string>
     <string name="ssh_credential_not_found">Associated credential not found</string>
     <string name="ssh_connection_error">Connection error</string>
+    <string name="ssh_auth_cancelled">Connection cancelled: no credential entered.</string>
     <string name="ssh_connecting_to">Connecting to %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connection terminated: %1$s</string>
     <string name="ssh_session_closed">Session closed (exit code %1$d)</string>

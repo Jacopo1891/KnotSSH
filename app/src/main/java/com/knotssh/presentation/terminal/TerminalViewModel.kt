@@ -15,6 +15,7 @@ import com.knotssh.domain.repository.CustomKeyRepository
 import com.knotssh.domain.repository.QuickCommandRepository
 import com.knotssh.ssh.SessionLimitReached
 import com.knotssh.ssh.SessionRegistry
+import com.knotssh.ssh.SecretPrompt
 import com.knotssh.ssh.SshSession
 import com.knotssh.ssh.SshSessionService
 import com.knotssh.ssh.TerminalStatus
@@ -99,6 +100,10 @@ class TerminalViewModel @Inject constructor(
         .flatMapLatest { it?.altArmed ?: flowOf(false) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val secretPrompt: StateFlow<SecretPrompt?> = _session
+        .flatMapLatest { it?.secretPrompt ?: flowOf(null) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     private val session: SshSession? get() = _session.value
 
     init {
@@ -167,6 +172,10 @@ class TerminalViewModel @Inject constructor(
 
     fun resolveHostKeyPrompt(accepted: Boolean) {
         session?.resolveHostKeyPrompt(accepted)
+    }
+
+    fun resolveSecretPrompt(secret: String?) {
+        session?.resolveSecretPrompt(secret)
     }
 
     /** Ends the session for good. Leaving the screen without calling this keeps it running. */
