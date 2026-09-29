@@ -1,5 +1,6 @@
 package com.knotssh
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import com.knotssh.presentation.navigation.NavGraph
 import com.knotssh.presentation.security.BiometricGate
 import com.knotssh.presentation.theme.KnotSshTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 /** AppCompat is required because BiometricPrompt attaches to a FragmentActivity. */
@@ -28,14 +30,15 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var appPreferences: AppPreferences
 
+    /** Terminal requested from a session notification, consumed once by the nav graph. */
+    private val pendingTerminal = MutableStateFlow<Long?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val initialTerminalServerId = intent
-            ?.getLongExtra(EXTRA_TERMINAL_SERVER_ID, -1L)
-            ?.takeIf { it > 0 }
+        pendingTerminal.value = intent?.terminalServerId()
 
         setContent {
             val appearance by appPreferences.appearance.collectAsState(initial = AppearanceSettings())
@@ -67,14 +70,26 @@ class MainActivity : AppCompatActivity() {
                     graceSeconds = security.biometricGraceSeconds
                 ) {
                     val navController = rememberNavController()
+                    val terminalRequest by pendingTerminal.collectAsState()
                     NavGraph(
                         navController = navController,
-                        initialTerminalServerId = initialTerminalServerId
+                        terminalRequest = terminalRequest,
+                        onTerminalRequestHandled = { pendingTerminal.value = null }
                     )
                 }
             }
         }
     }
+
+    /** singleTask delivers notification taps here when the activity is already running. */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent.terminalServerId()?.let { pendingTerminal.value = it }
+    }
+
+    private fun Intent.terminalServerId(): Long? =
+        getLongExtra(EXTRA_TERMINAL_SERVER_ID, -1L).takeIf { it > 0 }
 
     companion object {
         const val EXTRA_TERMINAL_SERVER_ID = "navigate_to_terminal_server_id"

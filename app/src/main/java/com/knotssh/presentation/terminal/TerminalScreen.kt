@@ -2,6 +2,7 @@ package com.knotssh.presentation.terminal
 
 import android.app.Activity
 import android.view.WindowManager
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -70,6 +71,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -106,6 +108,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.knotssh.data.local.preferences.TerminalSettings
 import com.knotssh.domain.model.CustomKey
 import com.knotssh.domain.model.HostKeyVerdict
+import com.knotssh.ssh.TerminalStatus
+import com.knotssh.presentation.common.RequestNotificationPermissionOnce
 import com.knotssh.presentation.theme.TerminalBackground
 import com.knotssh.presentation.theme.TerminalText
 import com.knotssh.terminal.TerminalEmulator
@@ -131,6 +135,19 @@ fun TerminalScreen(
     val ctrlArmed by viewModel.ctrlArmed.collectAsStateWithLifecycle()
     val altArmed by viewModel.altArmed.collectAsStateWithLifecycle()
     val hostKeyPrompt by viewModel.hostKeyPrompt.collectAsStateWithLifecycle()
+    val connection by viewModel.connectionSettings.collectAsStateWithLifecycle()
+    val backgroundSessions by viewModel.backgroundSessionsEnabled.collectAsStateWithLifecycle()
+
+    // Without this grant the session notification is created but never reaches the drawer.
+    RequestNotificationPermissionOnce(enabled = backgroundSessions)
+
+    // A remote logout leaves nothing to interact with; pause only long enough to read the notice.
+    LaunchedEffect(status, connection.closeOnExit, connection.closeOnExitSeconds) {
+        if (status is TerminalStatus.Ended && connection.closeOnExit) {
+            delay(connection.closeOnExitSeconds * 1_000L)
+            onBack()
+        }
+    }
 
     // Non-zero IME inset is the stable way to know the keyboard is up.
     val keyboardVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
@@ -142,6 +159,66 @@ fun TerminalScreen(
     val focusRequester = remember { FocusRequester() }
     val snackbarHost = remember { SnackbarHostState() }
     var menuExpanded by remember { mutableStateOf(false) }
+    var showLeaveDialog by remember { mutableStateOf(false) }
+    var backArmedAt by remember { mutableLongStateOf(0L) }
+
+    val limit by viewModel.limitReached.collectAsStateWithLifecycle()
+
+    // First press only arms the gesture, so a stray back never drops a live session.
+    fun onBackPressed() {
+        val now = System.currentTimeMillis()
+        if (now - backArmedAt < BACK_CONFIRM_WINDOW_MS) {
+            showLeaveDialog = true
+        } else {
+            backArmedAt = now
+            scope.launch {
+                snackbarHost.showSnackbar("Premi di nuovo indietro per chiudere o sospendere la sessione")
+            }
+        }
+    }
+
+    BackHandler { onBackPressed() }
+
+    limit?.let { max ->
+        AlertDialog(
+            onDismissRequest = onBack,
+            title = { Text("Troppe sessioni aperte") },
+            text = { Text("Puoi tenere al massimo $max sessioni contemporanee. Chiudine una dalla notifica, oppure alza il limite dalle impostazioni di connessione.") },
+            confirmButton = { TextButton(onClick = onBack) { Text("Ho capito") } }
+        )
+    }
+
+    if (showLeaveDialog) {
+        AlertDialog(
+            onDismissRequest = { showLeaveDialog = false },
+            title = { Text("Uscire dalla sessione?") },
+            text = {
+                Text(
+                    if (backgroundSessions) {
+                        "Puoi lasciarla attiva in background e rientrarci dalla notifica, oppure chiuderla definitivamente."
+                    } else {
+                        "Le sessioni in background sono disattivate in Impostazioni \u203a Connessione, quindi uscire chiude la connessione."
+                    }
+                )
+            },
+            confirmButton = {
+                if (backgroundSessions) {
+                    TextButton(onClick = {
+                        showLeaveDialog = false
+                        viewModel.detach()
+                        onBack()
+                    }) { Text("Lascia attiva") }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showLeaveDialog = false
+                    viewModel.terminate()
+                    onBack()
+                }) { Text("Termina", color = MaterialTheme.colorScheme.error) }
+            }
+        )
+    }
 
     // An explicit tap on the buffer always opens the keyboard; the setting only governs the
     // automatic popup once the session connects.
@@ -192,10 +269,17 @@ fun TerminalScreen(
                 title = { Text(title, maxLines = 1) },
                 navigationIcon = {
                     IconButton(onClick = {
-                        viewModel.disconnect()
+                        viewModel.detach()
                         onBack()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = if (backgroundSessions) {
+                                "Torna alle connessioni lasciando la sessione attiva"
+                            } else {
+                                "Indietro"
+                            }
+                        )
                     }
                 },
                 actions = {
@@ -249,6 +333,14 @@ fun TerminalScreen(
                                 onClick = {
                                     viewModel.resetTerminal()
                                     menuExpanded = false
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Termina sessione") },
+                                onClick = {
+                                    menuExpanded = false
+                                    viewModel.terminate()
+                                    onBack()
                                 }
                             )
                         }
@@ -519,6 +611,7 @@ private fun StatusBadge(status: TerminalStatus) {
         TerminalStatus.Connected -> "ONLINE" to Color(0xFF34A853)
         TerminalStatus.Connecting -> "CONNESSIONE" to Color(0xFFFBBC04)
         is TerminalStatus.Reconnecting -> "RETRY ${status.attempt}/${status.of}" to Color(0xFFFBBC04)
+        is TerminalStatus.Ended -> "TERMINATA" to Color(0xFF5F6368)
         is TerminalStatus.Disconnected -> "DISCONNESSO" to Color(0xFFEA4335)
     }
     Surface(color = color, shape = MaterialTheme.shapes.small) {
@@ -824,6 +917,7 @@ private const val PAD_MAX = 2048
 private const val MAX_DELETE_BURST = 16
 private const val REPEAT_INITIAL_DELAY_MS = 400L
 private const val REPEAT_INTERVAL_MS = 55L
+private const val BACK_CONFIRM_WINDOW_MS = 3_000L
 
 private val ARROW_ICONS = mapOf(
     "Su" to Icons.Default.ArrowUpward,

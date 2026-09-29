@@ -109,6 +109,7 @@ fun HomeScreen(
                     ServerList(
                         servers = uiState.servers,
                         credentials = uiState.credentials,
+                        activeSessions = uiState.activeSessions,
                         onConnect = onConnect,
                         onEdit = onEditServer,
                         onDelete = { serverToDelete = it },
@@ -201,6 +202,7 @@ private fun HomeTopBar(
 private fun ServerList(
     servers: List<Server>,
     credentials: Map<Long, Credential>,
+    activeSessions: Set<Long>,
     onConnect: (Long) -> Unit,
     onEdit: (Long) -> Unit,
     onDelete: (Server) -> Unit,
@@ -222,6 +224,7 @@ private fun ServerList(
                 ServerItemWithSwipe(
                     server = server,
                     credential = credentials[server.credentialId],
+                    hasActiveSession = server.id in activeSessions,
                     onConnect = { onConnect(server.id) },
                     onEdit = { onEdit(server.id) },
                     onDelete = { onDelete(server) },
@@ -242,6 +245,7 @@ private fun ServerList(
                 ServerItemWithSwipe(
                     server = server,
                     credential = credentials[server.credentialId],
+                    hasActiveSession = server.id in activeSessions,
                     onConnect = { onConnect(server.id) },
                     onEdit = { onEdit(server.id) },
                     onDelete = { onDelete(server) },
@@ -284,6 +288,7 @@ private fun SectionHeader(
 private fun ServerItemWithSwipe(
     server: Server,
     credential: Credential?,
+    hasActiveSession: Boolean,
     onConnect: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -295,6 +300,7 @@ private fun ServerItemWithSwipe(
         ServerCard(
             server = server,
             credential = credential,
+            hasActiveSession = hasActiveSession,
             onConnect = onConnect,
             onLongPress = { showContextMenu = true },
             onToggleFavorite = onToggleFavorite,
@@ -319,6 +325,7 @@ private fun ServerItemWithSwipe(
 private fun ServerCard(
     server: Server,
     credential: Credential?,
+    hasActiveSession: Boolean,
     onConnect: () -> Unit,
     onLongPress: () -> Unit,
     onToggleFavorite: () -> Unit,
@@ -374,6 +381,24 @@ private fun ServerCard(
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(22.dp)
                 )
+                if (hasActiveSession) {
+                    // Ringed so the dot stays visible against the icon underneath.
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(12.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(SshGreen)
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.width(14.dp))

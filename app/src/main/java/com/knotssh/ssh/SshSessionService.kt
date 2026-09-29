@@ -10,121 +10,189 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.knotssh.MainActivity
 import com.knotssh.R
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
- * Keeps an interactive SSH session alive while the app is backgrounded.
- *
- * The service holds no session state of its own; it only surfaces status, so stopping it can
- * never leave a connection dangling.
+ * Keeps background SSH sessions alive and shows one notification per session, each offering
+ * "riapri" and "termina".
  */
+@AndroidEntryPoint
 class SshSessionService : Service() {
 
-    private var serverId: Long = -1
-    private var serverAlias: String = "Sessione SSH"
-    private var connected: Boolean = true
+    @Inject
+    lateinit var registry: SessionRegistry
+
+    private val scope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Main)
+    private var observer: Job? = null
+    private var shownIds = emptySet<Long>()
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
+        createChannel()
+        // Claim foreground status immediately: Android kills services that take too long.
+        startForegroundCompat(summaryNotification(0))
+        observer = scope.launch {
+            registry.active.collectLatest { sessions ->
+                if (sessions.isEmpty()) {
+                    clearAll()
+                    stopSelf()
+                } else {
+                    render(sessions)
+                }
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.let {
-            if (it.hasExtra(EXTRA_SERVER_ID)) serverId = it.getLongExtra(EXTRA_SERVER_ID, -1)
-            if (it.hasExtra(EXTRA_SERVER_ALIAS)) {
-                serverAlias = it.getStringExtra(EXTRA_SERVER_ALIAS) ?: serverAlias
-            }
-            if (it.hasExtra(EXTRA_CONNECTED)) {
-                connected = it.getBooleanExtra(EXTRA_CONNECTED, true)
+        when (intent?.action) {
+            ACTION_TERMINATE -> {
+                val serverId = intent.getLongExtra(EXTRA_SERVER_ID, -1L)
+                if (serverId > 0) registry.close(serverId)
             }
         }
-
-        startForeground(
-            NOTIFICATION_ID,
-            buildNotification(),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        )
-        // The session belongs to the UI layer, so a restarted service would have nothing to attach to.
-        return START_NOT_STICKY
+        if (registry.active.value.isEmpty()) stopSelf()
+        return START_STICKY
     }
 
-    private fun buildNotification(): Notification {
-        val openIntent = Intent(this, MainActivity::class.java).apply {
-            putExtra(MainActivity.EXTRA_TERMINAL_SERVER_ID, serverId)
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+    private fun render(sessions: List<SessionSummary>) {
+        val manager = NotificationManagerCompat.from(this)
+        startForegroundCompat(summaryNotification(sessions.size))
+
+        sessions.forEach { session ->
+            runCatching {
+                manager.notify(notificationId(session.serverId), sessionNotification(session))
+            }
         }
-        val contentIntent = PendingIntent.getActivity(
+
+        // Drop notifications for sessions that have since ended.
+        (shownIds - sessions.map { it.serverId }.toSet()).forEach {
+            manager.cancel(notificationId(it))
+        }
+        shownIds = sessions.map { it.serverId }.toSet()
+    }
+
+    private fun clearAll() {
+        val manager = NotificationManagerCompat.from(this)
+        shownIds.forEach { manager.cancel(notificationId(it)) }
+        shownIds = emptySet()
+    }
+
+    private fun sessionNotification(session: SessionSummary): Notification {
+        val open = PendingIntent.getActivity(
             this,
-            serverId.toInt(),
-            openIntent,
+            session.serverId.toInt(),
+            Intent(this, MainActivity::class.java).apply {
+                putExtra(MainActivity.EXTRA_TERMINAL_SERVER_ID, session.serverId)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val terminate = PendingIntent.getService(
+            this,
+            // Distinct request code so it does not collide with the "open" intent above.
+            -session.serverId.toInt(),
+            Intent(this, SshSessionService::class.java).apply {
+                action = ACTION_TERMINATE
+                putExtra(EXTRA_SERVER_ID, session.serverId)
+            },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("KnotSSH — $serverAlias")
-            .setContentText(if (connected) "Sessione SSH attiva" else "Connessione caduta")
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(contentIntent)
-            .setOngoing(connected)
+            .setContentTitle(session.label.ifBlank { session.title })
+            .setContentText("Sessione SSH attiva")
+            .setSmallIcon(R.drawable.ic_launcher_monochrome)
+            .setContentIntent(open)
+            .addAction(0, "Riapri", open)
+            .addAction(0, "Termina", terminate)
+            .setOngoing(true)
             .setSilent(true)
+            .setGroup(GROUP_KEY)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
             .build()
     }
 
-    private fun createNotificationChannel() {
+    private fun summaryNotification(count: Int): Notification =
+        NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("KnotSSH")
+            .setContentText(
+                when (count) {
+                    0, 1 -> "Sessione SSH attiva"
+                    else -> "$count sessioni SSH attive"
+                }
+            )
+            .setSmallIcon(R.drawable.ic_launcher_monochrome)
+            .setOngoing(true)
+            .setSilent(true)
+            .setGroup(GROUP_KEY)
+            .setGroupSummary(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+
+    private fun startForegroundCompat(notification: Notification) {
+        runCatching {
+            startForeground(
+                SUMMARY_NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            )
+        }
+    }
+
+    private fun createChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Sessione SSH attiva",
+            "Sessioni SSH attive",
             NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "Mantiene la sessione SSH viva mentre l'app è in background"
+            description = "Una scheda silenziosa per ogni sessione lasciata aperta"
             setSound(null, null)
             enableVibration(false)
-            lockscreenVisibility = Notification.VISIBILITY_SECRET
         }
         getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
     }
 
     override fun onDestroy() {
+        observer?.cancel()
+        scope.cancel()
+        clearAll()
         stopForeground(STOP_FOREGROUND_REMOVE)
         super.onDestroy()
     }
 
     companion object {
         const val CHANNEL_ID = "knotssh_session_channel"
-        const val NOTIFICATION_ID = 1001
-        private const val EXTRA_SERVER_ID = "extra_server_id"
-        private const val EXTRA_SERVER_ALIAS = "extra_server_alias"
-        private const val EXTRA_CONNECTED = "extra_connected"
+        const val ACTION_TERMINATE = "com.knotssh.ACTION_TERMINATE_SESSION"
+        const val EXTRA_SERVER_ID = "extra_server_id"
 
-        fun startService(context: Context, serverId: Long, serverAlias: String) {
-            runCatching {
-                context.startForegroundService(
-                    Intent(context, SshSessionService::class.java).apply {
-                        putExtra(EXTRA_SERVER_ID, serverId)
-                        putExtra(EXTRA_SERVER_ALIAS, serverAlias)
-                        putExtra(EXTRA_CONNECTED, true)
-                    }
-                )
-            }
+        private const val GROUP_KEY = "knotssh_sessions"
+        private const val SUMMARY_NOTIFICATION_ID = 1000
+        private const val NOTIFICATION_ID_BASE = 2000
+
+        private fun notificationId(serverId: Long) =
+            NOTIFICATION_ID_BASE + (serverId % 1000).toInt()
+
+        /** Starts or refreshes the service so notifications match the live sessions. */
+        fun sync(context: Context) {
+            val intent = Intent(context, SshSessionService::class.java)
+            runCatching { context.startForegroundService(intent) }
         }
 
-        fun updateStatus(context: Context, isConnected: Boolean) {
-            runCatching {
-                context.startService(
-                    Intent(context, SshSessionService::class.java)
-                        .putExtra(EXTRA_CONNECTED, isConnected)
-                )
-            }
-        }
-
-        fun stopService(context: Context) {
-            runCatching { context.stopService(Intent(context, SshSessionService::class.java)) }
+        fun stop(context: Context) {
+            context.stopService(Intent(context, SshSessionService::class.java))
         }
     }
 }

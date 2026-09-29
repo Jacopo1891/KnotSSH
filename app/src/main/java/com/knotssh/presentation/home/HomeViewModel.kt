@@ -6,6 +6,7 @@ import com.knotssh.domain.model.Credential
 import com.knotssh.domain.model.Server
 import com.knotssh.domain.repository.CredentialRepository
 import com.knotssh.domain.repository.ServerRepository
+import com.knotssh.ssh.SessionRegistry
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -16,6 +17,7 @@ import javax.inject.Inject
 data class HomeUiState(
     val servers: List<Server> = emptyList(),
     val credentials: Map<Long, Credential> = emptyMap(),
+    val activeSessions: Set<Long> = emptySet(),
     val isLoading: Boolean = true,
     val searchQuery: String = ""
 )
@@ -24,7 +26,8 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val serverRepository: ServerRepository,
-    private val credentialRepository: CredentialRepository
+    private val credentialRepository: CredentialRepository,
+    sessionRegistry: SessionRegistry
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -32,8 +35,9 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeUiState> = combine(
         serverRepository.getRecentServers(50),
         credentialRepository.getAllCredentials(),
-        _searchQuery.debounce { if (it.isEmpty()) 0L else SEARCH_DEBOUNCE_MS }
-    ) { servers, credentialList, query ->
+        _searchQuery.debounce { if (it.isEmpty()) 0L else SEARCH_DEBOUNCE_MS },
+        sessionRegistry.active
+    ) { servers, credentialList, query, sessions ->
         val credentials = credentialList.associateBy { it.id }
         val filtered = if (query.isBlank()) servers
         else servers.filter { server ->
@@ -44,6 +48,7 @@ class HomeViewModel @Inject constructor(
         HomeUiState(
             servers = filtered,
             credentials = credentials,
+            activeSessions = sessions.map { it.serverId }.toSet(),
             isLoading = false,
             searchQuery = query
         )

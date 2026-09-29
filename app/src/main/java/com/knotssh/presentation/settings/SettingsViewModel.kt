@@ -18,7 +18,7 @@ import com.knotssh.domain.model.QuickCommand
 import com.knotssh.domain.repository.CustomKeyRepository
 import com.knotssh.domain.repository.KnownHostRepository
 import com.knotssh.domain.repository.QuickCommandRepository
-import com.knotssh.presentation.terminal.toControlChar
+import com.knotssh.ssh.toControlChar
 import com.knotssh.terminal.TerminalTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -92,6 +92,9 @@ class SettingsViewModel @Inject constructor(
     fun setWakeLock(value: Boolean) = update { prefs.setWakeLock(value) }
     fun setWakeLockMinutes(value: Int) = update { prefs.setWakeLockMinutes(value) }
     fun setForegroundNotification(value: Boolean) = update { prefs.setForegroundNotification(value) }
+    fun setMaxSessions(value: Int) = update { prefs.setMaxSessions(value) }
+    fun setCloseOnExit(value: Boolean) = update { prefs.setCloseOnExit(value) }
+    fun setCloseOnExitSeconds(value: Int) = update { prefs.setCloseOnExitSeconds(value) }
 
     // Security
     fun setAllowScreenshot(value: Boolean) = update { prefs.setAllowScreenshot(value) }

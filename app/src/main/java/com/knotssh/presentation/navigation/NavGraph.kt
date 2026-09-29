@@ -29,11 +29,18 @@ private const val ANIM_DURATION = 300
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    initialTerminalServerId: Long? = null
+    terminalRequest: Long? = null,
+    onTerminalRequestHandled: () -> Unit = {}
 ) {
-    LaunchedEffect(initialTerminalServerId) {
-        initialTerminalServerId?.let {
-            navController.navigate(Screen.Terminal.createRoute(it))
+    LaunchedEffect(terminalRequest) {
+        terminalRequest?.let {
+            // Replace whatever terminal is showing instead of stacking one entry per notification
+            // tap: a stale entry would reconnect its server as soon as the user pressed back.
+            navController.navigate(Screen.Terminal.createRoute(it)) {
+                popUpTo(Screen.Home.route)
+                launchSingleTop = true
+            }
+            onTerminalRequestHandled()
         }
     }
 

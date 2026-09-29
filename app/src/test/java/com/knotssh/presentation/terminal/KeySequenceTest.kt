@@ -3,6 +3,7 @@ package com.knotssh.presentation.terminal
 import com.knotssh.domain.model.KeyModifier
 import com.knotssh.presentation.settings.buildKeySequence
 import com.knotssh.presentation.settings.defaultLabel
+import com.knotssh.ssh.toControlChar
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

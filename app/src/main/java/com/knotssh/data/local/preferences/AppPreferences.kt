@@ -74,7 +74,10 @@ data class ConnectionSettings(
     val compression: Boolean = false,
     val wakeLock: Boolean = true,
     val wakeLockMinutes: Int = Defaults.WAKE_LOCK_MINUTES,
-    val foregroundNotification: Boolean = true
+    val foregroundNotification: Boolean = true,
+    val maxSessions: Int = Defaults.MAX_SESSIONS,
+    val closeOnExit: Boolean = true,
+    val closeOnExitSeconds: Int = Defaults.CLOSE_ON_EXIT_SECONDS
 )
 
 data class SecuritySettings(
@@ -100,6 +103,10 @@ object Defaults {
     const val RECONNECT_ATTEMPTS = 3
     const val WAKE_LOCK_MINUTES = 30
     const val BIOMETRIC_GRACE_SECONDS = 60
+    const val MAX_SESSIONS = 5
+    const val MAX_SESSIONS_LIMIT = 10
+    const val CLOSE_ON_EXIT_SECONDS = 3
+    const val CLOSE_ON_EXIT_SECONDS_MAX = 15
 }
 
 @Singleton
@@ -135,6 +142,9 @@ class AppPreferences @Inject constructor(
         val WAKE_LOCK = booleanPreferencesKey("wake_lock")
         val WAKE_LOCK_MINUTES = intPreferencesKey("wake_lock_minutes")
         val FOREGROUND_NOTIFICATION = booleanPreferencesKey("foreground_notification")
+        val MAX_SESSIONS = intPreferencesKey("max_sessions")
+        val CLOSE_ON_EXIT = booleanPreferencesKey("close_on_exit")
+        val CLOSE_ON_EXIT_SECONDS = intPreferencesKey("close_on_exit_seconds")
 
         val ALLOW_SCREENSHOT = booleanPreferencesKey("allow_screenshot")
         val BIOMETRIC_ENABLED = booleanPreferencesKey("biometric_enabled")
@@ -189,7 +199,12 @@ class AppPreferences @Inject constructor(
             compression = p[Keys.COMPRESSION] ?: false,
             wakeLock = p[Keys.WAKE_LOCK] ?: true,
             wakeLockMinutes = (p[Keys.WAKE_LOCK_MINUTES] ?: Defaults.WAKE_LOCK_MINUTES).coerceIn(5, 240),
-            foregroundNotification = p[Keys.FOREGROUND_NOTIFICATION] ?: true
+            foregroundNotification = p[Keys.FOREGROUND_NOTIFICATION] ?: true,
+            maxSessions = (p[Keys.MAX_SESSIONS] ?: Defaults.MAX_SESSIONS)
+                .coerceIn(1, Defaults.MAX_SESSIONS_LIMIT),
+            closeOnExit = p[Keys.CLOSE_ON_EXIT] ?: true,
+            closeOnExitSeconds = (p[Keys.CLOSE_ON_EXIT_SECONDS] ?: Defaults.CLOSE_ON_EXIT_SECONDS)
+                .coerceIn(1, Defaults.CLOSE_ON_EXIT_SECONDS_MAX)
         )
     }.distinctUntilChanged()
 
@@ -241,6 +256,13 @@ class AppPreferences @Inject constructor(
     suspend fun setWakeLock(value: Boolean) = put(Keys.WAKE_LOCK, value)
     suspend fun setWakeLockMinutes(value: Int) = put(Keys.WAKE_LOCK_MINUTES, value.coerceIn(5, 240))
     suspend fun setForegroundNotification(value: Boolean) = put(Keys.FOREGROUND_NOTIFICATION, value)
+
+    suspend fun setMaxSessions(value: Int) =
+        put(Keys.MAX_SESSIONS, value.coerceIn(1, Defaults.MAX_SESSIONS_LIMIT))
+
+    suspend fun setCloseOnExit(value: Boolean) = put(Keys.CLOSE_ON_EXIT, value)
+    suspend fun setCloseOnExitSeconds(value: Int) =
+        put(Keys.CLOSE_ON_EXIT_SECONDS, value.coerceIn(1, Defaults.CLOSE_ON_EXIT_SECONDS_MAX))
 
     suspend fun setAllowScreenshot(value: Boolean) = put(Keys.ALLOW_SCREENSHOT, value)
     suspend fun setBiometricEnabled(value: Boolean) = put(Keys.BIOMETRIC_ENABLED, value)

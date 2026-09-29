@@ -1,14 +1,11 @@
 package com.knotssh.presentation.settings
 
-import android.Manifest
-import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.knotssh.data.local.preferences.Defaults
+import com.knotssh.presentation.common.rememberNotificationPermissionRequester
 
 @Composable
 fun ConnectionSettingsScreen(
@@ -49,6 +46,25 @@ fun ConnectionSettingsScreen(
                 onCheckedChange = viewModel::setCompression
             )
         }
+        item {
+            SwitchRow(
+                title = "Chiudi il terminale a fine sessione",
+                description = "Dopo un exit torna da solo all'elenco delle connessioni",
+                checked = connection.closeOnExit,
+                onCheckedChange = viewModel::setCloseOnExit
+            )
+        }
+        item {
+            SliderRow(
+                title = "Attesa prima di chiudere",
+                description = "Tempo per leggere il messaggio di chiusura",
+                value = connection.closeOnExitSeconds,
+                range = 1..Defaults.CLOSE_ON_EXIT_SECONDS_MAX,
+                enabled = connection.closeOnExit,
+                valueLabel = { "$it s" },
+                onValueChange = viewModel::setCloseOnExitSeconds
+            )
+        }
 
         item { SettingsSection("Riconnessione") }
         item {
@@ -71,9 +87,18 @@ fun ConnectionSettingsScreen(
 
         item { SettingsSection("In background") }
         item {
+            SliderRow(
+                title = "Sessioni contemporanee",
+                description = "Quante connessioni puoi tenere aperte insieme. Ognuna occupa un thread e il proprio scrollback.",
+                value = connection.maxSessions,
+                range = 1..Defaults.MAX_SESSIONS_LIMIT,
+                onValueChange = viewModel::setMaxSessions
+            )
+        }
+        item {
             SwitchRow(
-                title = "Notifica persistente",
-                description = "Servizio in primo piano che mantiene viva la sessione in background",
+                title = "Sessioni in background",
+                description = "Permette di sospendere una sessione e rientrarci dalla notifica persistente",
                 checked = connection.foregroundNotification,
                 onCheckedChange = { enabled ->
                     if (enabled) notificationPermission()
@@ -100,20 +125,5 @@ fun ConnectionSettingsScreen(
                 onValueChange = viewModel::setWakeLockMinutes
             )
         }
-    }
-}
-
-/**
- * Notifications are only needed when the persistent session card is enabled, so the prompt is
- * tied to that switch rather than fired at app start.
- */
-@Composable
-private fun rememberNotificationPermissionRequester(): () -> Unit {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return remember { {} }
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { }
-    return remember(launcher) {
-        { launcher.launch(Manifest.permission.POST_NOTIFICATIONS) }
     }
 }
