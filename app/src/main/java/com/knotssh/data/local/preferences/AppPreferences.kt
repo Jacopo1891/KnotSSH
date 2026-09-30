@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.knotssh.data.backup.BackupSettings
 import com.knotssh.terminal.TerminalTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -280,6 +281,48 @@ class AppPreferences @Inject constructor(
 
     suspend fun resetToDefaults() {
         context.dataStore.edit { it.clear() }
+    }
+
+    /** Written in one transaction so a half-restored configuration is never observable. */
+    suspend fun restoreFromBackup(s: BackupSettings) {
+        context.dataStore.edit { p ->
+            p[Keys.THEME_MODE] = s.themeMode
+            p[Keys.DYNAMIC_COLOR] = s.dynamicColor
+            p[Keys.TERMINAL_FONT_SIZE] = s.terminalFontSize
+            p[Keys.TERMINAL_FONT] = s.terminalFont
+            p[Keys.TERMINAL_THEME] = s.terminalTheme
+            p[Keys.ANSI_COLORS] = s.ansiColors
+            p[Keys.CLICKABLE_URLS] = s.clickableUrls
+            p[Keys.SCROLLBACK_LINES] = s.scrollbackLines
+            p[Keys.AUTO_SIZE_PTY] = s.autoSizePty
+            p[Keys.FALLBACK_COLUMNS] = s.fallbackColumns
+            p[Keys.FALLBACK_ROWS] = s.fallbackRows
+            p[Keys.CURSOR_BLINK] = s.cursorBlink
+            p[Keys.SHOW_QUICK_COMMANDS] = s.showQuickCommandsBar
+            p[Keys.SHOW_ACCESSORY_BAR] = s.showAccessoryBar
+            p[Keys.HAPTIC_FEEDBACK] = s.hapticFeedback
+            p[Keys.BELL_MODE] = s.bellMode
+            p[Keys.KEEP_SCREEN_ON] = s.keepScreenOn
+            p[Keys.AUTO_SHOW_KEYBOARD] = s.autoShowKeyboard
+            p[Keys.SWIPE_SCROLLS_FULLSCREEN] = s.swipeScrollsFullScreenApps
+            p[Keys.KEEP_ALIVE_SECONDS] = s.keepAliveSeconds
+            p[Keys.CONNECT_TIMEOUT_SECONDS] = s.connectTimeoutSeconds
+            p[Keys.AUTO_RECONNECT] = s.autoReconnect
+            p[Keys.AUTO_RECONNECT_ATTEMPTS] = s.autoReconnectAttempts
+            p[Keys.COMPRESSION] = s.compression
+            p[Keys.WAKE_LOCK] = s.wakeLock
+            p[Keys.WAKE_LOCK_MINUTES] = s.wakeLockMinutes
+            p[Keys.FOREGROUND_NOTIFICATION] = s.foregroundNotification
+            p[Keys.MAX_SESSIONS] = s.maxSessions
+            p[Keys.CLOSE_ON_EXIT] = s.closeOnExit
+            p[Keys.CLOSE_ON_EXIT_SECONDS] = s.closeOnExitSeconds
+            p[Keys.ALLOW_SCREENSHOT] = s.allowScreenshot
+            p[Keys.BIOMETRIC_ENABLED] = s.biometricEnabled
+            p[Keys.BIOMETRIC_GRACE_SECONDS] = s.biometricGraceSeconds
+            p[Keys.HOST_KEY_POLICY] = s.hostKeyPolicy
+            p[Keys.MASK_SECRETS] = s.maskSecretsInUi
+            p[Keys.VERBOSE_SSH_LOGGING] = s.verboseSshLogging
+        }
     }
 
     private suspend fun <T> put(key: Preferences.Key<T>, value: T) {
