@@ -141,6 +141,9 @@ dependencies {
     // SSH
     implementation(libs.jsch)
 
+    // Argon2id, used only to derive the backup encryption key from a password
+    implementation(libs.argon2)
+
     // Serialization
     implementation(libs.kotlinx.serialization.json)
 
