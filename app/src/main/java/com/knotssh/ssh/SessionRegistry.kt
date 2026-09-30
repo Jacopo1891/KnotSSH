@@ -2,6 +2,7 @@ package com.knotssh.ssh
 
 import android.content.Context
 import com.knotssh.data.local.preferences.AppPreferences
+import com.knotssh.data.local.preferences.Defaults
 import com.knotssh.di.ApplicationScope
 import com.knotssh.domain.repository.CredentialRepository
 import com.knotssh.domain.repository.KnownHostRepository
@@ -106,5 +107,10 @@ class SessionRegistry @Inject constructor(
             .map { SessionSummary(it.serverId, it.label, it.title.value) }
     }
 
-    suspend fun sessionLimit(): Int = appPreferences.connection.first().maxSessions
+    /**
+     * Clamped here rather than trusted from storage: a value saved before the free ceiling
+     * existed would otherwise keep granting more sessions than the tier allows.
+     */
+    suspend fun sessionLimit(): Int =
+        appPreferences.connection.first().maxSessions.coerceIn(1, Defaults.FREE_MAX_SESSIONS)
 }

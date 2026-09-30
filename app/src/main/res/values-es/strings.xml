@@ -17,9 +17,9 @@
         <item quantity="other">%1$d reglas de reenvío de puertos</item>
     </plurals>
     <plurals name="session_limit_message">
-        <item quantity="one">Puedes mantener como máximo %1$d sesión a la vez. Ciérrala desde su notificación o sube el límite en los ajustes de conexión.</item>
-        <item quantity="many">Puedes mantener como máximo %1$d de sesiones a la vez. Cierra una desde su notificación o sube el límite en los ajustes de conexión.</item>
-        <item quantity="other">Puedes mantener como máximo %1$d sesiones a la vez. Cierra una desde su notificación o sube el límite en los ajustes de conexión.</item>
+        <item quantity="one">Puedes mantener como máximo %1$d sesión a la vez. Ciérrala desde su notificación antes de abrir otra.</item>
+        <item quantity="many">Puedes mantener como máximo %1$d de sesiones a la vez. Cierra una desde su notificación antes de abrir otra.</item>
+        <item quantity="other">Puedes mantener como máximo %1$d sesiones a la vez. Cierra una desde su notificación antes de abrir otra.</item>
     </plurals>
     <plurals name="custom_keys_count">
         <item quantity="one">%1$d tecla rápida</item>
@@ -307,8 +307,8 @@
     <string name="connection_auto_reconnect">Reconexión automática</string>
     <string name="connection_auto_reconnect_desc">Reintenta cuando la sesión cae por motivos de red</string>
     <string name="connection_reconnect_attempts">Intentos de reconexión</string>
-    <string name="connection_max_sessions">Sesiones simultáneas</string>
-    <string name="connection_max_sessions_desc">Cuántas conexiones puedes mantener abiertas a la vez. Cada una ocupa un hilo y su propio historial.</string>
+    <string name="connection_multi_session">Sesiones múltiples</string>
+    <string name="connection_multi_session_desc">Mantén hasta %1$d conexiones abiertas a la vez y cambia entre ellas desde sus notificaciones. Cada una ocupa un hilo y su propio historial.</string>
     <string name="connection_background_sessions">Sesiones en segundo plano</string>
     <string name="connection_background_sessions_desc">Permite suspender una sesión y volver a ella desde la notificación persistente</string>
     <string name="connection_wake_lock_desc">Impide que la CPU se suspenda durante la sesión</string>

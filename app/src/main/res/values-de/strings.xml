@@ -13,8 +13,8 @@
         <item quantity="other">%1$d Portweiterleitungsregeln</item>
     </plurals>
     <plurals name="session_limit_message">
-        <item quantity="one">Du kannst höchstens %1$d Sitzung gleichzeitig offen halten. Schließe sie über ihre Benachrichtigung oder erhöhe das Limit in den Verbindungseinstellungen.</item>
-        <item quantity="other">Du kannst höchstens %1$d Sitzungen gleichzeitig offen halten. Schließe eine über ihre Benachrichtigung oder erhöhe das Limit in den Verbindungseinstellungen.</item>
+        <item quantity="one">Du kannst höchstens %1$d Sitzung gleichzeitig offen halten. Schließe sie über ihre Benachrichtigung, bevor du eine weitere öffnest.</item>
+        <item quantity="other">Du kannst höchstens %1$d Sitzungen gleichzeitig offen halten. Schließe eine über ihre Benachrichtigung, bevor du eine weitere öffnest.</item>
     </plurals>
     <plurals name="custom_keys_count">
         <item quantity="one">%1$d eigene Taste</item>
@@ -297,8 +297,8 @@
     <string name="connection_auto_reconnect">Automatische Neuverbindung</string>
     <string name="connection_auto_reconnect_desc">Erneut versuchen, wenn die Sitzung aus Netzgründen abbricht</string>
     <string name="connection_reconnect_attempts">Verbindungsversuche</string>
-    <string name="connection_max_sessions">Gleichzeitige Sitzungen</string>
-    <string name="connection_max_sessions_desc">Wie viele Verbindungen du gleichzeitig offen halten kannst. Jede belegt einen Thread und ihren eigenen Verlauf.</string>
+    <string name="connection_multi_session">Mehrere Sitzungen</string>
+    <string name="connection_multi_session_desc">Halte bis zu %1$d Verbindungen gleichzeitig offen und wechsle über ihre Benachrichtigungen zwischen ihnen. Jede belegt einen Thread und ihren eigenen Verlauf.</string>
     <string name="connection_background_sessions">Hintergrundsitzungen</string>
     <string name="connection_background_sessions_desc">Erlaubt es, eine Sitzung zu parken und über die dauerhafte Benachrichtigung zurückzukehren</string>
     <string name="connection_wake_lock_desc">Verhindert, dass die CPU während der Sitzung schlafen geht</string>

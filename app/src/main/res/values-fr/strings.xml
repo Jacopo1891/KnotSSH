@@ -17,9 +17,9 @@
         <item quantity="other">%1$d règles de redirection de port</item>
     </plurals>
     <plurals name="session_limit_message">
-        <item quantity="one">Vous pouvez garder au maximum %1$d session à la fois. Fermez-la depuis sa notification, ou augmentez la limite dans les paramètres de connexion.</item>
-        <item quantity="many">Vous pouvez garder au maximum %1$d de sessions simultanées. Fermez-en une depuis sa notification, ou augmentez la limite dans les paramètres de connexion.</item>
-        <item quantity="other">Vous pouvez garder au maximum %1$d sessions simultanées. Fermez-en une depuis sa notification, ou augmentez la limite dans les paramètres de connexion.</item>
+        <item quantity="one">Vous pouvez garder au maximum %1$d session à la fois. Fermez-la depuis sa notification avant d\'en ouvrir une autre.</item>
+        <item quantity="many">Vous pouvez garder au maximum %1$d de sessions simultanées. Fermez-en une depuis sa notification avant d\'en ouvrir une autre.</item>
+        <item quantity="other">Vous pouvez garder au maximum %1$d sessions simultanées. Fermez-en une depuis sa notification avant d\'en ouvrir une autre.</item>
     </plurals>
     <plurals name="custom_keys_count">
         <item quantity="one">%1$d touche perso</item>
@@ -307,8 +307,8 @@
     <string name="connection_auto_reconnect">Reconnexion automatique</string>
     <string name="connection_auto_reconnect_desc">Réessaie quand la session tombe pour des raisons réseau</string>
     <string name="connection_reconnect_attempts">Tentatives de reconnexion</string>
-    <string name="connection_max_sessions">Sessions simultanées</string>
-    <string name="connection_max_sessions_desc">Combien de connexions vous pouvez garder ouvertes ensemble. Chacune occupe un thread et son propre historique.</string>
+    <string name="connection_multi_session">Sessions multiples</string>
+    <string name="connection_multi_session_desc">Gardez jusqu\'à %1$d connexions ouvertes en même temps et passez de l\'une à l\'autre depuis leurs notifications. Chacune occupe un thread et son propre historique.</string>
     <string name="connection_background_sessions">Sessions en arrière-plan</string>
     <string name="connection_background_sessions_desc">Permet de suspendre une session et d\'y revenir depuis la notification persistante</string>
     <string name="connection_wake_lock_desc">Empêche le processeur de se mettre en veille pendant la session</string>

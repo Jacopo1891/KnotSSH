@@ -95,12 +95,16 @@ fun ConnectionSettingsScreen(
 
         item { SettingsSection(stringResource(R.string.section_background)) }
         item {
-            SliderRow(
-                title = stringResource(R.string.connection_max_sessions),
-                description = stringResource(R.string.connection_max_sessions_desc),
-                value = connection.maxSessions,
-                range = 1..Defaults.MAX_SESSIONS_LIMIT,
-                onValueChange = viewModel::setMaxSessions
+            SwitchRow(
+                title = stringResource(R.string.connection_multi_session),
+                description = stringResource(
+                    R.string.connection_multi_session_desc,
+                    Defaults.FREE_MAX_SESSIONS
+                ),
+                checked = connection.maxSessions > 1,
+                onCheckedChange = { enabled ->
+                    viewModel.setMaxSessions(if (enabled) Defaults.FREE_MAX_SESSIONS else 1)
+                }
             )
         }
         item {

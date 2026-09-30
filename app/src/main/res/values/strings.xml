@@ -17,8 +17,8 @@
         <item quantity="other">%1$d port forward rules</item>
     </plurals>
     <plurals name="session_limit_message">
-        <item quantity="one">You can keep at most %1$d session at a time. Close it from its notification, or raise the limit in the connection settings.</item>
-        <item quantity="other">You can keep at most %1$d sessions at a time. Close one from its notification, or raise the limit in the connection settings.</item>
+        <item quantity="one">You can keep at most %1$d session at a time. Close it from its notification before opening another.</item>
+        <item quantity="other">You can keep at most %1$d sessions at a time. Close one from its notification before opening another.</item>
     </plurals>
     <plurals name="custom_keys_count">
         <item quantity="one">%1$d custom key</item>
@@ -336,8 +336,8 @@
     <string name="connection_auto_reconnect">Automatic reconnection</string>
     <string name="connection_auto_reconnect_desc">Retry when the session drops for network reasons</string>
     <string name="connection_reconnect_attempts">Reconnection attempts</string>
-    <string name="connection_max_sessions">Concurrent sessions</string>
-    <string name="connection_max_sessions_desc">How many connections you can keep open together. Each one uses a thread and its own scrollback.</string>
+    <string name="connection_multi_session">Multiple sessions</string>
+    <string name="connection_multi_session_desc">Keep up to %1$d connections open at once and switch between them from their notifications. Each one uses a thread and its own scrollback.</string>
     <string name="connection_background_sessions">Background sessions</string>
     <string name="connection_background_sessions_desc">Lets you suspend a session and come back from the persistent notification</string>
     <string name="connection_wake_lock" translatable="false">Wake lock</string>

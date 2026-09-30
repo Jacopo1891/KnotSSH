@@ -105,7 +105,10 @@ object Defaults {
     const val RECONNECT_ATTEMPTS = 3
     const val WAKE_LOCK_MINUTES = 30
     const val BIOMETRIC_GRACE_SECONDS = 60
-    const val MAX_SESSIONS = 5
+    const val MAX_SESSIONS = 2
+
+    /** Ceiling of the free tier. The paid tier raises it up to [MAX_SESSIONS_LIMIT]. */
+    const val FREE_MAX_SESSIONS = 2
     const val MAX_SESSIONS_LIMIT = 10
     const val CLOSE_ON_EXIT_SECONDS = 3
     const val CLOSE_ON_EXIT_SECONDS_MAX = 15
