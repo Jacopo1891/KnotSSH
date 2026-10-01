@@ -25,7 +25,7 @@ class DiagnosticsViewModel @Inject constructor(
 
     private val started = SharingStarted.WhileSubscribed(5_000)
 
-    val entries: StateFlow<List<String>> = log.entries
+    val entries: StateFlow<List<String>> = log.entriesText
 
     val verbose: StateFlow<Boolean> =
         prefs.diagnosticsVerbose.stateIn(viewModelScope, started, false)

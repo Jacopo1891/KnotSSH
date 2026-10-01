@@ -16,10 +16,28 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
-enum class DiagnosticLevel(val marker: Char) { INFO('I'), WARN('W'), ERROR('E') }
+enum class DiagnosticLevel(val marker: Char) {
+    INFO('I'),
+    WARN('W'),
+    ERROR('E');
+
+    val isProblem: Boolean get() = this != INFO
+}
+
+private data class DiagnosticEntry(
+    val timestampMs: Long,
+    val level: DiagnosticLevel,
+    val tag: String,
+    val message: String,
+    val count: Int = 1
+) {
+    fun sameEventAs(other: DiagnosticEntry) =
+        level == other.level && tag == other.tag && message == other.message
+}
 
 /**
  * Rolling log of app-level events, kept so a user can send a meaningful bug report.
@@ -27,6 +45,12 @@ enum class DiagnosticLevel(val marker: Char) { INFO('I'), WARN('W'), ERROR('E') 
  * Everything that goes in passes through [DiagnosticsRedactor] first, and terminal output,
  * credentials and hostnames are never recorded at all. The file lives in the app's private
  * storage and only leaves the device when the user explicitly exports or shares it.
+ *
+ * Retention is deliberately asymmetric. An install that never misbehaves produces only routine
+ * events, which are worthless after a few days and are capped hard and expired quickly; failures
+ * and crashes are what a report is made of, so they get a far larger budget and a far longer life.
+ * Repeating the same event does not add a line, it bumps a counter, which is what keeps an
+ * open-close-open-close session from filling the log.
  */
 @Singleton
 class DiagnosticsLog @Inject constructor(
@@ -35,11 +59,13 @@ class DiagnosticsLog @Inject constructor(
 ) {
     private val file = File(context.filesDir, FILE_NAME)
     private val lock = Any()
-    private val lines = ArrayDeque<String>()
-    private val timestampFormat = SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.US)
+    private val entries = ArrayDeque<DiagnosticEntry>()
+    private val timestampFormat = SimpleDateFormat("MM-dd HH:mm:ss", Locale.US)
 
-    private val _entries = MutableStateFlow<List<String>>(emptyList())
-    val entries: StateFlow<List<String>> = _entries.asStateFlow()
+    private val _lines = MutableStateFlow<List<String>>(emptyList())
+
+    /** Formatted, newest last. Exposed for the preview and for the "N entries" label. */
+    val entriesText: StateFlow<List<String>> = _lines.asStateFlow()
 
     /** Routine events are opt-in; failures are always kept so a report is never empty. */
     @Volatile
@@ -47,8 +73,11 @@ class DiagnosticsLog @Inject constructor(
 
     init {
         synchronized(lock) {
-            runCatching { if (file.exists()) lines.addAll(file.readLines().takeLast(MAX_LINES)) }
-            _entries.value = lines.toList()
+            runCatching {
+                if (file.exists()) file.readLines().mapNotNullTo(entries) { decode(it) }
+            }
+            prune(System.currentTimeMillis())
+            publish()
         }
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             preferences.diagnosticsVerbose.collect { verboseEnabled = it }
@@ -87,15 +116,16 @@ class DiagnosticsLog @Inject constructor(
 
     fun clear() {
         synchronized(lock) {
-            lines.clear()
+            entries.clear()
             runCatching { file.delete() }
-            _entries.value = emptyList()
+            publish()
         }
     }
 
     /** Full text to export or attach to an email, environment header included. */
     fun report(): String {
-        val body = synchronized(lock) { lines.toList() }
+        val body = synchronized(lock) { entries.toList() }
+        val problems = body.count { it.level.isProblem }
         return buildString {
             appendLine("KnotSSH diagnostic report")
             appendLine("Generated: ${SimpleDateFormat(REPORT_FORMAT, Locale.US).format(Date())}")
@@ -104,10 +134,14 @@ class DiagnosticsLog @Inject constructor(
             appendLine("Android: ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})")
             appendLine("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
             appendLine("Locale: ${Locale.getDefault().toLanguageTag()}")
-            appendLine("Entries: ${body.size}")
+            appendLine("Entries: ${body.size} ($problems with a problem)")
             appendLine("Hostnames, accounts, keys and terminal output are never recorded.")
+            appendLine(
+                "Routine events expire after $INFO_MAX_AGE_DAYS days, " +
+                    "problems after $PROBLEM_MAX_AGE_DAYS."
+            )
             appendLine("---")
-            body.forEach(::appendLine)
+            body.forEach { appendLine(it.format()) }
         }
     }
 
@@ -117,25 +151,94 @@ class DiagnosticsLog @Inject constructor(
         message: String,
         redact: Boolean = true
     ) {
-        val stamp = synchronized(timestampFormat) { timestampFormat.format(Date()) }
-        val body = if (redact) DiagnosticsRedactor.redact(message) else message
-        val line = "$stamp ${level.marker}/$tag: $body"
+        val now = System.currentTimeMillis()
+        val entry = DiagnosticEntry(
+            timestampMs = now,
+            level = level,
+            tag = tag,
+            message = if (redact) DiagnosticsRedactor.redact(message) else message
+        )
+
         synchronized(lock) {
-            lines.addLast(line)
-            val trimmed = lines.size > MAX_LINES
-            while (lines.size > MAX_LINES) lines.removeFirst()
-            runCatching {
-                // A rewrite is only needed when the oldest lines were dropped.
-                if (trimmed) file.writeText(lines.joinToString("\n", postfix = "\n"))
-                else file.appendText("$line\n")
+            val last = entries.lastOrNull()
+            if (last != null && last.sameEventAs(entry)) {
+                // Same event again: bump the counter instead of adding a line.
+                entries.removeLast()
+                entries.addLast(last.copy(timestampMs = now, count = last.count + 1))
+            } else {
+                entries.addLast(entry)
             }
-            _entries.value = lines.toList()
+            prune(now)
+            runCatching { file.writeText(entries.joinToString("\n", postfix = "\n") { encode(it) }) }
+            publish()
         }
+    }
+
+    /**
+     * Drops what has stopped being useful. Each class is capped on its own so a burst of routine
+     * events can never push an old crash out of the log.
+     */
+    private fun prune(now: Long) {
+        entries.removeAll { entry ->
+            val maxAge = if (entry.level.isProblem) PROBLEM_MAX_AGE_MS else INFO_MAX_AGE_MS
+            now - entry.timestampMs > maxAge
+        }
+        trimOldest(wantProblems = false, cap = MAX_INFO)
+        trimOldest(wantProblems = true, cap = MAX_PROBLEMS)
+    }
+
+    private fun trimOldest(wantProblems: Boolean, cap: Int) {
+        var excess = entries.count { it.level.isProblem == wantProblems } - cap
+        if (excess <= 0) return
+        val iterator = entries.iterator()
+        while (iterator.hasNext() && excess > 0) {
+            if (iterator.next().level.isProblem == wantProblems) {
+                iterator.remove()
+                excess--
+            }
+        }
+    }
+
+    private fun publish() {
+        _lines.value = entries.map { it.format() }
+    }
+
+    private fun DiagnosticEntry.format(): String {
+        val stamp = synchronized(timestampFormat) { timestampFormat.format(Date(timestampMs)) }
+        val repeats = if (count > 1) " (x$count)" else ""
+        return "$stamp ${level.marker}/$tag: $message$repeats"
+    }
+
+    private fun encode(entry: DiagnosticEntry) = listOf(
+        entry.timestampMs.toString(),
+        entry.count.toString(),
+        entry.level.name,
+        entry.tag,
+        entry.message.replace("\n", NEWLINE)
+    ).joinToString(SEPARATOR)
+
+    private fun decode(line: String): DiagnosticEntry? {
+        val parts = line.split(SEPARATOR)
+        if (parts.size != 5) return null
+        val timestamp = parts[0].toLongOrNull() ?: return null
+        val count = parts[1].toIntOrNull() ?: return null
+        val level = DiagnosticLevel.entries.firstOrNull { it.name == parts[2] } ?: return null
+        return DiagnosticEntry(timestamp, level, parts[3], parts[4].replace(NEWLINE, "\n"), count)
     }
 
     private companion object {
         const val FILE_NAME = "diagnostics.log"
-        const val MAX_LINES = 500
         const val REPORT_FORMAT = "yyyy-MM-dd HH:mm:ss"
+
+        /** Unit and record separators: never produced by a redacted message. */
+        const val SEPARATOR = "\u001F"
+        const val NEWLINE = "\u001E"
+
+        const val MAX_INFO = 60
+        const val MAX_PROBLEMS = 200
+        const val INFO_MAX_AGE_DAYS = 7L
+        const val PROBLEM_MAX_AGE_DAYS = 90L
+        val INFO_MAX_AGE_MS: Long = TimeUnit.DAYS.toMillis(INFO_MAX_AGE_DAYS)
+        val PROBLEM_MAX_AGE_MS: Long = TimeUnit.DAYS.toMillis(PROBLEM_MAX_AGE_DAYS)
     }
 }
