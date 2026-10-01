@@ -15,9 +15,11 @@ import com.knotssh.presentation.credentials.CredentialsScreen
 import com.knotssh.presentation.credentials.EditCredentialScreen
 import com.knotssh.presentation.home.HomeScreen
 import com.knotssh.presentation.server.EditServerScreen
+import com.knotssh.presentation.settings.AboutScreen
 import com.knotssh.presentation.settings.AppearanceSettingsScreen
 import com.knotssh.presentation.settings.BackupSettingsScreen
 import com.knotssh.presentation.settings.ConnectionSettingsScreen
+import com.knotssh.presentation.settings.FaqScreen
 import com.knotssh.presentation.settings.KeyboardSettingsScreen
 import com.knotssh.presentation.settings.LanguageSettingsScreen
 import com.knotssh.presentation.settings.SecuritySettingsScreen
@@ -136,7 +138,9 @@ fun NavGraph(
                 onOpenConnection = { navController.navigate(Screen.ConnectionSettings.route) },
                 onOpenSecurity = { navController.navigate(Screen.SecuritySettings.route) },
                 onOpenLanguage = { navController.navigate(Screen.LanguageSettings.route) },
-                onOpenBackup = { navController.navigate(Screen.BackupSettings.route) }
+                onOpenBackup = { navController.navigate(Screen.BackupSettings.route) },
+                onOpenFaq = { navController.navigate(Screen.Faq.route) },
+                onOpenAbout = { navController.navigate(Screen.About.route) }
             )
         }
 
@@ -160,6 +164,12 @@ fun NavGraph(
         }
         composable(Screen.BackupSettings.route) {
             BackupSettingsScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.Faq.route) {
+            FaqScreen(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.About.route) {
+            AboutScreen(onBack = { navController.popBackStack() })
         }
 
         composable(

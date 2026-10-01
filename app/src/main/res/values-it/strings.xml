@@ -289,7 +289,7 @@
     <string name="keyboard_manage_keys">Gestisci tasti rapidi (%1$d)</string>
     <string name="keyboard_manage_commands">Gestisci comandi rapidi (%1$d)</string>
     <string name="keyboard_auto_show">Apri tastiera automaticamente</string>
-    <string name="keyboard_auto_show_desc">Alla connessione. Un tocco sul buffer la apre comunque.</string>
+    <string name="keyboard_auto_show_desc">La tastiera si apre da sola all\'avvio della connessione. Un tocco sul buffer la apre comunque.</string>
     <string name="keyboard_swipe_scroll">Scorri con le dita nelle app a schermo intero</string>
     <string name="keyboard_swipe_scroll_desc">In vim, less e simili lo swipe verticale invia frecce su/giù</string>
     <string name="keyboard_haptics">Feedback aptico</string>
@@ -397,4 +397,55 @@
 
     <string name="language_system">Lingua di sistema</string>
     <string name="language_description">Vale per tutta l\'app. Non serve riavviare.</string>
+
+    <!-- FAQ -->
+    <string name="settings_faq">FAQ</string>
+    <string name="settings_faq_summary">Risposte alle domande più frequenti</string>
+    <string name="faq_q_storage">Dove vengono salvati password e chiavi?</string>
+    <string name="faq_a_storage">Solo su questo dispositivo, cifrate con una chiave custodita nell\'Android Keystore. Non viene caricato nulla online: KnotSSH non ha account né server propri.</string>
+    <string name="faq_q_host_key">Cos\'è la chiave host che mi viene chiesto di accettare?</string>
+    <string name="faq_a_host_key">È la carta d\'identità del server. Accettandola la prima volta la si memorizza, così da lì in poi l\'app sa distinguere il server vero da chi tenta di impersonarlo. Confronta il fingerprint con quello ottenuto sul server con: ssh-keyscan -p PORTA HOST | ssh-keygen -lf -</string>
+    <string name="faq_q_policies">Che differenza c\'è tra Rigida, Chiedi e Fidati al primo uso?</string>
+    <string name="faq_a_policies">Chiedi mostra il fingerprint e lascia decidere a te. Fidati al primo uso memorizza senza chiedere la prima chiave vista. Rigida accetta solo host già presenti nell\'elenco degli host conosciuti. Tutte e tre bloccano sempre una chiave cambiata, perché è il segnale tipico di un attacco.</string>
+    <string name="faq_q_strict_add">In modalità Rigida non riesco a connettermi a un server nuovo. Come faccio?</string>
+    <string name="faq_a_strict_add">La modalità Rigida non si fida mai da sola, quindi devi aggiungere prima la sua chiave: Impostazioni &gt; Sicurezza &gt; Host conosciuti &gt; Aggiungi, poi incolla la riga known_hosts prodotta da ssh-keyscan -p PORTA HOST. In alternativa passa a Chiedi per la prima connessione.</string>
+    <string name="faq_q_ssh_key">Come mi collego con una chiave SSH invece della password?</string>
+    <string name="faq_a_ssh_key">Crea un\'utenza in Utenze, scegli Chiave SSH come tipo e incolla la chiave privata. Se la chiave ha una passphrase puoi salvarla o farla chiedere a ogni connessione. La chiave pubblica corrispondente deve stare in ~/.ssh/authorized_keys sul server.</string>
+    <string name="faq_q_background">Perché la connessione cade quando esco dall\'app?</string>
+    <string name="faq_a_background">Non dovrebbe: una sessione attiva continua a girare in un servizio in primo piano con la sua notifica. Se cade comunque, escludi KnotSSH dall\'ottimizzazione batteria nelle impostazioni di Android e tieni attivo il keep-alive.</string>
+    <string name="faq_q_sessions">Posso tenere aperte più sessioni insieme?</string>
+    <string name="faq_a_sessions">Sì. Le sessioni aperte sopravvivono al ritorno all\'elenco e sono elencate nell\'area notifiche. Il numero massimo di sessioni contemporanee si imposta in Impostazioni &gt; Connessione.</string>
+    <string name="faq_q_port_forward">A cosa serve il port forwarding?</string>
+    <string name="faq_a_port_forward">Porta una porta TCP dentro il tunnel SSH: l\'inoltro locale porta un servizio remoto su questo dispositivo, quello remoto fa l\'opposto. Le regole si configurano per singolo server, quando lo aggiungi o lo modifichi.</string>
+    <string name="faq_q_migrate">Come sposto tutto su un telefono nuovo?</string>
+    <string name="faq_a_migrate">Impostazioni &gt; Backup &gt; Esporta crea un file con server, utenze e host conosciuti. Proteggilo con una password, perché contiene le tue credenziali, e importalo sull\'altro dispositivo.</string>
+    <string name="faq_q_bug">Ho trovato un problema. Come lo segnalo?</string>
+    <string name="faq_a_bug">Impostazioni &gt; Informazioni app &gt; Invia una segnalazione allega il log diagnostico a un\'email verso il nostro team. Attivare la registrazione dettagliata prima di riprodurre il problema rende la segnalazione molto più utile.</string>
+
+    <!-- Informazioni app e diagnostica -->
+    <string name="settings_about">Informazioni app</string>
+    <string name="settings_about_summary">Versione, supporto e diagnostica</string>
+    <string name="about_tagline">Client SSH per Android</string>
+    <string name="about_version">Versione %1$s (build %2$d)</string>
+    <string name="about_section_support">Supporto</string>
+    <string name="about_contact">Contatta gli sviluppatori</string>
+    <string name="about_contact_desc">%1$s · problemi, suggerimenti, segnalazioni</string>
+    <string name="about_mail_subject">KnotSSH %1$s — segnalazione</string>
+    <string name="about_mail_body">Descrivi il tuo suggerimento o il problema riscontrato:\n\n</string>
+    <string name="about_report">Invia una segnalazione</string>
+    <string name="about_report_desc">Allega il log diagnostico a un\'email</string>
+    <string name="about_report_subject">KnotSSH %1$s — segnalazione di un problema</string>
+    <string name="about_report_mail_body">Descrivi cosa stavi facendo quando si è verificato il problema:\n\n\n(Il log allegato non contiene nomi host, utenze, chiavi né output del terminale.)</string>
+    <string name="about_no_mail_app">Nessuna app disponibile per inviare l\'email.</string>
+    <string name="about_section_diagnostics">Diagnostica</string>
+    <string name="about_verbose">Registrazione dettagliata</string>
+    <string name="about_verbose_desc">Registra anche gli eventi ordinari. Errori e crash vengono registrati sempre.</string>
+    <string name="about_diagnostics_privacy">Il log non contiene mai nomi host, utenze, chiavi o output del terminale e resta su questo dispositivo finché non decidi di inviarlo.</string>
+    <string name="about_view_log">Vedi log (%1$d)</string>
+    <string name="about_export_log">Esporta</string>
+    <string name="about_clear_log">Cancella il log</string>
+    <string name="about_log_title">Log diagnostico</string>
+    <string name="about_log_cleared">Log cancellato.</string>
+    <string name="about_export_done">Log esportato.</string>
+    <string name="about_export_failed">Non è stato possibile esportare il log.</string>
 </resources>

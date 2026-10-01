@@ -279,7 +279,7 @@
     <string name="keyboard_manage_keys">Eigene Tasten verwalten (%1$d)</string>
     <string name="keyboard_manage_commands">Schnellbefehle verwalten (%1$d)</string>
     <string name="keyboard_auto_show">Tastatur automatisch öffnen</string>
-    <string name="keyboard_auto_show_desc">Beim Verbinden. Ein Tippen auf den Puffer öffnet sie ohnehin.</string>
+    <string name="keyboard_auto_show_desc">Die Tastatur öffnet sich beim Verbindungsaufbau von selbst. Ein Tippen auf den Puffer öffnet sie ohnehin.</string>
     <string name="keyboard_swipe_scroll">Mit dem Finger in Vollbild-Apps scrollen</string>
     <string name="keyboard_swipe_scroll_desc">In vim, less und ähnlichen sendet ein vertikales Wischen Pfeil hoch/runter</string>
     <string name="keyboard_haptics">Haptisches Feedback</string>
@@ -387,4 +387,55 @@
 
     <string name="language_system">Systemsprache</string>
     <string name="language_description">Gilt für die gesamte App. Ein Neustart ist nicht nötig.</string>
+
+    <!-- FAQ -->
+    <string name="settings_faq">FAQ</string>
+    <string name="settings_faq_summary">Antworten auf die häufigsten Fragen</string>
+    <string name="faq_q_storage">Wo werden meine Passwörter und Schlüssel gespeichert?</string>
+    <string name="faq_a_storage">Nur auf diesem Gerät, verschlüsselt mit einem Schlüssel im Android Keystore. Nichts wird hochgeladen: KnotSSH hat weder Konten noch eigene Server.</string>
+    <string name="faq_q_host_key">Was ist der Host-Schlüssel, den ich bestätigen soll?</string>
+    <string name="faq_a_host_key">Er ist der Ausweis des Servers. Wird er beim ersten Mal akzeptiert, wird er gespeichert, sodass die App den echten Server von jedem Angreifer unterscheiden kann. Vergleiche den Fingerabdruck mit dem auf dem Server ermittelten: ssh-keyscan -p PORT HOST | ssh-keygen -lf -</string>
+    <string name="faq_q_policies">Was unterscheidet Streng, Nachfragen und Beim ersten Mal vertrauen?</string>
+    <string name="faq_a_policies">Nachfragen zeigt den Fingerabdruck und überlässt dir die Entscheidung. Beim ersten Mal vertrauen speichert den zuerst gesehenen Schlüssel ohne Rückfrage. Streng akzeptiert nur Hosts, die bereits in der Liste der bekannten Hosts stehen. Alle drei blockieren immer einen geänderten Schlüssel, denn das ist das typische Zeichen eines Angriffs.</string>
+    <string name="faq_q_strict_add">Im Modus Streng kann ich mich nicht mit einem neuen Server verbinden. Was tun?</string>
+    <string name="faq_a_strict_add">Der strenge Modus vertraut nie von selbst, du musst seinen Schlüssel also vorher hinzufügen: Einstellungen &gt; Sicherheit &gt; Bekannte Hosts &gt; Hinzufügen, dann die von ssh-keyscan -p PORT HOST erzeugte known_hosts-Zeile einfügen. Alternativ für die erste Verbindung auf Nachfragen wechseln.</string>
+    <string name="faq_q_ssh_key">Wie verbinde ich mich mit einem SSH-Schlüssel statt mit einem Passwort?</string>
+    <string name="faq_a_ssh_key">Lege unter Zugänge einen Zugang an, wähle als Typ SSH-Schlüssel und füge den privaten Schlüssel ein. Hat der Schlüssel eine Passphrase, kannst du sie speichern oder bei jeder Verbindung abfragen lassen. Der passende öffentliche Schlüssel muss auf dem Server in ~/.ssh/authorized_keys stehen.</string>
+    <string name="faq_q_background">Warum bricht die Verbindung ab, wenn ich die App verlasse?</string>
+    <string name="faq_a_background">Sollte sie nicht: Eine aktive Sitzung läuft in einem Vordergrunddienst mit eigener Benachrichtigung weiter. Bricht sie trotzdem ab, nimm KnotSSH in den Android-Einstellungen von der Akku-Optimierung aus und lasse Keep-Alive aktiviert.</string>
+    <string name="faq_q_sessions">Kann ich mehrere Sitzungen gleichzeitig offen halten?</string>
+    <string name="faq_a_sessions">Ja. Offene Sitzungen überleben die Rückkehr zur Liste und erscheinen im Benachrichtigungsbereich. Die maximale Anzahl gleichzeitiger Sitzungen legst du unter Einstellungen &gt; Verbindung fest.</string>
+    <string name="faq_q_port_forward">Wofür ist die Portweiterleitung gut?</string>
+    <string name="faq_a_port_forward">Sie leitet einen TCP-Port durch den SSH-Tunnel: Die lokale Weiterleitung holt einen entfernten Dienst auf dieses Gerät, die entfernte macht das Gegenteil. Die Regeln werden pro Server beim Anlegen oder Bearbeiten konfiguriert.</string>
+    <string name="faq_q_migrate">Wie übertrage ich alles auf ein neues Telefon?</string>
+    <string name="faq_a_migrate">Einstellungen &gt; Sicherung &gt; Exportieren erzeugt eine Datei mit Servern, Zugängen und bekannten Hosts. Schütze sie mit einem Passwort, da sie deine Zugangsdaten enthält, und importiere sie auf dem anderen Gerät.</string>
+    <string name="faq_q_bug">Ich habe einen Fehler gefunden. Wie melde ich ihn?</string>
+    <string name="faq_a_bug">Einstellungen &gt; App-Infos &gt; Fehlerbericht senden hängt das Diagnoseprotokoll an eine E-Mail an unser Team an. Schalte die ausführliche Protokollierung ein, bevor du das Problem reproduzierst: Das macht den Bericht deutlich nützlicher.</string>
+
+    <!-- App-Infos und Diagnose -->
+    <string name="settings_about">App-Infos</string>
+    <string name="settings_about_summary">Version, Support und Diagnose</string>
+    <string name="about_tagline">SSH-Client für Android</string>
+    <string name="about_version">Version %1$s (Build %2$d)</string>
+    <string name="about_section_support">Support</string>
+    <string name="about_contact">Entwickler kontaktieren</string>
+    <string name="about_contact_desc">%1$s · Fehler, Vorschläge, Rückmeldungen</string>
+    <string name="about_mail_subject">KnotSSH %1$s — Rückmeldung</string>
+    <string name="about_mail_body">Beschreibe deinen Vorschlag oder das aufgetretene Problem:\n\n</string>
+    <string name="about_report">Fehlerbericht senden</string>
+    <string name="about_report_desc">Hängt das Diagnoseprotokoll an eine E-Mail an</string>
+    <string name="about_report_subject">KnotSSH %1$s — Fehlerbericht</string>
+    <string name="about_report_mail_body">Beschreibe, was du getan hast, als das Problem auftrat:\n\n\n(Das angehängte Protokoll enthält keine Hostnamen, Zugänge, Schlüssel oder Terminalausgaben.)</string>
+    <string name="about_no_mail_app">Keine App zum Senden der E-Mail verfügbar.</string>
+    <string name="about_section_diagnostics">Diagnose</string>
+    <string name="about_verbose">Ausführliche Protokollierung</string>
+    <string name="about_verbose_desc">Zeichnet auch gewöhnliche Ereignisse auf. Fehler und Abstürze werden immer aufgezeichnet.</string>
+    <string name="about_diagnostics_privacy">Das Protokoll enthält nie Hostnamen, Zugänge, Schlüssel oder Terminalausgaben und bleibt auf diesem Gerät, bis du es selbst versendest.</string>
+    <string name="about_view_log">Protokoll ansehen (%1$d)</string>
+    <string name="about_export_log">Exportieren</string>
+    <string name="about_clear_log">Protokoll löschen</string>
+    <string name="about_log_title">Diagnoseprotokoll</string>
+    <string name="about_log_cleared">Protokoll gelöscht.</string>
+    <string name="about_export_done">Protokoll exportiert.</string>
+    <string name="about_export_failed">Das Protokoll konnte nicht exportiert werden.</string>
 </resources>

@@ -56,6 +56,17 @@
                 android:value="true" />
         </service>
 
+        <!-- Hands a diagnostic report to the mail app the user picks, nothing else. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_paths" />
+        </provider>
+
     </application>
 
 </manifest>

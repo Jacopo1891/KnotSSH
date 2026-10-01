@@ -3,6 +3,8 @@ package com.knotssh.presentation.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
@@ -30,6 +32,8 @@ fun SettingsScreen(
     onOpenSecurity: () -> Unit,
     onOpenLanguage: () -> Unit,
     onOpenBackup: () -> Unit,
+    onOpenFaq: () -> Unit,
+    onOpenAbout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val appearance by viewModel.appearance.collectAsStateWithLifecycle()
@@ -165,6 +169,22 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_backup),
                 summary = stringResource(R.string.settings_backup_summary),
                 onClick = onOpenBackup
+            )
+        }
+        item {
+            SettingsCategoryRow(
+                icon = Icons.AutoMirrored.Filled.HelpOutline,
+                title = stringResource(R.string.settings_faq),
+                summary = stringResource(R.string.settings_faq_summary),
+                onClick = onOpenFaq
+            )
+        }
+        item {
+            SettingsCategoryRow(
+                icon = Icons.Default.Info,
+                title = stringResource(R.string.settings_about),
+                summary = stringResource(R.string.settings_about_summary),
+                onClick = onOpenAbout
             )
         }
     }

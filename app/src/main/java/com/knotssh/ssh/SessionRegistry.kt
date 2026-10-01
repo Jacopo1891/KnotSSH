@@ -1,6 +1,7 @@
 package com.knotssh.ssh
 
 import android.content.Context
+import com.knotssh.data.diagnostics.DiagnosticsLog
 import com.knotssh.data.local.preferences.AppPreferences
 import com.knotssh.data.local.preferences.Defaults
 import com.knotssh.di.ApplicationScope
@@ -40,6 +41,7 @@ class SessionRegistry @Inject constructor(
     private val credentialRepository: CredentialRepository,
     private val knownHostRepository: KnownHostRepository,
     private val appPreferences: AppPreferences,
+    private val diagnostics: DiagnosticsLog,
     @ApplicationScope private val scope: CoroutineScope
 ) {
     private val sessions = linkedMapOf<Long, SshSession>()
@@ -64,6 +66,7 @@ class SessionRegistry @Inject constructor(
             credentialRepository = credentialRepository,
             appPreferences = appPreferences,
             sshManager = SshManager(knownHostRepository),
+            diagnostics = diagnostics,
             parentScope = scope,
             onFinished = ::onSessionFinished
         )

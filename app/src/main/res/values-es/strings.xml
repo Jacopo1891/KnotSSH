@@ -289,7 +289,7 @@
     <string name="keyboard_manage_keys">Gestionar teclas rápidas (%1$d)</string>
     <string name="keyboard_manage_commands">Gestionar comandos rápidos (%1$d)</string>
     <string name="keyboard_auto_show">Abrir el teclado automáticamente</string>
-    <string name="keyboard_auto_show_desc">Al conectar. Tocar el búfer lo abre igualmente.</string>
+    <string name="keyboard_auto_show_desc">El teclado se abre solo al iniciarse la conexión. Tocar el búfer lo abre igualmente.</string>
     <string name="keyboard_swipe_scroll">Desplazar con los dedos en apps a pantalla completa</string>
     <string name="keyboard_swipe_scroll_desc">En vim, less y similares un deslizamiento vertical envía flechas arriba/abajo</string>
     <string name="keyboard_haptics">Respuesta háptica</string>
@@ -397,4 +397,55 @@
 
     <string name="language_system">Idioma del sistema</string>
     <string name="language_description">Se aplica a toda la aplicación. No hace falta reiniciar.</string>
+
+    <!-- FAQ -->
+    <string name="settings_faq">Preguntas frecuentes</string>
+    <string name="settings_faq_summary">Respuestas a las dudas más habituales</string>
+    <string name="faq_q_storage">¿Dónde se guardan mis contraseñas y claves?</string>
+    <string name="faq_a_storage">Solo en este dispositivo, cifradas con una clave custodiada en el Android Keystore. No se sube nada a ningún sitio: KnotSSH no tiene cuentas ni servidores propios.</string>
+    <string name="faq_q_host_key">¿Qué es la clave de host que se me pide aceptar?</string>
+    <string name="faq_a_host_key">Es el documento de identidad del servidor. Al aceptarla la primera vez queda fijada, de modo que la aplicación puede distinguir el servidor real de quien intente suplantarlo. Compara la huella con la que obtienes en el servidor con: ssh-keyscan -p PUERTO HOST | ssh-keygen -lf -</string>
+    <string name="faq_q_policies">¿Qué diferencia hay entre Estricta, Preguntar y Confiar la primera vez?</string>
+    <string name="faq_a_policies">Preguntar muestra la huella y te deja decidir. Confiar la primera vez fija sin preguntar la primera clave vista. Estricta solo acepta hosts que ya estén en tu lista de hosts conocidos. Las tres bloquean siempre una clave que haya cambiado, porque es la señal típica de un ataque.</string>
+    <string name="faq_q_strict_add">En modo Estricto no puedo conectarme a un servidor nuevo. ¿Qué hago?</string>
+    <string name="faq_a_strict_add">El modo Estricto nunca confía por su cuenta, así que primero debes añadir su clave: Ajustes &gt; Seguridad &gt; Hosts conocidos &gt; Añadir y pega la línea known_hosts que genera ssh-keyscan -p PUERTO HOST. Como alternativa, cambia a Preguntar para la primera conexión.</string>
+    <string name="faq_q_ssh_key">¿Cómo me conecto con una clave SSH en lugar de una contraseña?</string>
+    <string name="faq_a_ssh_key">Crea una cuenta en Cuentas, elige Clave SSH como tipo y pega la clave privada. Si la clave tiene passphrase puedes guardarla o pedirla en cada conexión. La clave pública correspondiente debe estar en ~/.ssh/authorized_keys del servidor.</string>
+    <string name="faq_q_background">¿Por qué se corta la conexión al salir de la aplicación?</string>
+    <string name="faq_a_background">No debería: una sesión activa sigue ejecutándose en un servicio en primer plano con su propia notificación. Si aun así se corta, excluye KnotSSH de la optimización de batería en los ajustes de Android y mantén activo el keep-alive.</string>
+    <string name="faq_q_sessions">¿Puedo mantener varias sesiones abiertas?</string>
+    <string name="faq_a_sessions">Sí. Las sesiones abiertas sobreviven al volver a la lista y aparecen en el área de notificaciones. El número máximo de sesiones simultáneas se ajusta en Ajustes &gt; Conexión.</string>
+    <string name="faq_q_port_forward">¿Para qué sirve el reenvío de puertos?</string>
+    <string name="faq_a_port_forward">Lleva un puerto TCP por el túnel SSH: el reenvío local trae un servicio remoto a este dispositivo y el remoto hace lo contrario. Las reglas se configuran por servidor, al añadirlo o editarlo.</string>
+    <string name="faq_q_migrate">¿Cómo paso todo a un teléfono nuevo?</string>
+    <string name="faq_a_migrate">Ajustes &gt; Copia de seguridad &gt; Exportar crea un archivo con servidores, cuentas y hosts conocidos. Protégelo con contraseña, porque contiene tus credenciales, e impórtalo en el otro dispositivo.</string>
+    <string name="faq_q_bug">He encontrado un fallo. ¿Cómo lo comunico?</string>
+    <string name="faq_a_bug">Ajustes &gt; Información de la app &gt; Enviar un informe adjunta el registro de diagnóstico a un correo dirigido a nuestro equipo. Activar el registro detallado antes de reproducir el problema hace el informe mucho más útil.</string>
+
+    <!-- Información de la app y diagnóstico -->
+    <string name="settings_about">Información de la app</string>
+    <string name="settings_about_summary">Versión, soporte y diagnóstico</string>
+    <string name="about_tagline">Cliente SSH para Android</string>
+    <string name="about_version">Versión %1$s (compilación %2$d)</string>
+    <string name="about_section_support">Soporte</string>
+    <string name="about_contact">Contactar con los desarrolladores</string>
+    <string name="about_contact_desc">%1$s · fallos, sugerencias, comentarios</string>
+    <string name="about_mail_subject">KnotSSH %1$s — comentarios</string>
+    <string name="about_mail_body">Describe tu sugerencia o el problema que has tenido:\n\n</string>
+    <string name="about_report">Enviar un informe</string>
+    <string name="about_report_desc">Adjunta el registro de diagnóstico a un correo</string>
+    <string name="about_report_subject">KnotSSH %1$s — informe de fallo</string>
+    <string name="about_report_mail_body">Describe qué estabas haciendo cuando se produjo el problema:\n\n\n(El registro adjunto no contiene nombres de host, cuentas, claves ni salida del terminal.)</string>
+    <string name="about_no_mail_app">No hay ninguna aplicación disponible para enviar el correo.</string>
+    <string name="about_section_diagnostics">Diagnóstico</string>
+    <string name="about_verbose">Registro detallado</string>
+    <string name="about_verbose_desc">Registra también los eventos ordinarios. Los errores y los cierres inesperados se registran siempre.</string>
+    <string name="about_diagnostics_privacy">El registro nunca contiene nombres de host, cuentas, claves ni salida del terminal, y permanece en este dispositivo hasta que decidas enviarlo.</string>
+    <string name="about_view_log">Ver registro (%1$d)</string>
+    <string name="about_export_log">Exportar</string>
+    <string name="about_clear_log">Borrar el registro</string>
+    <string name="about_log_title">Registro de diagnóstico</string>
+    <string name="about_log_cleared">Registro borrado.</string>
+    <string name="about_export_done">Registro exportado.</string>
+    <string name="about_export_failed">No se ha podido exportar el registro.</string>
 </resources>

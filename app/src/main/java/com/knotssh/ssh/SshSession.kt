@@ -8,6 +8,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
 import com.knotssh.R
+import com.knotssh.data.diagnostics.DiagnosticsLog
 import com.knotssh.data.local.preferences.AppPreferences
 import com.knotssh.data.local.preferences.BellMode
 import com.knotssh.data.local.preferences.ConnectionSettings
@@ -70,6 +71,7 @@ class SshSession(
     private val credentialRepository: CredentialRepository,
     private val appPreferences: AppPreferences,
     private val sshManager: SshManager,
+    private val diagnostics: DiagnosticsLog,
     parentScope: CoroutineScope,
     private val onFinished: (Long) -> Unit
 ) {
@@ -235,6 +237,13 @@ class SshSession(
                 _status.value =
                     if (attempt == 0) TerminalStatus.Connecting
                     else TerminalStatus.Reconnecting(attempt, connectionSettings.autoReconnectAttempts)
+                diagnostics.verbose(
+                    "ssh",
+                    "server#$serverId connect attempt $attempt " +
+                        "(timeout=${connectionSettings.connectTimeoutSeconds}s, " +
+                        "keepAlive=${connectionSettings.keepAliveSeconds}s, " +
+                        "compression=${connectionSettings.compression})"
+                )
 
                 val failure = attemptConnect(connectionSettings, security)
                 if (failure == null) return@launch
@@ -313,6 +322,11 @@ class SshSession(
             connection = established
             sessionStartedAt = System.currentTimeMillis()
             _status.value = TerminalStatus.Connected
+            diagnostics.info(
+                "ssh",
+                "server#$serverId connected (auth=${credential.authType}, " +
+                    "policy=${security.hostKeyPolicy})"
+            )
             // Held only now that it is known to work: a wrong password must prompt again, a
             // dropped connection must not.
             promptedSecret = typed
@@ -329,6 +343,7 @@ class SshSession(
         } catch (e: Exception) {
             // The handshake failed, so a typed secret may simply be wrong: ask again next time.
             promptedSecret = null
+            diagnostics.error("ssh", "server#$serverId connection failed", e)
             val reason = e.message ?: context.getString(R.string.ssh_connection_error)
             writeLocal("\r\n\u001B[31m[$reason]\u001B[0m\r\n")
             e
@@ -430,6 +445,10 @@ class SshSession(
         val deferred = CompletableDeferred<Boolean>()
         hostKeyDecision = deferred
         _hostKeyPrompt.value = verdict
+        diagnostics.verbose(
+            "ssh",
+            "server#$serverId host key prompt: ${verdict::class.simpleName}"
+        )
         return try {
             deferred.await()
         } finally {
@@ -590,6 +609,7 @@ class SshSession(
     /** Terminates the session for good and releases its threads. */
     fun close() {
         closedByUser = true
+        diagnostics.verbose("ssh", "server#$serverId session closed by user")
         sessionGeneration++
         hostKeyDecision?.complete(false)
         secretDecision?.complete(null)

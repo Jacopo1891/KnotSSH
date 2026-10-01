@@ -289,7 +289,7 @@
     <string name="keyboard_manage_keys">Gérer les touches perso (%1$d)</string>
     <string name="keyboard_manage_commands">Gérer les commandes rapides (%1$d)</string>
     <string name="keyboard_auto_show">Ouvrir le clavier automatiquement</string>
-    <string name="keyboard_auto_show_desc">À la connexion. Toucher le tampon l\'ouvre de toute façon.</string>
+    <string name="keyboard_auto_show_desc">Le clavier s\'ouvre tout seul au démarrage de la connexion. Toucher le tampon l\'ouvre de toute façon.</string>
     <string name="keyboard_swipe_scroll">Faire défiler au doigt dans les applis plein écran</string>
     <string name="keyboard_swipe_scroll_desc">Dans vim, less et similaires, un balayage vertical envoie les flèches haut/bas</string>
     <string name="keyboard_haptics">Retour haptique</string>
@@ -397,4 +397,55 @@
 
     <string name="language_system">Langue du système</string>
     <string name="language_description">S\'applique à toute l\'application. Aucun redémarrage n\'est nécessaire.</string>
+
+    <!-- FAQ -->
+    <string name="settings_faq">FAQ</string>
+    <string name="settings_faq_summary">Réponses aux questions les plus fréquentes</string>
+    <string name="faq_q_storage">Où sont enregistrés mes mots de passe et mes clés ?</string>
+    <string name="faq_a_storage">Uniquement sur cet appareil, chiffrés avec une clé conservée dans l\'Android Keystore. Rien n\'est envoyé en ligne : KnotSSH n\'a ni compte ni serveur propre.</string>
+    <string name="faq_q_host_key">Qu\'est-ce que la clé d\'hôte que l\'on me demande d\'accepter ?</string>
+    <string name="faq_a_host_key">C\'est la carte d\'identité du serveur. L\'accepter la première fois l\'épingle, de sorte que l\'application distingue ensuite le vrai serveur de quiconque tenterait de l\'usurper. Comparez l\'empreinte avec celle obtenue sur le serveur par : ssh-keyscan -p PORT HÔTE | ssh-keygen -lf -</string>
+    <string name="faq_q_policies">Quelle différence entre Stricte, Demander et Confiance au premier usage ?</string>
+    <string name="faq_a_policies">Demander affiche l\'empreinte et vous laisse décider. Confiance au premier usage épingle sans demander la première clé rencontrée. Stricte n\'accepte que les hôtes déjà présents dans votre liste d\'hôtes connus. Les trois bloquent toujours une clé modifiée, car c\'est la signature typique d\'une attaque.</string>
+    <string name="faq_q_strict_add">En mode Strict je n\'arrive pas à me connecter à un nouveau serveur. Que faire ?</string>
+    <string name="faq_a_strict_add">Le mode Strict ne fait jamais confiance de lui-même : il faut d\'abord ajouter sa clé via Paramètres &gt; Sécurité &gt; Hôtes connus &gt; Ajouter, puis coller la ligne known_hosts produite par ssh-keyscan -p PORT HÔTE. Vous pouvez sinon passer à Demander pour la première connexion.</string>
+    <string name="faq_q_ssh_key">Comment me connecter avec une clé SSH plutôt qu\'un mot de passe ?</string>
+    <string name="faq_a_ssh_key">Créez un compte dans Comptes, choisissez Clé SSH comme type et collez la clé privée. Si la clé a une phrase secrète, vous pouvez l\'enregistrer ou la faire demander à chaque connexion. La clé publique correspondante doit figurer dans ~/.ssh/authorized_keys sur le serveur.</string>
+    <string name="faq_q_background">Pourquoi la connexion tombe-t-elle quand je quitte l\'application ?</string>
+    <string name="faq_a_background">Elle ne devrait pas : une session active continue de tourner dans un service de premier plan avec sa propre notification. Si elle tombe quand même, excluez KnotSSH de l\'optimisation de batterie dans les paramètres Android et gardez le keep-alive activé.</string>
+    <string name="faq_q_sessions">Puis-je garder plusieurs sessions ouvertes ?</string>
+    <string name="faq_a_sessions">Oui. Les sessions ouvertes survivent au retour à la liste et apparaissent dans la zone de notifications. Le nombre maximal de sessions simultanées se règle dans Paramètres &gt; Connexion.</string>
+    <string name="faq_q_port_forward">À quoi sert la redirection de ports ?</string>
+    <string name="faq_a_port_forward">Elle fait passer un port TCP dans le tunnel SSH : la redirection locale amène un service distant sur cet appareil, la redirection distante fait l\'inverse. Les règles se configurent par serveur, à l\'ajout ou à la modification.</string>
+    <string name="faq_q_migrate">Comment transférer le tout vers un nouveau téléphone ?</string>
+    <string name="faq_a_migrate">Paramètres &gt; Sauvegarde &gt; Exporter crée un fichier contenant serveurs, comptes et hôtes connus. Protégez-le par un mot de passe, car il contient vos identifiants, puis importez-le sur l\'autre appareil.</string>
+    <string name="faq_q_bug">J\'ai trouvé un bug. Comment le signaler ?</string>
+    <string name="faq_a_bug">Paramètres &gt; Infos de l\'application &gt; Envoyer un signalement joint le journal de diagnostic à un e-mail adressé à notre équipe. Activer la journalisation détaillée avant de reproduire le problème rend le signalement bien plus utile.</string>
+
+    <!-- Infos de l'application et diagnostic -->
+    <string name="settings_about">Infos de l\'application</string>
+    <string name="settings_about_summary">Version, assistance et diagnostic</string>
+    <string name="about_tagline">Client SSH pour Android</string>
+    <string name="about_version">Version %1$s (build %2$d)</string>
+    <string name="about_section_support">Assistance</string>
+    <string name="about_contact">Contacter les développeurs</string>
+    <string name="about_contact_desc">%1$s · bugs, suggestions, retours</string>
+    <string name="about_mail_subject">KnotSSH %1$s — retour</string>
+    <string name="about_mail_body">Décrivez votre suggestion ou le problème rencontré :\n\n</string>
+    <string name="about_report">Envoyer un signalement</string>
+    <string name="about_report_desc">Joint le journal de diagnostic à un e-mail</string>
+    <string name="about_report_subject">KnotSSH %1$s — signalement de bug</string>
+    <string name="about_report_mail_body">Décrivez ce que vous faisiez au moment du problème :\n\n\n(Le journal joint ne contient ni noms d\'hôte, ni comptes, ni clés, ni sortie du terminal.)</string>
+    <string name="about_no_mail_app">Aucune application disponible pour envoyer l\'e-mail.</string>
+    <string name="about_section_diagnostics">Diagnostic</string>
+    <string name="about_verbose">Journalisation détaillée</string>
+    <string name="about_verbose_desc">Enregistre aussi les événements ordinaires. Les erreurs et les plantages sont toujours enregistrés.</string>
+    <string name="about_diagnostics_privacy">Le journal ne contient jamais de noms d\'hôte, de comptes, de clés ni de sortie du terminal, et il reste sur cet appareil tant que vous ne décidez pas de l\'envoyer.</string>
+    <string name="about_view_log">Voir le journal (%1$d)</string>
+    <string name="about_export_log">Exporter</string>
+    <string name="about_clear_log">Effacer le journal</string>
+    <string name="about_log_title">Journal de diagnostic</string>
+    <string name="about_log_cleared">Journal effacé.</string>
+    <string name="about_export_done">Journal exporté.</string>
+    <string name="about_export_failed">Le journal n\'a pas pu être exporté.</string>
 </resources>

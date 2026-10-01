@@ -160,6 +160,7 @@ class AppPreferences @Inject constructor(
         val VERBOSE_SSH_LOGGING = booleanPreferencesKey("verbose_ssh_logging")
 
         val GOOGLE_DRIVE_SYNC = booleanPreferencesKey("google_drive_sync")
+        val DIAGNOSTICS_VERBOSE = booleanPreferencesKey("diagnostics_verbose")
     }
 
     /** DataStore surfaces read errors through the flow; fall back to defaults instead of crashing collectors. */
@@ -230,6 +231,10 @@ class AppPreferences @Inject constructor(
         .map { it[Keys.GOOGLE_DRIVE_SYNC] ?: false }
         .distinctUntilChanged()
 
+    val diagnosticsVerbose: Flow<Boolean> = prefs
+        .map { it[Keys.DIAGNOSTICS_VERBOSE] ?: false }
+        .distinctUntilChanged()
+
     suspend fun setThemeMode(value: ThemeMode) = put(Keys.THEME_MODE, value.name)
     suspend fun setDynamicColor(value: Boolean) = put(Keys.DYNAMIC_COLOR, value)
 
@@ -281,6 +286,8 @@ class AppPreferences @Inject constructor(
     suspend fun setVerboseSshLogging(value: Boolean) = put(Keys.VERBOSE_SSH_LOGGING, value)
 
     suspend fun setGoogleDriveSync(value: Boolean) = put(Keys.GOOGLE_DRIVE_SYNC, value)
+
+    suspend fun setDiagnosticsVerbose(value: Boolean) = put(Keys.DIAGNOSTICS_VERBOSE, value)
 
     suspend fun resetToDefaults() {
         context.dataStore.edit { it.clear() }

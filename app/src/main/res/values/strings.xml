@@ -317,7 +317,7 @@
     <string name="keyboard_manage_keys">Manage custom keys (%1$d)</string>
     <string name="keyboard_manage_commands">Manage quick commands (%1$d)</string>
     <string name="keyboard_auto_show">Open the keyboard automatically</string>
-    <string name="keyboard_auto_show_desc">On connect. Tapping the buffer opens it anyway.</string>
+    <string name="keyboard_auto_show_desc">The keyboard opens by itself when the connection starts. Tapping the buffer opens it anyway.</string>
     <string name="keyboard_swipe_scroll">Swipe to scroll in full-screen apps</string>
     <string name="keyboard_swipe_scroll_desc">In vim, less and the like a vertical swipe sends up/down arrows</string>
     <string name="keyboard_haptics">Haptic feedback</string>
@@ -433,4 +433,55 @@
     <!-- Language -->
     <string name="language_system">System language</string>
     <string name="language_description">Applies to the whole app. Restarting is not needed.</string>
+
+    <!-- FAQ -->
+    <string name="settings_faq">FAQ</string>
+    <string name="settings_faq_summary">Answers to the most common questions</string>
+    <string name="faq_q_storage">Where are my passwords and keys stored?</string>
+    <string name="faq_a_storage">On this device only, encrypted with a key held in the Android Keystore. Nothing is uploaded anywhere: KnotSSH has no account and no server of its own.</string>
+    <string name="faq_q_host_key">What is the host key I am asked to accept?</string>
+    <string name="faq_a_host_key">It is the identity card of the server. Accepting it the first time pins it, so from then on the app can tell the real server apart from anyone trying to impersonate it. Check the fingerprint against the one you get on the server with: ssh-keyscan -p PORT HOST | ssh-keygen -lf -</string>
+    <string name="faq_q_policies">What is the difference between Strict, Ask and Trust on first use?</string>
+    <string name="faq_a_policies">Ask shows you the fingerprint and lets you decide. Trust on first use pins the first key seen without asking. Strict only accepts hosts that are already in your known hosts list. All three always block a key that has changed, because that is the signature of an attack.</string>
+    <string name="faq_q_strict_add">In Strict mode I cannot connect to a new server. What do I do?</string>
+    <string name="faq_a_strict_add">Strict never trusts a host on its own, so you have to add its key first: Settings &gt; Security &gt; Known hosts &gt; Add, then paste the known_hosts line produced by ssh-keyscan -p PORT HOST. Alternatively switch to Ask for the first connection.</string>
+    <string name="faq_q_ssh_key">How do I connect with an SSH key instead of a password?</string>
+    <string name="faq_a_ssh_key">Create an account in Credentials, pick SSH key as the type and paste the private key. If the key has a passphrase you can store it or have it asked at every connection. The matching public key has to be in ~/.ssh/authorized_keys on the server.</string>
+    <string name="faq_q_background">Why does the connection drop when I leave the app?</string>
+    <string name="faq_a_background">It should not: an active session keeps running in a foreground service with its own notification. If it still drops, exclude KnotSSH from battery optimisation in the Android settings and keep keep-alive on.</string>
+    <string name="faq_q_sessions">Can I keep more than one session open?</string>
+    <string name="faq_a_sessions">Yes. Open sessions survive going back to the list and are shown in the notification area. The maximum number of simultaneous sessions is set in Settings &gt; Connection.</string>
+    <string name="faq_q_port_forward">What is port forwarding for?</string>
+    <string name="faq_a_port_forward">It carries a TCP port through the SSH tunnel: local forwarding brings a remote service onto this device, remote forwarding does the opposite. Rules are configured per server when you add or edit it.</string>
+    <string name="faq_q_migrate">How do I move everything to a new phone?</string>
+    <string name="faq_a_migrate">Settings &gt; Backup &gt; Export creates a file with servers, accounts and known hosts. Protect it with a password, since it contains your credentials, and import it on the other device.</string>
+    <string name="faq_q_bug">I found a bug. How do I report it?</string>
+    <string name="faq_a_bug">Settings &gt; App info &gt; Send a bug report attaches the diagnostic log to an email to our team. Turning on detailed logging before reproducing the problem makes the report far more useful.</string>
+
+    <!-- App info and diagnostics -->
+    <string name="settings_about">App info</string>
+    <string name="settings_about_summary">Version, support and diagnostics</string>
+    <string name="about_tagline">SSH client for Android</string>
+    <string name="about_version">Version %1$s (build %2$d)</string>
+    <string name="about_section_support">Support</string>
+    <string name="about_contact">Contact the developers</string>
+    <string name="about_contact_desc">%1$s · bugs, suggestions, feedback</string>
+    <string name="about_mail_subject">KnotSSH %1$s — feedback</string>
+    <string name="about_mail_body">Describe your suggestion or the problem you ran into:\n\n</string>
+    <string name="about_report">Send a bug report</string>
+    <string name="about_report_desc">Attaches the diagnostic log to an email</string>
+    <string name="about_report_subject">KnotSSH %1$s — bug report</string>
+    <string name="about_report_mail_body">Describe what you were doing when the problem happened:\n\n\n(The attached log contains no hostnames, accounts, keys or terminal output.)</string>
+    <string name="about_no_mail_app">No app available to send the email.</string>
+    <string name="about_section_diagnostics">Diagnostics</string>
+    <string name="about_verbose">Detailed logging</string>
+    <string name="about_verbose_desc">Also records routine events. Errors and crashes are always recorded.</string>
+    <string name="about_diagnostics_privacy">The log never contains hostnames, accounts, keys or terminal output, and it stays on this device until you choose to send it.</string>
+    <string name="about_view_log">View log (%1$d)</string>
+    <string name="about_export_log">Export</string>
+    <string name="about_clear_log">Clear the log</string>
+    <string name="about_log_title">Diagnostic log</string>
+    <string name="about_log_cleared">Log cleared.</string>
+    <string name="about_export_done">Log exported.</string>
+    <string name="about_export_failed">The log could not be exported.</string>
 </resources>
