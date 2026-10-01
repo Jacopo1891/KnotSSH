@@ -92,7 +92,7 @@
     <string name="home_last_connection">Last connection: %1$s</string>
     <string name="home_no_credential">No account</string>
     <string name="home_empty_title">No connections</string>
-    <string name="home_empty_message">Add your first SSH server\nwith the button below</string>
+    <string name="home_empty_message">Add your first SSH server</string>
     <string name="home_empty_search_title">No results</string>
     <string name="home_empty_search_message">Try a different term</string>
 

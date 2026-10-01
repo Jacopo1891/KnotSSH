@@ -90,7 +90,7 @@
     <string name="home_last_connection">Ultima connessione: %1$s</string>
     <string name="home_no_credential">Nessuna utenza</string>
     <string name="home_empty_title">Nessuna connessione</string>
-    <string name="home_empty_message">Aggiungi il tuo primo server SSH\ncon il pulsante in basso</string>
+    <string name="home_empty_message">Aggiungi il tuo primo server SSH</string>
     <string name="home_empty_search_title">Nessun risultato</string>
     <string name="home_empty_search_message">Prova con un termine diverso</string>
 

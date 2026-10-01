@@ -80,7 +80,7 @@
     <string name="home_last_connection">Letzte Verbindung: %1$s</string>
     <string name="home_no_credential">Kein Zugang</string>
     <string name="home_empty_title">Keine Verbindungen</string>
-    <string name="home_empty_message">Füge deinen ersten SSH-Server\nmit der Schaltfläche unten hinzu</string>
+    <string name="home_empty_message">Füge deinen ersten SSH-Server hinzu</string>
     <string name="home_empty_search_title">Keine Ergebnisse</string>
     <string name="home_empty_search_message">Versuche einen anderen Suchbegriff</string>
 
