@@ -14,7 +14,9 @@ data class Server(
     // Short enough to keep NAT mappings on mobile networks alive.
     val keepAliveSeconds: Int = 30,
     val connectTimeoutSeconds: Int = 30,
-    val portForwardRules: List<PortForwardRule> = emptyList()
+    val portForwardRules: List<PortForwardRule> = emptyList(),
+    val folderId: Long? = null,
+    val sortOrder: Int = 0
 )
 
 @Serializable

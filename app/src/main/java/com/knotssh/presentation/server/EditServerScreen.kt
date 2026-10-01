@@ -126,6 +126,53 @@ fun EditServerScreen(
                                 modifier = Modifier.weight(0.3f)
                             )
                         }
+
+                        if (state.foldersEnabled) {
+                            var folderMenuExpanded by remember { mutableStateOf(false) }
+                            val selectedFolder = state.folders.find { it.id == state.folderId }
+
+                            ExposedDropdownMenuBox(
+                                expanded = folderMenuExpanded,
+                                onExpandedChange = { folderMenuExpanded = it }
+                            ) {
+                                OutlinedTextField(
+                                    value = selectedFolder?.name
+                                        ?: stringResource(R.string.home_no_folder),
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text(stringResource(R.string.server_folder_label)) },
+                                    trailingIcon = {
+                                        ExposedDropdownMenuDefaults.TrailingIcon(
+                                            expanded = folderMenuExpanded
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .menuAnchor()
+                                )
+                                ExposedDropdownMenu(
+                                    expanded = folderMenuExpanded,
+                                    onDismissRequest = { folderMenuExpanded = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.home_no_folder)) },
+                                        onClick = {
+                                            viewModel.onFolderSelected(null)
+                                            folderMenuExpanded = false
+                                        }
+                                    )
+                                    state.folders.forEach { folder ->
+                                        DropdownMenuItem(
+                                            text = { Text(folder.name) },
+                                            onClick = {
+                                                viewModel.onFolderSelected(folder.id)
+                                                folderMenuExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

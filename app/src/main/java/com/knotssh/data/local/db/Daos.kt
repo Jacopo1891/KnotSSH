@@ -28,6 +28,42 @@ interface ServerDao {
 
     @Query("UPDATE servers SET isFavorite = :isFavorite WHERE id = :id")
     suspend fun toggleFavorite(id: Long, isFavorite: Boolean)
+
+    @Query("UPDATE servers SET folderId = :folderId WHERE id = :id")
+    suspend fun setFolder(id: Long, folderId: Long?)
+
+    @Query("UPDATE servers SET folderId = NULL WHERE folderId = :folderId")
+    suspend fun detachFromFolder(folderId: Long)
+
+    @Query("UPDATE servers SET sortOrder = :sortOrder WHERE id = :id")
+    suspend fun setSortOrder(id: Long, sortOrder: Int)
+}
+
+@Dao
+interface FolderDao {
+    @Query("SELECT * FROM folders ORDER BY sortOrder ASC, name COLLATE NOCASE ASC")
+    fun getAll(): Flow<List<FolderEntity>>
+
+    @Query("SELECT * FROM folders ORDER BY sortOrder ASC, name COLLATE NOCASE ASC")
+    suspend fun getAllOnce(): List<FolderEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(folder: FolderEntity): Long
+
+    @Query("UPDATE folders SET name = :name WHERE id = :id")
+    suspend fun rename(id: Long, name: String)
+
+    @Query("UPDATE folders SET isExpanded = :expanded WHERE id = :id")
+    suspend fun setExpanded(id: Long, expanded: Boolean)
+
+    @Query("UPDATE folders SET sortOrder = :sortOrder WHERE id = :id")
+    suspend fun setSortOrder(id: Long, sortOrder: Int)
+
+    @Query("DELETE FROM folders WHERE id = :id")
+    suspend fun delete(id: Long)
+
+    @Query("SELECT MAX(sortOrder) FROM folders")
+    suspend fun maxSortOrder(): Int?
 }
 
 @Dao

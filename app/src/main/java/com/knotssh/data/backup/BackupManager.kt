@@ -14,6 +14,7 @@ import com.knotssh.domain.model.Server
 import com.knotssh.domain.model.SshKeyType
 import com.knotssh.domain.repository.CredentialRepository
 import com.knotssh.domain.repository.CustomKeyRepository
+import com.knotssh.domain.repository.FolderRepository
 import com.knotssh.domain.repository.KnownHostRepository
 import com.knotssh.domain.repository.QuickCommandRepository
 import com.knotssh.domain.repository.ServerRepository
@@ -37,12 +38,15 @@ class BackupManager @Inject constructor(
     private val knownHostRepository: KnownHostRepository,
     private val quickCommandRepository: QuickCommandRepository,
     private val customKeyRepository: CustomKeyRepository,
+    private val folderRepository: FolderRepository,
     private val appPreferences: AppPreferences
 ) {
 
     suspend fun export(includeSettings: Boolean): BackupPayload = withContext(Dispatchers.IO) {
         val credentials = credentialRepository.getAllCredentials().first()
         val aliasById = credentials.associate { it.id to it.alias }
+        val folders = folderRepository.getAllOnce()
+        val folderNameById = folders.associate { it.id to it.name }
 
         BackupPayload(
             exportedAtMs = System.currentTimeMillis(),
@@ -59,9 +63,12 @@ class BackupManager @Inject constructor(
                     connectTimeoutSeconds = server.connectTimeoutSeconds,
                     portForwardRules = server.portForwardRules.map {
                         BackupPortForward(it.type.name, it.localPort, it.remoteHost, it.remotePort)
-                    }
+                    },
+                    folderName = server.folderId?.let(folderNameById::get),
+                    sortOrder = server.sortOrder
                 )
             },
+            folders = folders.map { BackupFolder(it.name, it.sortOrder) },
             knownHosts = knownHostRepository.getAll().first().map {
                 BackupKnownHost(it.host, it.port, it.keyType, it.keyBlob)
             },
@@ -130,6 +137,15 @@ class BackupManager @Inject constructor(
         var serversAdded = 0
         var serversSkipped = 0
 
+        // Folders are merged by name: importing twice must not produce a duplicate "Work".
+        val folderIdByName = folderRepository.getAllOnce()
+            .associate { it.name to it.id }
+            .toMutableMap()
+        for (folder in payload.folders.sortedBy { it.sortOrder }) {
+            if (folder.name.isBlank() || folder.name in folderIdByName) continue
+            folderIdByName[folder.name] = folderRepository.create(folder.name)
+        }
+
         for (incoming in payload.servers) {
             val credentialId = credentialIdByAlias[incoming.credentialAlias] ?: 0L
             val existing = existingServers.firstOrNull { it.alias == incoming.alias }
@@ -160,7 +176,9 @@ class BackupManager @Inject constructor(
                             remoteHost = it.remoteHost,
                             remotePort = it.remotePort
                         )
-                    }
+                    },
+                    folderId = incoming.folderName?.let(folderIdByName::get),
+                    sortOrder = incoming.sortOrder
                 )
             )
             serversAdded++

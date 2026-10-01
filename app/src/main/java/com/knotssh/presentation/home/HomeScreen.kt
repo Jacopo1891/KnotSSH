@@ -5,14 +5,17 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -22,7 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -30,10 +38,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.knotssh.R
+import com.knotssh.data.local.preferences.ServerSortMode
 import com.knotssh.domain.model.Credential
+import com.knotssh.domain.model.Folder
 import com.knotssh.domain.model.Server
 import com.knotssh.presentation.components.SwipeToDeleteContainer
 import com.knotssh.presentation.theme.*
@@ -53,6 +64,88 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchExpanded by remember { mutableStateOf(false) }
     var serverToDelete by remember { mutableStateOf<Server?>(null) }
+    var serverToMove by remember { mutableStateOf<Server?>(null) }
+    var folderToFill by remember { mutableStateOf<Folder?>(null) }
+    var folderToRename by remember { mutableStateOf<Folder?>(null) }
+    var folderToDelete by remember { mutableStateOf<Folder?>(null) }
+    var showFolderManager by remember { mutableStateOf(false) }
+
+    folderToRename?.let { folder ->
+        RenameFolderDialog(
+            folder = folder,
+            onConfirm = { name ->
+                viewModel.renameFolder(folder.id, name)
+                folderToRename = null
+            },
+            onDismiss = { folderToRename = null }
+        )
+    }
+
+    folderToDelete?.let { folder ->
+        AlertDialog(
+            onDismissRequest = { folderToDelete = null },
+            icon = { Icon(Icons.Default.Delete, contentDescription = null) },
+            title = { Text(stringResource(R.string.folder_delete_title)) },
+            text = { Text(stringResource(R.string.folder_delete_message, folder.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteFolder(folder.id)
+                    folderToDelete = null
+                }) {
+                    Text(
+                        text = stringResource(R.string.action_delete),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { folderToDelete = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
+    folderToFill?.let { folder ->
+        // Re-read it from the list so the checkmarks follow the edits instead of a stale copy.
+        val current = uiState.folders.firstOrNull { it.id == folder.id }
+        if (current == null) {
+            folderToFill = null
+        } else {
+            FolderContentsDialog(
+                folder = current,
+                servers = uiState.allServers,
+                onToggle = { server ->
+                    val target = if (server.folderId == current.id) null else current.id
+                    viewModel.moveServerToFolder(server.id, target)
+                },
+                onDismiss = { folderToFill = null }
+            )
+        }
+    }
+
+    if (showFolderManager) {
+        FolderManagerDialog(
+            folders = uiState.folders,
+            onCreate = viewModel::createFolder,
+            onRename = viewModel::renameFolder,
+            onDelete = viewModel::deleteFolder,
+            onMove = viewModel::moveFolder,
+            onDismiss = { showFolderManager = false }
+        )
+    }
+
+    serverToMove?.let { server ->
+        MoveToFolderDialog(
+            server = server,
+            folders = uiState.folders,
+            onSelect = { folderId ->
+                viewModel.moveServerToFolder(server.id, folderId)
+                serverToMove = null
+            },
+            onDismiss = { serverToMove = null }
+        )
+    }
 
     // Confirmation dialog for delete
     serverToDelete?.let { server ->
@@ -85,8 +178,13 @@ fun HomeScreen(
             HomeTopBar(
                 searchExpanded = searchExpanded,
                 searchQuery = uiState.searchQuery,
+                sortMode = uiState.sortMode,
+                foldersEnabled = uiState.foldersEnabled,
                 onSearchExpandToggle = { searchExpanded = !searchExpanded },
                 onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                onSortModeSelected = viewModel::setSortMode,
+                onFoldersEnabledChange = viewModel::setFoldersEnabled,
+                onManageFolders = { showFolderManager = true },
                 onNavigateCredentials = onNavigateCredentials,
                 onNavigateSettings = onNavigateSettings
             )
@@ -94,7 +192,7 @@ fun HomeScreen(
         floatingActionButton = {
             // L'empty state mostra già un pulsante centrale per aggiungere il primo server.
             val showEmptyStateAddButton =
-                !uiState.isLoading && uiState.servers.isEmpty() && uiState.searchQuery.isBlank()
+                !uiState.isLoading && uiState.totalServers == 0 && uiState.searchQuery.isBlank()
             if (!showEmptyStateAddButton) {
                 ExtendedFloatingActionButton(
                     onClick = onAddServer,
@@ -120,22 +218,32 @@ fun HomeScreen(
                 uiState.isLoading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                uiState.servers.isEmpty() -> {
+                !uiState.hasVisibleServers -> {
                     EmptyState(
-                        hasSearch = uiState.searchQuery.isNotBlank(),
+                        hasSearch = uiState.isSearching,
                         onAddServer = onAddServer,
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
                 else -> {
                     ServerList(
-                        servers = uiState.servers,
-                        credentials = uiState.credentials,
-                        activeSessions = uiState.activeSessions,
+                        state = uiState,
                         onConnect = onConnect,
                         onEdit = onEditServer,
                         onDelete = { serverToDelete = it },
-                        onToggleFavorite = { s -> viewModel.toggleFavorite(s.id, s.isFavorite) }
+                        onToggleFavorite = { s -> viewModel.toggleFavorite(s.id, s.isFavorite) },
+                        onToggleFolder = viewModel::toggleFolder,
+                        onMoveToFolder = { serverToMove = it },
+                        onEnableReorder = { viewModel.setSortMode(ServerSortMode.MANUAL) },
+                        onEditFolderContents = { folderToFill = it },
+                        onRenameFolder = { folderToRename = it },
+                        onDeleteFolder = { folderToDelete = it },
+                        onServerDragStart = viewModel::beginServerDrag,
+                        onServerDragStep = viewModel::moveServerStep,
+                        onServerDragFinish = { committed ->
+                            if (committed) viewModel.endServerDrag() else viewModel.cancelServerDrag()
+                        },
+                        onFolderDragStep = viewModel::moveFolderStep
                     )
                 }
             }
@@ -148,13 +256,19 @@ fun HomeScreen(
 private fun HomeTopBar(
     searchExpanded: Boolean,
     searchQuery: String,
+    sortMode: ServerSortMode,
+    foldersEnabled: Boolean,
     onSearchExpandToggle: () -> Unit,
     onSearchQueryChanged: (String) -> Unit,
+    onSortModeSelected: (ServerSortMode) -> Unit,
+    onFoldersEnabledChange: (Boolean) -> Unit,
+    onManageFolders: () -> Unit,
     onNavigateCredentials: () -> Unit,
     onNavigateSettings: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    var sortMenuExpanded by remember { mutableStateOf(false) }
 
     Column {
         TopAppBar(
@@ -220,6 +334,56 @@ private fun HomeTopBar(
                         }
                     )
                 }
+                Box {
+                    IconButton(onClick = { sortMenuExpanded = true }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = stringResource(R.string.home_sort)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = sortMenuExpanded,
+                        onDismissRequest = { sortMenuExpanded = false }
+                    ) {
+                        SORT_MODES.forEach { (mode, label) ->
+                            DropdownMenuItem(
+                                text = { Text(stringResource(label)) },
+                                leadingIcon = {
+                                    if (mode == sortMode) Icon(Icons.Default.Check, null)
+                                },
+                                onClick = {
+                                    sortMenuExpanded = false
+                                    onSortModeSelected(mode)
+                                }
+                            )
+                        }
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.home_use_folders)) },
+                            leadingIcon = {
+                                Icon(
+                                    if (foldersEnabled) Icons.Default.CheckBox
+                                    else Icons.Default.CheckBoxOutlineBlank,
+                                    contentDescription = null
+                                )
+                            },
+                            onClick = {
+                                sortMenuExpanded = false
+                                onFoldersEnabledChange(!foldersEnabled)
+                            }
+                        )
+                        if (foldersEnabled) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.home_manage_folders)) },
+                                leadingIcon = { Icon(Icons.Default.CreateNewFolder, null) },
+                                onClick = {
+                                    sortMenuExpanded = false
+                                    onManageFolders()
+                                }
+                            )
+                        }
+                    }
+                }
                 IconButton(onClick = onNavigateCredentials) {
                     Icon(
                         Icons.Default.Key,
@@ -241,64 +405,402 @@ private fun HomeTopBar(
     }
 }
 
+private val SORT_MODES = listOf(
+    ServerSortMode.LAST_USED to R.string.home_sort_last_used,
+    ServerSortMode.NAME to R.string.home_sort_name,
+    ServerSortMode.ADDED to R.string.home_sort_added,
+    ServerSortMode.MANUAL to R.string.home_sort_manual
+)
+
 @Composable
 private fun ServerList(
-    servers: List<Server>,
-    credentials: Map<Long, Credential>,
-    activeSessions: Set<Long>,
+    state: HomeUiState,
     onConnect: (Long) -> Unit,
     onEdit: (Long) -> Unit,
     onDelete: (Server) -> Unit,
-    onToggleFavorite: (Server) -> Unit
+    onToggleFavorite: (Server) -> Unit,
+    onToggleFolder: (Folder) -> Unit,
+    onMoveToFolder: (Server) -> Unit,
+    onEnableReorder: () -> Unit,
+    onEditFolderContents: (Folder) -> Unit,
+    onRenameFolder: (Folder) -> Unit,
+    onDeleteFolder: (Folder) -> Unit,
+    onServerDragStart: (Long) -> Unit,
+    onServerDragStep: (Long, Int) -> Unit,
+    onServerDragFinish: (Boolean) -> Unit,
+    onFolderDragStep: (Long, Int) -> Unit
 ) {
-    // Separate favorites and recents
-    val favorites = servers.filter { it.isFavorite }
-    val recents = servers.filter { !it.isFavorite }
+    val reorderable = state.isReorderable
 
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        if (favorites.isNotEmpty()) {
-            item {
-                SectionHeader(title = stringResource(R.string.home_favorites), icon = Icons.Default.Star)
+        if (reorderable) {
+            item(key = "reorder_hint") {
+                Text(
+                    text = stringResource(R.string.home_reorder_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-            items(favorites, key = { it.id }) { server ->
-                ServerItemWithSwipe(
+        }
+        // Favourites are a shortcut, not a location: the same servers stay in their folder below.
+        if (state.favorites.isNotEmpty() && !state.isSearching) {
+            item(key = "header_favorites") {
+                SectionHeader(
+                    title = stringResource(R.string.home_favorites),
+                    icon = Icons.Default.Star
+                )
+            }
+            items(state.favorites, key = { "fav_${it.id}" }) { server ->
+                ServerRow(
                     server = server,
-                    credential = credentials[server.credentialId],
-                    hasActiveSession = server.id in activeSessions,
-                    onConnect = { onConnect(server.id) },
-                    onEdit = { onEdit(server.id) },
-                    onDelete = { onDelete(server) },
-                    onToggleFavorite = { onToggleFavorite(server) }
+                    state = state,
+                    onConnect = onConnect,
+                    onEdit = onEdit,
+                    onDelete = onDelete,
+                    onToggleFavorite = onToggleFavorite,
+                    onMoveToFolder = onMoveToFolder,
+                    onEnableReorder = onEnableReorder
                 )
             }
         }
 
-        if (recents.isNotEmpty()) {
-            item {
-                SectionHeader(
-                    title = stringResource(R.string.home_recents),
-                    icon = Icons.Default.History,
-                    modifier = Modifier.padding(top = if (favorites.isNotEmpty()) 8.dp else 0.dp)
-                )
+        state.visibleGroups.forEach { group ->
+            val folder = group.folder
+
+            item(key = "header_${group.key}") {
+                when {
+                    // With folders off there is a single section, so a header would say nothing.
+                    !state.foldersEnabled -> Spacer(Modifier.height(0.dp))
+                    folder == null -> SectionHeader(
+                        title = stringResource(R.string.home_no_folder),
+                        icon = Icons.Default.Dns,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                    else -> FolderHeader(
+                        folder = folder,
+                        count = group.servers.size,
+                        reorderable = reorderable,
+                        onToggle = { onToggleFolder(folder) },
+                        onEditContents = { onEditFolderContents(folder) },
+                        onRename = { onRenameFolder(folder) },
+                        onDelete = { onDeleteFolder(folder) },
+                        onDragStep = { step -> onFolderDragStep(folder.id, step) }
+                    )
+                }
             }
-            items(recents, key = { it.id }) { server ->
-                ServerItemWithSwipe(
+
+            if (folder?.isExpanded == false && !state.isSearching) return@forEach
+
+            if (group.servers.isEmpty()) {
+                item(key = "empty_${group.key}") {
+                    if (state.foldersEnabled) {
+                        EmptyGroupHint(isFolder = folder != null, reorderable = reorderable)
+                    }
+                }
+                return@forEach
+            }
+
+            // Keyed by server alone: a key that included the section would make Compose discard
+            // and rebuild the row when it crosses a folder, killing the drag gesture mid-flight.
+            items(group.servers, key = { "srv_${it.id}" }) { server ->
+                ServerRow(
                     server = server,
-                    credential = credentials[server.credentialId],
-                    hasActiveSession = server.id in activeSessions,
-                    onConnect = { onConnect(server.id) },
-                    onEdit = { onEdit(server.id) },
-                    onDelete = { onDelete(server) },
-                    onToggleFavorite = { onToggleFavorite(server) }
+                    state = state,
+                    onConnect = onConnect,
+                    onEdit = onEdit,
+                    onDelete = onDelete,
+                    onToggleFavorite = onToggleFavorite,
+                    onMoveToFolder = onMoveToFolder,
+                    onEnableReorder = onEnableReorder,
+                    draggable = reorderable,
+                    onDragStart = { onServerDragStart(server.id) },
+                    onDragStep = { step -> onServerDragStep(server.id, step) },
+                    onDragFinish = onServerDragFinish
                 )
             }
         }
 
         // Bottom padding for FAB
-        item { Spacer(modifier = Modifier.height(80.dp)) }
+        item(key = "fab_spacer") { Spacer(modifier = Modifier.height(80.dp)) }
+    }
+}
+
+@Composable
+private fun EmptyGroupHint(isFolder: Boolean, reorderable: Boolean) {
+    Text(
+        text = stringResource(
+            when {
+                !isFolder -> R.string.home_no_folder_empty
+                reorderable -> R.string.home_folder_empty_drag
+                else -> R.string.home_folder_empty
+            }
+        ),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+    )
+}
+
+@Composable
+private fun LazyItemScope.ServerRow(
+    server: Server,
+    state: HomeUiState,
+    onConnect: (Long) -> Unit,
+    onEdit: (Long) -> Unit,
+    onDelete: (Server) -> Unit,
+    onToggleFavorite: (Server) -> Unit,
+    onMoveToFolder: (Server) -> Unit,
+    onEnableReorder: () -> Unit = {},
+    draggable: Boolean = false,
+    onDragStart: () -> Unit = {},
+    onDragStep: (Int) -> Unit = {},
+    onDragFinish: (Boolean) -> Unit = {}
+) {
+    var showContextMenu by remember { mutableStateOf(false) }
+    var rowHeight by remember { mutableIntStateOf(0) }
+    val drag = rememberDragToReorder(
+        stepHeightPx = { rowHeight.toFloat() },
+        onStart = onDragStart,
+        onStep = onDragStep,
+        onFinish = onDragFinish,
+        onPressWithoutMove = { showContextMenu = true }
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (drag.isDragging) Modifier.zIndex(1f) else Modifier.animateItem())
+            .liftWhileDragging(drag)
+            .onSizeChanged { rowHeight = it.height },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ServerSwipeCard(
+            server = server,
+            credential = state.credentials[server.credentialId],
+            hasActiveSession = server.id in state.activeSessions,
+            onConnect = { onConnect(server.id) },
+            onEdit = { onEdit(server.id) },
+            onDelete = { onDelete(server) },
+            onToggleFavorite = { onToggleFavorite(server) },
+            // While reordering the long press is the grab gesture, so it cannot also open a menu.
+            onLongPress = if (draggable) null else ({ showContextMenu = true }),
+            gestureModifier = if (draggable) drag.modifier else Modifier
+        )
+    }
+
+    if (showContextMenu) {
+        ServerContextMenu(
+            server = server,
+            foldersEnabled = state.foldersEnabled,
+            canReorder = state.isReorderable,
+            onDismiss = { showContextMenu = false },
+            onConnect = { showContextMenu = false; onConnect(server.id) },
+            onEdit = { showContextMenu = false; onEdit(server.id) },
+            onDelete = { showContextMenu = false; onDelete(server) },
+            onToggleFavorite = { showContextMenu = false; onToggleFavorite(server) },
+            onMoveToFolder = { showContextMenu = false; onMoveToFolder(server) },
+            onEnableReorder = { showContextMenu = false; onEnableReorder() }
+        )
+    }
+}
+
+/** Drag state shared by server rows and folder headers. */
+@Stable
+private class DragToReorder(
+    val modifier: Modifier,
+    isDragging: () -> Boolean,
+    offset: () -> Float
+) {
+    val isDraggingProvider = isDragging
+    val offsetProvider = offset
+    val isDragging: Boolean get() = isDraggingProvider()
+}
+
+/**
+ * Picks the item up on a long press and emits one reorder step every time the finger travels a
+ * full slot. The leftover travel is kept as [DragToReorder.offsetProvider] so the row can follow
+ * the finger: after a step the list has already moved the row by exactly one slot, which is what
+ * makes the residual the correct visual offset.
+ */
+@Composable
+private fun rememberDragToReorder(
+    stepHeightPx: () -> Float,
+    onStep: (Int) -> Unit,
+    onStart: () -> Unit = {},
+    onFinish: (committed: Boolean) -> Unit = {},
+    onPressWithoutMove: () -> Unit = {}
+): DragToReorder {
+    val step by rememberUpdatedState(onStep)
+    val start by rememberUpdatedState(onStart)
+    val finish by rememberUpdatedState(onFinish)
+    val press by rememberUpdatedState(onPressWithoutMove)
+    val height by rememberUpdatedState(stepHeightPx)
+    val dragging = remember { mutableStateOf(false) }
+    val offset = remember { mutableFloatStateOf(0f) }
+    val haptics = LocalHapticFeedback.current
+
+    val modifier = remember {
+        Modifier.pointerInput(Unit) {
+            var moved = false
+            detectDragGesturesAfterLongPress(
+                onDragStart = {
+                    moved = false
+                    dragging.value = true
+                    offset.floatValue = 0f
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    start()
+                },
+                onDragEnd = {
+                    if (moved) finish(true) else press()
+                    dragging.value = false
+                    offset.floatValue = 0f
+                },
+                onDragCancel = {
+                    if (moved) finish(false)
+                    dragging.value = false
+                    offset.floatValue = 0f
+                }
+            ) { change, amount ->
+                change.consume()
+                if (amount.y != 0f) moved = true
+                val threshold = height().takeIf { it > 0f } ?: return@detectDragGesturesAfterLongPress
+                offset.floatValue += amount.y
+                while (offset.floatValue >= threshold) {
+                    offset.floatValue -= threshold
+                    step(1)
+                }
+                while (offset.floatValue <= -threshold) {
+                    offset.floatValue += threshold
+                    step(-1)
+                }
+            }
+        }
+    }
+
+    return remember {
+        DragToReorder(
+            modifier = modifier,
+            isDragging = { dragging.value },
+            offset = { offset.floatValue }
+        )
+    }
+}
+
+/** Reads the offset at draw time, so following the finger never costs a recomposition. */
+private fun Modifier.liftWhileDragging(drag: DragToReorder): Modifier = graphicsLayer {
+    translationY = drag.offsetProvider()
+    val lifted = drag.isDraggingProvider()
+    val scale = if (lifted) 1.02f else 1f
+    scaleX = scale
+    scaleY = scale
+    shadowElevation = if (lifted) 12.dp.toPx() else 0f
+    shape = RoundedCornerShape(16.dp)
+    clip = false
+}
+
+@Composable
+private fun LazyItemScope.FolderHeader(
+    folder: Folder,
+    count: Int,
+    reorderable: Boolean,
+    onToggle: () -> Unit,
+    onEditContents: () -> Unit,
+    onRename: () -> Unit,
+    onDelete: () -> Unit,
+    onDragStep: (Int) -> Unit
+) {
+    var headerHeight by remember { mutableIntStateOf(0) }
+    // A folder step is one folder, not one row: the threshold is this header's own height.
+    val drag = rememberDragToReorder(
+        stepHeightPx = { headerHeight.toFloat() },
+        onStep = onDragStep
+    )
+
+    Surface(
+        onClick = onToggle,
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (drag.isDragging) Modifier.zIndex(1f) else Modifier.animateItem())
+            .padding(top = 8.dp)
+            .liftWhileDragging(drag)
+            .onSizeChanged { headerHeight = it.height }
+            .then(if (reorderable) drag.modifier else Modifier)
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 12.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = if (folder.isExpanded) Icons.Default.FolderOpen else Icons.Default.Folder,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = folder.name,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Box {
+                var menuExpanded by remember { mutableStateOf(false) }
+                IconButton(onClick = { menuExpanded = true }, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.folder_actions),
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.folder_pick_servers)) },
+                        leadingIcon = { Icon(Icons.Default.PlaylistAdd, null) },
+                        onClick = { menuExpanded = false; onEditContents() }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.folder_rename)) },
+                        leadingIcon = { Icon(Icons.Default.Edit, null) },
+                        onClick = { menuExpanded = false; onRename() }
+                    )
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = stringResource(R.string.folder_delete),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error)
+                        },
+                        onClick = { menuExpanded = false; onDelete() }
+                    )
+                }
+            }
+            Icon(
+                imageVector = if (folder.isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -328,17 +830,17 @@ private fun SectionHeader(
 }
 
 @Composable
-private fun ServerItemWithSwipe(
+private fun ServerSwipeCard(
     server: Server,
     credential: Credential?,
     hasActiveSession: Boolean,
     onConnect: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onToggleFavorite: () -> Unit
+    onToggleFavorite: () -> Unit,
+    onLongPress: (() -> Unit)?,
+    gestureModifier: Modifier
 ) {
-    var showContextMenu by remember { mutableStateOf(false) }
-
     SwipeToDeleteContainer(onDelete = { onDelete(); false }) {
         ServerCard(
             server = server,
@@ -346,20 +848,11 @@ private fun ServerItemWithSwipe(
             hasActiveSession = hasActiveSession,
             onConnect = onConnect,
             onFixCredential = onEdit,
-            onLongPress = { showContextMenu = true },
+            onLongPress = onLongPress,
             onToggleFavorite = onToggleFavorite,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-
-    if (showContextMenu) {
-        ServerContextMenu(
-            server = server,
-            onDismiss = { showContextMenu = false },
-            onConnect = { showContextMenu = false; onConnect() },
-            onEdit = { showContextMenu = false; onEdit() },
-            onDelete = { showContextMenu = false; onDelete() },
-            onToggleFavorite = { showContextMenu = false; onToggleFavorite() }
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(gestureModifier)
         )
     }
 }
@@ -372,7 +865,7 @@ private fun ServerCard(
     hasActiveSession: Boolean,
     onConnect: () -> Unit,
     onFixCredential: () -> Unit,
-    onLongPress: () -> Unit,
+    onLongPress: (() -> Unit)?,
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -582,11 +1075,15 @@ private fun ServerChip(
 @Composable
 private fun ServerContextMenu(
     server: Server,
+    foldersEnabled: Boolean,
+    canReorder: Boolean,
     onDismiss: () -> Unit,
     onConnect: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onToggleFavorite: () -> Unit
+    onToggleFavorite: () -> Unit,
+    onMoveToFolder: () -> Unit,
+    onEnableReorder: () -> Unit
 ) {
     DropdownMenu(expanded = true, onDismissRequest = onDismiss) {
         DropdownMenuItem(
@@ -617,6 +1114,21 @@ private fun ServerContextMenu(
             },
             onClick = onToggleFavorite
         )
+        if (foldersEnabled) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.home_move_to_folder)) },
+                leadingIcon = { Icon(Icons.Default.DriveFileMove, null) },
+                onClick = onMoveToFolder
+            )
+        }
+        // Dragging is tied to custom ordering, so offer the switch where the user looks for it.
+        if (!canReorder) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.home_enable_reorder)) },
+                leadingIcon = { Icon(Icons.Default.SwapVert, null) },
+                onClick = onEnableReorder
+            )
+        }
         HorizontalDivider()
         DropdownMenuItem(
             text = {

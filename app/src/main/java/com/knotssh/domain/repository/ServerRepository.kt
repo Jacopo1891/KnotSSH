@@ -12,4 +12,6 @@ interface ServerRepository {
     suspend fun deleteServer(id: Long)
     suspend fun updateLastConnected(id: Long, timestamp: Long)
     suspend fun toggleFavorite(id: Long, isFavorite: Boolean)
+    suspend fun setFolder(id: Long, folderId: Long?)
+    suspend fun applyOrder(serverIds: List<Long>)
 }

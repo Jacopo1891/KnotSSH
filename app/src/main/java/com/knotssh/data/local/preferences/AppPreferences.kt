@@ -43,6 +43,9 @@ enum class HostKeyPolicy {
 
 enum class BellMode { OFF, VIBRATE, SOUND }
 
+/** How the server list is ordered inside each folder. */
+enum class ServerSortMode { LAST_USED, NAME, ADDED, MANUAL }
+
 data class AppearanceSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColor: Boolean = true
@@ -161,6 +164,8 @@ class AppPreferences @Inject constructor(
 
         val GOOGLE_DRIVE_SYNC = booleanPreferencesKey("google_drive_sync")
         val DIAGNOSTICS_VERBOSE = booleanPreferencesKey("diagnostics_verbose")
+        val SERVER_SORT_MODE = stringPreferencesKey("server_sort_mode")
+        val FOLDERS_ENABLED = booleanPreferencesKey("folders_enabled")
     }
 
     /** DataStore surfaces read errors through the flow; fall back to defaults instead of crashing collectors. */
@@ -235,6 +240,15 @@ class AppPreferences @Inject constructor(
         .map { it[Keys.DIAGNOSTICS_VERBOSE] ?: false }
         .distinctUntilChanged()
 
+    val serverSortMode: Flow<ServerSortMode> = prefs
+        .map { it[Keys.SERVER_SORT_MODE].toEnum(ServerSortMode.LAST_USED) }
+        .distinctUntilChanged()
+
+    /** Turning folders off hides the grouping without discarding it. */
+    val foldersEnabled: Flow<Boolean> = prefs
+        .map { it[Keys.FOLDERS_ENABLED] ?: true }
+        .distinctUntilChanged()
+
     suspend fun setThemeMode(value: ThemeMode) = put(Keys.THEME_MODE, value.name)
     suspend fun setDynamicColor(value: Boolean) = put(Keys.DYNAMIC_COLOR, value)
 
@@ -288,6 +302,10 @@ class AppPreferences @Inject constructor(
     suspend fun setGoogleDriveSync(value: Boolean) = put(Keys.GOOGLE_DRIVE_SYNC, value)
 
     suspend fun setDiagnosticsVerbose(value: Boolean) = put(Keys.DIAGNOSTICS_VERBOSE, value)
+
+    suspend fun setServerSortMode(value: ServerSortMode) = put(Keys.SERVER_SORT_MODE, value.name)
+
+    suspend fun setFoldersEnabled(value: Boolean) = put(Keys.FOLDERS_ENABLED, value)
 
     suspend fun resetToDefaults() {
         context.dataStore.edit { it.clear() }

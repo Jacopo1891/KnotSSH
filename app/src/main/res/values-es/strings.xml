@@ -447,5 +447,35 @@
     <string name="about_log_title">Registro de diagnóstico</string>
     <string name="about_log_cleared">Registro borrado.</string>
     <string name="about_export_done">Registro exportado.</string>
-    <string name="about_export_failed">No se ha podido exportar el registro.</string>
+    <string name="about_export_failed">No se ha podido exportar el registro.</string>    <!-- Carpetas y ordenación -->
+    <string name="home_sort">Ordenar</string>
+    <string name="home_sort_last_used">Último uso</string>
+    <string name="home_sort_name">Nombre A-Z</string>
+    <string name="home_sort_added">Añadidos recientemente</string>
+    <string name="home_sort_manual">Personalizado</string>
+    <string name="home_reorder_hint">Mantén pulsado un elemento para moverlo.</string>
+    <string name="home_enable_reorder">Reordenar manualmente</string>
+    <string name="home_use_folders">Usar carpetas</string>
+    <string name="home_manage_folders">Gestionar carpetas</string>
+    <string name="home_move_to_folder">Mover a una carpeta</string>
+    <string name="home_no_folder">Sin carpeta</string>
+    <string name="folder_name_label">Nombre de la carpeta</string>
+    <string name="folder_create">Crear carpeta</string>
+    <string name="folder_rename">Renombrar</string>
+    <string name="folder_delete">Eliminar carpeta</string>
+    <string name="folder_actions">Acciones de la carpeta</string>
+    <string name="folder_delete_title">¿Eliminar la carpeta?</string>
+    <string name="folder_delete_message">"%1$s" se eliminará. Los servidores que contiene no se borran: vuelven a "Sin carpeta".</string>
+    <string name="folder_move_up">Subir</string>
+    <string name="folder_move_down">Bajar</string>
+    <string name="folder_none">No hay carpetas. Crea una para agrupar tus servidores.</string>
+    <string name="folder_pick_servers">Elegir servidores</string>
+    <string name="folder_pick_servers_hint">Marca los servidores que pertenecen a esta carpeta.</string>
+    <string name="folder_in_other_folder">Actualmente en otra carpeta</string>
+    <string name="folder_no_servers_yet">Todavía no hay ningún servidor que añadir.</string>
+    <string name="home_folder_empty">Carpeta vacía. Usa el icono de lista para elegir sus servidores.</string>
+    <string name="home_folder_empty_drag">Carpeta vacía. Mantén pulsado un servidor y arrástralo aquí, o usa el icono de lista.</string>
+    <string name="home_no_folder_empty">Arrastra aquí un servidor para sacarlo de su carpeta.</string>
+    <string name="server_folder_label">Carpeta</string>
+
 </resources>

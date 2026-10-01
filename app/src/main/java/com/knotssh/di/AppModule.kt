@@ -4,17 +4,20 @@ import android.content.Context
 import androidx.room.Room
 import com.knotssh.data.local.db.CredentialDao
 import com.knotssh.data.local.db.CustomKeyDao
+import com.knotssh.data.local.db.FolderDao
 import com.knotssh.data.local.db.KnownHostDao
 import com.knotssh.data.local.db.QuickCommandDao
 import com.knotssh.data.local.db.ServerDao
 import com.knotssh.data.local.db.KnotSshDatabase
 import com.knotssh.data.repository.CredentialRepositoryImpl
 import com.knotssh.data.repository.CustomKeyRepositoryImpl
+import com.knotssh.data.repository.FolderRepositoryImpl
 import com.knotssh.data.repository.KnownHostRepositoryImpl
 import com.knotssh.data.repository.QuickCommandRepositoryImpl
 import com.knotssh.data.repository.ServerRepositoryImpl
 import com.knotssh.domain.repository.CredentialRepository
 import com.knotssh.domain.repository.CustomKeyRepository
+import com.knotssh.domain.repository.FolderRepository
 import com.knotssh.domain.repository.KnownHostRepository
 import com.knotssh.domain.repository.QuickCommandRepository
 import com.knotssh.domain.repository.ServerRepository
@@ -34,6 +37,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): KnotSshDatabase =
         Room.databaseBuilder(context, KnotSshDatabase::class.java, KnotSshDatabase.DATABASE_NAME)
+            .addMigrations(KnotSshDatabase.MIGRATION_4_5)
             .fallbackToDestructiveMigration()
             .build()
 
@@ -51,6 +55,9 @@ object DatabaseModule {
 
     @Provides
     fun provideCustomKeyDao(db: KnotSshDatabase): CustomKeyDao = db.customKeyDao()
+
+    @Provides
+    fun provideFolderDao(db: KnotSshDatabase): FolderDao = db.folderDao()
 }
 
 @Module
@@ -76,4 +83,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindCustomKeyRepository(impl: CustomKeyRepositoryImpl): CustomKeyRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFolderRepository(impl: FolderRepositoryImpl): FolderRepository
 }

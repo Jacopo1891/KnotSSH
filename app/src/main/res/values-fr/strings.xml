@@ -447,5 +447,35 @@
     <string name="about_log_title">Journal de diagnostic</string>
     <string name="about_log_cleared">Journal effacé.</string>
     <string name="about_export_done">Journal exporté.</string>
-    <string name="about_export_failed">Le journal n\'a pas pu être exporté.</string>
+    <string name="about_export_failed">Le journal n\'a pas pu être exporté.</string>    <!-- Dossiers et tri -->
+    <string name="home_sort">Trier</string>
+    <string name="home_sort_last_used">Dernière utilisation</string>
+    <string name="home_sort_name">Nom A-Z</string>
+    <string name="home_sort_added">Ajoutés récemment</string>
+    <string name="home_sort_manual">Personnalisé</string>
+    <string name="home_reorder_hint">Appuyez longuement sur un élément pour le déplacer.</string>
+    <string name="home_enable_reorder">Réorganiser manuellement</string>
+    <string name="home_use_folders">Utiliser les dossiers</string>
+    <string name="home_manage_folders">Gérer les dossiers</string>
+    <string name="home_move_to_folder">Déplacer vers un dossier</string>
+    <string name="home_no_folder">Sans dossier</string>
+    <string name="folder_name_label">Nom du dossier</string>
+    <string name="folder_create">Créer le dossier</string>
+    <string name="folder_rename">Renommer</string>
+    <string name="folder_delete">Supprimer le dossier</string>
+    <string name="folder_actions">Actions du dossier</string>
+    <string name="folder_delete_title">Supprimer le dossier ?</string>
+    <string name="folder_delete_message">"%1$s" sera supprimé. Les serveurs qu\'il contient ne sont pas supprimés : ils retournent dans "Sans dossier".</string>
+    <string name="folder_move_up">Monter</string>
+    <string name="folder_move_down">Descendre</string>
+    <string name="folder_none">Aucun dossier. Créez-en un pour regrouper vos serveurs.</string>
+    <string name="folder_pick_servers">Choisir des serveurs</string>
+    <string name="folder_pick_servers_hint">Cochez les serveurs qui appartiennent à ce dossier.</string>
+    <string name="folder_in_other_folder">Actuellement dans un autre dossier</string>
+    <string name="folder_no_servers_yet">Il n\'y a encore aucun serveur à ajouter.</string>
+    <string name="home_folder_empty">Dossier vide. Utilisez l\'icône de liste pour choisir ses serveurs.</string>
+    <string name="home_folder_empty_drag">Dossier vide. Appuyez longuement sur un serveur et faites-le glisser ici, ou utilisez l\'icône de liste.</string>
+    <string name="home_no_folder_empty">Faites glisser un serveur ici pour le sortir de son dossier.</string>
+    <string name="server_folder_label">Dossier</string>
+
 </resources>

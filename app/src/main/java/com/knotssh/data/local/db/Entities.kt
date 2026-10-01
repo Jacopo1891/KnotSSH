@@ -18,7 +18,18 @@ data class ServerEntity(
     val isFavorite: Boolean = false,
     val keepAliveSeconds: Int = 30,
     val connectTimeoutSeconds: Int = 30,
-    val portForwardRules: List<PortForwardRule> = emptyList()
+    val portForwardRules: List<PortForwardRule> = emptyList(),
+    /** `null` keeps the server in the "no folder" section. */
+    val folderId: Long? = null,
+    val sortOrder: Int = 0
+)
+
+@Entity(tableName = "folders")
+data class FolderEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val sortOrder: Int = 0,
+    val isExpanded: Boolean = true
 )
 
 @Entity(tableName = "credentials")

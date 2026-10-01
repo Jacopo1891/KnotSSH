@@ -447,5 +447,35 @@
     <string name="about_log_title">Log diagnostico</string>
     <string name="about_log_cleared">Log cancellato.</string>
     <string name="about_export_done">Log esportato.</string>
-    <string name="about_export_failed">Non è stato possibile esportare il log.</string>
+    <string name="about_export_failed">Non è stato possibile esportare il log.</string>    <!-- Cartelle e ordinamento -->
+    <string name="home_sort">Ordina</string>
+    <string name="home_sort_last_used">Ultimo utilizzo</string>
+    <string name="home_sort_name">Nome A-Z</string>
+    <string name="home_sort_added">Aggiunti di recente</string>
+    <string name="home_sort_manual">Personalizzato</string>
+    <string name="home_reorder_hint">Tieni premuto un elemento per spostarlo.</string>
+    <string name="home_enable_reorder">Riordina manualmente</string>
+    <string name="home_use_folders">Usa le cartelle</string>
+    <string name="home_manage_folders">Gestisci cartelle</string>
+    <string name="home_move_to_folder">Sposta in cartella</string>
+    <string name="home_no_folder">Senza cartella</string>
+    <string name="folder_name_label">Nome cartella</string>
+    <string name="folder_create">Crea cartella</string>
+    <string name="folder_rename">Rinomina</string>
+    <string name="folder_delete">Elimina cartella</string>
+    <string name="folder_actions">Azioni cartella</string>
+    <string name="folder_delete_title">Eliminare la cartella?</string>
+    <string name="folder_delete_message">"%1$s" verrà rimossa. I server al suo interno non vengono eliminati: tornano in "Senza cartella".</string>
+    <string name="folder_move_up">Sposta su</string>
+    <string name="folder_move_down">Sposta giù</string>
+    <string name="folder_none">Nessuna cartella. Creane una per raggruppare i server.</string>
+    <string name="folder_pick_servers">Scegli i server</string>
+    <string name="folder_pick_servers_hint">Spunta i server che appartengono a questa cartella.</string>
+    <string name="folder_in_other_folder">Attualmente in un\'altra cartella</string>
+    <string name="folder_no_servers_yet">Non c\'è ancora nessun server da aggiungere.</string>
+    <string name="home_folder_empty">Cartella vuota. Usa l\'icona con l\'elenco per sceglierne i server.</string>
+    <string name="home_folder_empty_drag">Cartella vuota. Tieni premuto un server e trascinalo qui, oppure usa l\'icona con l\'elenco.</string>
+    <string name="home_no_folder_empty">Trascina qui un server per toglierlo dalla sua cartella.</string>
+    <string name="server_folder_label">Cartella</string>
+
 </resources>

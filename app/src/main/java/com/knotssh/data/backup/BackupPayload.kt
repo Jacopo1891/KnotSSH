@@ -18,7 +18,14 @@ data class BackupPayload(
     val knownHosts: List<BackupKnownHost> = emptyList(),
     val quickCommands: List<BackupQuickCommand> = emptyList(),
     val customKeys: List<BackupCustomKey> = emptyList(),
+    val folders: List<BackupFolder> = emptyList(),
     val settings: BackupSettings? = null
+)
+
+@Serializable
+data class BackupFolder(
+    val name: String,
+    val sortOrder: Int = 0
 )
 
 /** Secrets travel in clear *inside* the encrypted envelope; the file itself protects them. */
@@ -44,7 +51,10 @@ data class BackupServer(
     val isFavorite: Boolean = false,
     val keepAliveSeconds: Int = 30,
     val connectTimeoutSeconds: Int = 30,
-    val portForwardRules: List<BackupPortForward> = emptyList()
+    val portForwardRules: List<BackupPortForward> = emptyList(),
+    /** Folders are referenced by name, for the same reason credentials are referenced by alias. */
+    val folderName: String? = null,
+    val sortOrder: Int = 0
 )
 
 @Serializable

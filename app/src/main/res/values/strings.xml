@@ -483,5 +483,35 @@
     <string name="about_log_title">Diagnostic log</string>
     <string name="about_log_cleared">Log cleared.</string>
     <string name="about_export_done">Log exported.</string>
-    <string name="about_export_failed">The log could not be exported.</string>
+    <string name="about_export_failed">The log could not be exported.</string>    <!-- Folders and sorting -->
+    <string name="home_sort">Sort</string>
+    <string name="home_sort_last_used">Last used</string>
+    <string name="home_sort_name">Name A-Z</string>
+    <string name="home_sort_added">Recently added</string>
+    <string name="home_sort_manual">Custom</string>
+    <string name="home_reorder_hint">Press and hold an item to move it.</string>
+    <string name="home_enable_reorder">Reorder manually</string>
+    <string name="home_use_folders">Use folders</string>
+    <string name="home_manage_folders">Manage folders</string>
+    <string name="home_move_to_folder">Move to folder</string>
+    <string name="home_no_folder">No folder</string>
+    <string name="folder_name_label">Folder name</string>
+    <string name="folder_create">Create folder</string>
+    <string name="folder_rename">Rename</string>
+    <string name="folder_delete">Delete folder</string>
+    <string name="folder_actions">Folder actions</string>
+    <string name="folder_delete_title">Delete the folder?</string>
+    <string name="folder_delete_message">"%1$s" will be removed. The servers inside it are not deleted: they go back to "No folder".</string>
+    <string name="folder_move_up">Move up</string>
+    <string name="folder_move_down">Move down</string>
+    <string name="folder_none">No folder yet. Create one to group your servers.</string>
+    <string name="folder_pick_servers">Choose servers</string>
+    <string name="folder_pick_servers_hint">Tick the servers that belong to this folder.</string>
+    <string name="folder_in_other_folder">Currently in another folder</string>
+    <string name="folder_no_servers_yet">There is no server to add yet.</string>
+    <string name="home_folder_empty">Empty folder. Use the list icon to choose its servers.</string>
+    <string name="home_folder_empty_drag">Empty folder. Hold a server and drag it in, or use the list icon.</string>
+    <string name="home_no_folder_empty">Drag a server here to take it out of its folder.</string>
+    <string name="server_folder_label">Folder</string>
+
 </resources>

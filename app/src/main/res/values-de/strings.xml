@@ -437,5 +437,35 @@
     <string name="about_log_title">Diagnoseprotokoll</string>
     <string name="about_log_cleared">Protokoll gelöscht.</string>
     <string name="about_export_done">Protokoll exportiert.</string>
-    <string name="about_export_failed">Das Protokoll konnte nicht exportiert werden.</string>
+    <string name="about_export_failed">Das Protokoll konnte nicht exportiert werden.</string>    <!-- Ordner und Sortierung -->
+    <string name="home_sort">Sortieren</string>
+    <string name="home_sort_last_used">Zuletzt verwendet</string>
+    <string name="home_sort_name">Name A-Z</string>
+    <string name="home_sort_added">Zuletzt hinzugefügt</string>
+    <string name="home_sort_manual">Benutzerdefiniert</string>
+    <string name="home_reorder_hint">Element gedrückt halten, um es zu verschieben.</string>
+    <string name="home_enable_reorder">Manuell umsortieren</string>
+    <string name="home_use_folders">Ordner verwenden</string>
+    <string name="home_manage_folders">Ordner verwalten</string>
+    <string name="home_move_to_folder">In Ordner verschieben</string>
+    <string name="home_no_folder">Ohne Ordner</string>
+    <string name="folder_name_label">Ordnername</string>
+    <string name="folder_create">Ordner erstellen</string>
+    <string name="folder_rename">Umbenennen</string>
+    <string name="folder_delete">Ordner löschen</string>
+    <string name="folder_actions">Ordneraktionen</string>
+    <string name="folder_delete_title">Ordner löschen?</string>
+    <string name="folder_delete_message">"%1$s" wird entfernt. Die enthaltenen Server werden nicht gelöscht: Sie landen wieder unter "Ohne Ordner".</string>
+    <string name="folder_move_up">Nach oben</string>
+    <string name="folder_move_down">Nach unten</string>
+    <string name="folder_none">Noch keine Ordner. Erstelle einen, um deine Server zu gruppieren.</string>
+    <string name="folder_pick_servers">Server auswählen</string>
+    <string name="folder_pick_servers_hint">Häkchen bei den Servern setzen, die in diesen Ordner gehören.</string>
+    <string name="folder_in_other_folder">Derzeit in einem anderen Ordner</string>
+    <string name="folder_no_servers_yet">Es gibt noch keinen Server zum Hinzufügen.</string>
+    <string name="home_folder_empty">Leerer Ordner. Über das Listensymbol seine Server auswählen.</string>
+    <string name="home_folder_empty_drag">Leerer Ordner. Einen Server gedrückt halten und hierher ziehen oder das Listensymbol verwenden.</string>
+    <string name="home_no_folder_empty">Einen Server hierher ziehen, um ihn aus seinem Ordner zu nehmen.</string>
+    <string name="server_folder_label">Ordner</string>
+
 </resources>

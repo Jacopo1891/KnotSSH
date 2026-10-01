@@ -5,8 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.knotssh.R
-import com.knotssh.domain.model.*
-import com.knotssh.domain.repository.CredentialRepository
+import com.knotssh.data.local.preferences.AppPreferences
+import com.knotssh.domain.model.*import com.knotssh.domain.repository.CredentialRepository
+import com.knotssh.domain.repository.FolderRepository
 import com.knotssh.domain.repository.ServerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -22,6 +23,9 @@ data class EditServerUiState(
     val connectTimeoutSeconds: String = "30",
     val portForwardRules: List<PortForwardRule> = emptyList(),
     val credentials: List<Credential> = emptyList(),
+    val folders: List<Folder> = emptyList(),
+    val foldersEnabled: Boolean = true,
+    val folderId: Long? = null,
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     // Validation errors, as string resources so they follow the app language
@@ -42,6 +46,8 @@ sealed class TestResult {
 class EditServerViewModel @Inject constructor(
     private val serverRepository: ServerRepository,
     private val credentialRepository: CredentialRepository,
+    private val folderRepository: FolderRepository,
+    preferences: AppPreferences,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -50,6 +56,16 @@ class EditServerViewModel @Inject constructor(
     val state: StateFlow<EditServerUiState> = _state.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            preferences.foldersEnabled.collect { enabled ->
+                _state.update { it.copy(foldersEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            folderRepository.getAll().collect { folders ->
+                _state.update { it.copy(folders = folders) }
+            }
+        }
         viewModelScope.launch {
             var knownIds: Set<Long>? = null
             credentialRepository.getAllCredentials().collect { creds ->
@@ -80,7 +96,8 @@ class EditServerViewModel @Inject constructor(
                             selectedCredentialId = server.credentialId,
                             keepAliveSeconds = server.keepAliveSeconds.toString(),
                             connectTimeoutSeconds = server.connectTimeoutSeconds.toString(),
-                            portForwardRules = server.portForwardRules
+                            portForwardRules = server.portForwardRules,
+                            folderId = server.folderId
                         )
                     }
                 }
@@ -94,6 +111,7 @@ class EditServerViewModel @Inject constructor(
     fun onCredentialSelected(id: Long) = _state.update { it.copy(selectedCredentialId = id, credentialError = null) }
     fun onKeepAliveChanged(v: String) = _state.update { it.copy(keepAliveSeconds = v) }
     fun onTimeoutChanged(v: String) = _state.update { it.copy(connectTimeoutSeconds = v) }
+    fun onFolderSelected(id: Long?) = _state.update { it.copy(folderId = id) }
 
     fun addPortForwardRule(rule: PortForwardRule) = _state.update {
         it.copy(portForwardRules = it.portForwardRules + rule)
@@ -132,7 +150,8 @@ class EditServerViewModel @Inject constructor(
                 credentialId = s.selectedCredentialId!!,
                 keepAliveSeconds = s.keepAliveSeconds.toIntOrNull() ?: 30,
                 connectTimeoutSeconds = s.connectTimeoutSeconds.toIntOrNull() ?: 30,
-                portForwardRules = s.portForwardRules
+                portForwardRules = s.portForwardRules,
+                folderId = s.folderId
             )
             if (serverId != null) serverRepository.updateServer(server)
             else serverRepository.insertServer(server)

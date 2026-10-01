@@ -37,12 +37,19 @@ class ServerRepositoryImpl @Inject constructor(
     override suspend fun toggleFavorite(id: Long, isFavorite: Boolean) =
         dao.toggleFavorite(id, isFavorite)
 
+    override suspend fun setFolder(id: Long, folderId: Long?) = dao.setFolder(id, folderId)
+
+    override suspend fun applyOrder(serverIds: List<Long>) {
+        serverIds.forEachIndexed { index, id -> dao.setSortOrder(id, index) }
+    }
+
     private fun ServerEntity.toDomain() = Server(
         id = id, alias = alias, hostname = hostname, port = port,
         credentialId = credentialId, lastConnectedMs = lastConnectedMs,
         isFavorite = isFavorite, keepAliveSeconds = keepAliveSeconds,
         connectTimeoutSeconds = connectTimeoutSeconds,
-        portForwardRules = portForwardRules
+        portForwardRules = portForwardRules,
+        folderId = folderId, sortOrder = sortOrder
     )
 
     private fun Server.toEntity() = ServerEntity(
@@ -50,6 +57,7 @@ class ServerRepositoryImpl @Inject constructor(
         credentialId = credentialId, lastConnectedMs = lastConnectedMs,
         isFavorite = isFavorite, keepAliveSeconds = keepAliveSeconds,
         connectTimeoutSeconds = connectTimeoutSeconds,
-        portForwardRules = portForwardRules
+        portForwardRules = portForwardRules,
+        folderId = folderId, sortOrder = sortOrder
     )
 }
