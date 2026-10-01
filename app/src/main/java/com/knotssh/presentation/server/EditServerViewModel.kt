@@ -51,9 +51,22 @@ class EditServerViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            // Load credentials list
+            var knownIds: Set<Long>? = null
             credentialRepository.getAllCredentials().collect { creds ->
-                _state.update { it.copy(credentials = creds) }
+                val previousIds = knownIds
+                knownIds = creds.mapTo(mutableSetOf()) { it.id }
+                // A credential created while this form is open was almost certainly created
+                // for this server, so select it instead of making the user pick it again.
+                val created = previousIds?.let { old ->
+                    creds.filter { it.id !in old }.maxByOrNull { it.id }
+                }
+                _state.update { state ->
+                    state.copy(
+                        credentials = creds,
+                        selectedCredentialId = created?.id ?: state.selectedCredentialId,
+                        credentialError = if (created != null) null else state.credentialError
+                    )
+                }
             }
         }
         serverId?.let { id ->
