@@ -197,7 +197,7 @@
     <string name="ssh_bad_private_key">Chiave privata non valida o passphrase errata: %1$s</string>
     <string name="ssh_dynamic_forward_unsupported">Port forwarding dinamico (SOCKS) sulla porta %1$d non è supportato dalla libreria SSH: regola ignorata.</string>
     <string name="ssh_forward_rule_failed">Regola %1$s porta %2$d non applicata: %3$s</string>
-    <string name="ssh_unknown_host">Host %1$s:%2$d sconosciuto (%3$s). La politica chiavi host attuale non consente di fidarsi automaticamente.</string>
+    <string name="ssh_unknown_host">Host %1$s:%2$d sconosciuto (%3$s). La politica rigida non consente di fidarsi automaticamente: aggiungi la sua chiave in Impostazioni › Sicurezza › Host conosciuti, oppure scegli un\'altra politica.</string>
     <string name="ssh_host_key_changed">ATTENZIONE: la chiave host di %1$s:%2$d è cambiata.\nAttesa:   %3$s\nRicevuta: %4$s\nPossibile attacco man-in-the-middle.</string>
     <string name="ssh_host_key_declined">Connessione annullata: chiave host non accettata.</string>
 
@@ -334,6 +334,12 @@
 
     <string name="known_hosts_title">Host conosciuti</string>
     <string name="known_hosts_empty">Nessuna chiave host memorizzata.</string>
+    <string name="known_hosts_import_help">Incolla (o digita) una o più righe known_hosts, come quelle prodotte da ssh-keyscan. Necessario per raggiungere un nuovo server con la politica rigida. Verifica prima il fingerprint su un canale fidato e controlla che host e porta coincidano esattamente con quelli del server.</string>
+    <string name="known_hosts_import_label">Voci known_hosts</string>
+    <string name="known_hosts_import_placeholder">[host]:2222 ssh-ed25519 AAAAC3Nza…</string>
+    <string name="known_hosts_import_done">%1$d chiavi host aggiunte.</string>
+    <string name="known_hosts_import_partial">%1$d chiavi host aggiunte, %2$d righe ignorate.</string>
+    <string name="known_hosts_import_none">Nessuna voce valida: il formato atteso è "host ssh-ed25519 AAAA…" oppure "[host]:porta ssh-rsa AAAA…".</string>
     <string name="quick_commands_title">Comandi rapidi</string>
     <string name="quick_commands_hint">Appaiono come chip sopra la tastiera del terminale e vengono inviati con a capo.</string>
     <string name="custom_keys_title">Tasti rapidi</string>

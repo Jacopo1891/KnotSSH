@@ -39,41 +39,93 @@ import com.knotssh.domain.model.QuickCommand
 @Composable
 internal fun KnownHostsDialog(
     hosts: List<KnownHost>,
+    importResult: KnownHostImportResult?,
     onForget: (Long) -> Unit,
     onForgetAll: () -> Unit,
+    onImport: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    var pastedEntries by remember { mutableStateOf("") }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.known_hosts_title)) },
         text = {
-            if (hosts.isEmpty()) {
-                Text(stringResource(R.string.known_hosts_empty))
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(hosts.size, key = { hosts[it].id }) { index ->
-                        val host = hosts[index]
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    "${host.host}:${host.port}",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Text(
-                                    "${host.keyType} · ${host.fingerprintSha256}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            IconButton(onClick = { onForget(host.id) }) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = stringResource(R.string.action_forget),
-                                    tint = MaterialTheme.colorScheme.error
-                                )
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    stringResource(R.string.known_hosts_import_help),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = pastedEntries,
+                    onValueChange = { pastedEntries = it },
+                    label = { Text(stringResource(R.string.known_hosts_import_label)) },
+                    placeholder = { Text(stringResource(R.string.known_hosts_import_placeholder)) },
+                    minLines = 2,
+                    maxLines = 4,
+                    textStyle = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Button(
+                    onClick = {
+                        onImport(pastedEntries)
+                        pastedEntries = ""
+                    },
+                    enabled = pastedEntries.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(stringResource(R.string.action_add)) }
+
+                importResult?.let { result ->
+                    Text(
+                        text = when {
+                            result.added == 0 -> stringResource(R.string.known_hosts_import_none)
+                            result.rejectedLines > 0 -> stringResource(
+                                R.string.known_hosts_import_partial,
+                                result.added,
+                                result.rejectedLines
+                            )
+                            else -> stringResource(R.string.known_hosts_import_done, result.added)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (result.added == 0) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                HorizontalDivider()
+
+                if (hosts.isEmpty()) {
+                    Text(stringResource(R.string.known_hosts_empty))
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.heightIn(max = 200.dp)
+                    ) {
+                        items(hosts.size, key = { hosts[it].id }) { index ->
+                            val host = hosts[index]
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        "${host.host}:${host.port}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        "${host.keyType} · ${host.fingerprintSha256}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                IconButton(onClick = { onForget(host.id) }) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = stringResource(R.string.action_forget),
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             }
                         }
                     }

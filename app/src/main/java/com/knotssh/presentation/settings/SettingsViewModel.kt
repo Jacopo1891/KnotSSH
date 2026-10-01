@@ -18,14 +18,20 @@ import com.knotssh.domain.model.QuickCommand
 import com.knotssh.domain.repository.CustomKeyRepository
 import com.knotssh.domain.repository.KnownHostRepository
 import com.knotssh.domain.repository.QuickCommandRepository
+import com.knotssh.ssh.KnownHostsImporter
 import com.knotssh.ssh.toControlChar
 import com.knotssh.terminal.TerminalTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/** Outcome of pasting `known_hosts` entries, reported back to the dialog. */
+data class KnownHostImportResult(val added: Int, val rejectedLines: Int)
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -60,6 +66,9 @@ class SettingsViewModel @Inject constructor(
 
     val customKeyList: StateFlow<List<CustomKey>> =
         customKeys.getAll().stateIn(viewModelScope, started, emptyList())
+
+    private val _knownHostImport = MutableStateFlow<KnownHostImportResult?>(null)
+    val knownHostImport: StateFlow<KnownHostImportResult?> = _knownHostImport.asStateFlow()
 
     // Appearance
     fun setThemeMode(value: ThemeMode) = update { prefs.setThemeMode(value) }
@@ -110,6 +119,17 @@ class SettingsViewModel @Inject constructor(
 
     fun forgetKnownHost(id: Long) = update { knownHosts.forget(id) }
     fun forgetAllKnownHosts() = update { knownHosts.forgetAll() }
+
+    fun importKnownHosts(text: String) = update {
+        val parsed = KnownHostsImporter.parse(text)
+        parsed.keys.forEach { knownHosts.trust(it.host, it.port, it.keyType, it.keyBlob) }
+        _knownHostImport.value = KnownHostImportResult(parsed.keys.size, parsed.rejectedLines)
+    }
+
+    fun clearKnownHostImportResult() {
+        _knownHostImport.value = null
+    }
+
     fun resetToDefaults() = update { prefs.resetToDefaults() }
 
     fun addQuickCommand(label: String, command: String) = update {

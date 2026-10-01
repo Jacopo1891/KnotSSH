@@ -23,6 +23,7 @@ fun SecuritySettingsScreen(
 ) {
     val security by viewModel.security.collectAsStateWithLifecycle()
     val knownHosts by viewModel.knownHostList.collectAsStateWithLifecycle()
+    val knownHostImport by viewModel.knownHostImport.collectAsStateWithLifecycle()
     var showKnownHosts by remember { mutableStateOf(false) }
     // valueLabel is a plain lambda, so its strings are resolved outside composition.
     val resources = LocalContext.current.resources
@@ -30,9 +31,14 @@ fun SecuritySettingsScreen(
     if (showKnownHosts) {
         KnownHostsDialog(
             hosts = knownHosts,
+            importResult = knownHostImport,
             onForget = viewModel::forgetKnownHost,
             onForgetAll = viewModel::forgetAllKnownHosts,
-            onDismiss = { showKnownHosts = false }
+            onImport = viewModel::importKnownHosts,
+            onDismiss = {
+                showKnownHosts = false
+                viewModel.clearKnownHostImportResult()
+            }
         )
     }
 

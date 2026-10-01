@@ -208,7 +208,7 @@
     <!-- The %d here are port numbers, not counts. -->
     <string name="ssh_dynamic_forward_unsupported" tools:ignore="PluralsCandidate">Dynamic port forwarding (SOCKS) on port %1$d is not supported by the SSH library: rule ignored.</string>
     <string name="ssh_forward_rule_failed" tools:ignore="PluralsCandidate">Rule %1$s on port %2$d was not applied: %3$s</string>
-    <string name="ssh_unknown_host" tools:ignore="PluralsCandidate">Host %1$s:%2$d is unknown (%3$s). The current host key policy does not allow trusting it automatically.</string>
+    <string name="ssh_unknown_host" tools:ignore="PluralsCandidate">Host %1$s:%2$d is unknown (%3$s). The strict host key policy does not allow trusting it automatically: add its key under Settings › Security › Known hosts, or choose another policy.</string>
     <string name="ssh_host_key_changed" tools:ignore="PluralsCandidate">WARNING: the host key of %1$s:%2$d has changed.\nExpected: %3$s\nReceived: %4$s\nThis could be a man-in-the-middle attack.</string>
     <string name="ssh_host_key_declined">Connection cancelled: host key not accepted.</string>
 
@@ -367,6 +367,12 @@
     <!-- Dialogs -->
     <string name="known_hosts_title">Known hosts</string>
     <string name="known_hosts_empty">No host key stored.</string>
+    <string name="known_hosts_import_help">Paste (or type) one or more known_hosts lines, as produced by ssh-keyscan. Required to reach a new server under the strict policy. Check the fingerprint on a trusted channel first, and make sure host and port match the server exactly.</string>
+    <string name="known_hosts_import_label">known_hosts entries</string>
+    <string name="known_hosts_import_placeholder">[host]:2222 ssh-ed25519 AAAAC3Nza…</string>
+    <string name="known_hosts_import_done" tools:ignore="PluralsCandidate">%1$d host keys added.</string>
+    <string name="known_hosts_import_partial" tools:ignore="PluralsCandidate">%1$d host keys added, %2$d lines ignored.</string>
+    <string name="known_hosts_import_none">No valid entry: expected format is "host ssh-ed25519 AAAA…" or "[host]:port ssh-rsa AAAA…".</string>
     <string name="quick_commands_title">Quick commands</string>
     <string name="quick_commands_hint">They appear as chips above the terminal keyboard and are sent with a newline.</string>
     <string name="custom_keys_title">Custom keys</string>

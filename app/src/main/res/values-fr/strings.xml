@@ -197,7 +197,7 @@
     <string name="ssh_bad_private_key">Clé privée invalide ou phrase secrète incorrecte : %1$s</string>
     <string name="ssh_dynamic_forward_unsupported">La redirection de port dynamique (SOCKS) sur le port %1$d n\'est pas prise en charge par la bibliothèque SSH : règle ignorée.</string>
     <string name="ssh_forward_rule_failed">Règle %1$s sur le port %2$d non appliquée : %3$s</string>
-    <string name="ssh_unknown_host">L\'hôte %1$s:%2$d est inconnu (%3$s). La politique de clés d\'hôte actuelle ne permet pas de lui faire confiance automatiquement.</string>
+    <string name="ssh_unknown_host">L\'hôte %1$s:%2$d est inconnu (%3$s). La politique stricte ne permet pas de lui faire confiance automatiquement : ajoutez sa clé dans Paramètres › Sécurité › Hôtes connus, ou choisissez une autre politique.</string>
     <string name="ssh_host_key_changed">ATTENTION : la clé d\'hôte de %1$s:%2$d a changé.\nAttendue : %3$s\nReçue :    %4$s\nPossible attaque de l\'intercepteur.</string>
     <string name="ssh_host_key_declined">Connexion annulée : clé d\'hôte refusée.</string>
 
@@ -334,6 +334,12 @@
 
     <string name="known_hosts_title">Hôtes connus</string>
     <string name="known_hosts_empty">Aucune clé d\'hôte enregistrée.</string>
+    <string name="known_hosts_import_help">Collez (ou saisissez) une ou plusieurs lignes known_hosts, telles que produites par ssh-keyscan. Nécessaire pour atteindre un nouveau serveur avec la politique stricte. Vérifiez d\'abord l\'empreinte par un canal de confiance et que l\'hôte et le port correspondent exactement à ceux du serveur.</string>
+    <string name="known_hosts_import_label">Entrées known_hosts</string>
+    <string name="known_hosts_import_placeholder">[host]:2222 ssh-ed25519 AAAAC3Nza…</string>
+    <string name="known_hosts_import_done">%1$d clés d\'hôte ajoutées.</string>
+    <string name="known_hosts_import_partial">%1$d clés d\'hôte ajoutées, %2$d lignes ignorées.</string>
+    <string name="known_hosts_import_none">Aucune entrée valide : le format attendu est "hôte ssh-ed25519 AAAA…" ou "[hôte]:port ssh-rsa AAAA…".</string>
     <string name="quick_commands_title">Commandes rapides</string>
     <string name="quick_commands_hint">Elles apparaissent comme des puces au-dessus du clavier du terminal et sont envoyées avec un retour à la ligne.</string>
     <string name="custom_keys_title">Touches personnalisées</string>

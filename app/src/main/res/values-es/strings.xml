@@ -197,7 +197,7 @@
     <string name="ssh_bad_private_key">Clave privada no válida o frase de contraseña incorrecta: %1$s</string>
     <string name="ssh_dynamic_forward_unsupported">El reenvío dinámico de puertos (SOCKS) en el puerto %1$d no es compatible con la biblioteca SSH: regla ignorada.</string>
     <string name="ssh_forward_rule_failed">La regla %1$s en el puerto %2$d no se aplicó: %3$s</string>
-    <string name="ssh_unknown_host">El host %1$s:%2$d es desconocido (%3$s). La política de claves de host actual no permite confiar en él automáticamente.</string>
+    <string name="ssh_unknown_host">El host %1$s:%2$d es desconocido (%3$s). La política estricta no permite confiar en él automáticamente: añade su clave en Ajustes › Seguridad › Hosts conocidos, o elige otra política.</string>
     <string name="ssh_host_key_changed">ATENCIÓN: la clave de host de %1$s:%2$d ha cambiado.\nEsperada: %3$s\nRecibida: %4$s\nPosible ataque de intermediario.</string>
     <string name="ssh_host_key_declined">Conexión cancelada: clave de host no aceptada.</string>
 
@@ -334,6 +334,12 @@
 
     <string name="known_hosts_title">Hosts conocidos</string>
     <string name="known_hosts_empty">No hay ninguna clave de host almacenada.</string>
+    <string name="known_hosts_import_help">Pega (o escribe) una o varias líneas known_hosts, como las que genera ssh-keyscan. Necesario para llegar a un servidor nuevo con la política estricta. Comprueba antes la huella por un canal de confianza y que el host y el puerto coincidan exactamente con los del servidor.</string>
+    <string name="known_hosts_import_label">Entradas known_hosts</string>
+    <string name="known_hosts_import_placeholder">[host]:2222 ssh-ed25519 AAAAC3Nza…</string>
+    <string name="known_hosts_import_done">%1$d claves de host añadidas.</string>
+    <string name="known_hosts_import_partial">%1$d claves de host añadidas, %2$d líneas ignoradas.</string>
+    <string name="known_hosts_import_none">Ninguna entrada válida: el formato esperado es "host ssh-ed25519 AAAA…" o "[host]:puerto ssh-rsa AAAA…".</string>
     <string name="quick_commands_title">Comandos rápidos</string>
     <string name="quick_commands_hint">Aparecen como chips sobre el teclado del terminal y se envían con salto de línea.</string>
     <string name="custom_keys_title">Teclas rápidas</string>

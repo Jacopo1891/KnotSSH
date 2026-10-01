@@ -187,7 +187,7 @@
     <string name="ssh_bad_private_key">Ungültiger privater Schlüssel oder falsche Passphrase: %1$s</string>
     <string name="ssh_dynamic_forward_unsupported">Dynamische Portweiterleitung (SOCKS) auf Port %1$d wird von der SSH-Bibliothek nicht unterstützt: Regel ignoriert.</string>
     <string name="ssh_forward_rule_failed">Regel %1$s auf Port %2$d nicht angewendet: %3$s</string>
-    <string name="ssh_unknown_host">Host %1$s:%2$d ist unbekannt (%3$s). Die aktuelle Host-Schlüssel-Richtlinie erlaubt kein automatisches Vertrauen.</string>
+    <string name="ssh_unknown_host">Host %1$s:%2$d ist unbekannt (%3$s). Die strenge Richtlinie erlaubt kein automatisches Vertrauen: Füge den Schlüssel unter Einstellungen › Sicherheit › Bekannte Hosts hinzu oder wähle eine andere Richtlinie.</string>
     <string name="ssh_host_key_changed">ACHTUNG: Der Host-Schlüssel von %1$s:%2$d hat sich geändert.\nErwartet: %3$s\nErhalten: %4$s\nMöglicher Man-in-the-Middle-Angriff.</string>
     <string name="ssh_host_key_declined">Verbindung abgebrochen: Host-Schlüssel nicht akzeptiert.</string>
 
@@ -324,6 +324,12 @@
 
     <string name="known_hosts_title">Bekannte Hosts</string>
     <string name="known_hosts_empty">Kein Host-Schlüssel gespeichert.</string>
+    <string name="known_hosts_import_help">Füge eine oder mehrere known_hosts-Zeilen ein (oder tippe sie), wie sie ssh-keyscan erzeugt. Nötig, um mit der strengen Richtlinie einen neuen Server zu erreichen. Prüfe den Fingerabdruck vorher über einen vertrauenswürdigen Kanal und dass Host und Port exakt mit dem Server übereinstimmen.</string>
+    <string name="known_hosts_import_label">known_hosts-Einträge</string>
+    <string name="known_hosts_import_placeholder">[host]:2222 ssh-ed25519 AAAAC3Nza…</string>
+    <string name="known_hosts_import_done">%1$d Host-Schlüssel hinzugefügt.</string>
+    <string name="known_hosts_import_partial">%1$d Host-Schlüssel hinzugefügt, %2$d Zeilen ignoriert.</string>
+    <string name="known_hosts_import_none">Kein gültiger Eintrag: erwartet wird "host ssh-ed25519 AAAA…" oder "[host]:port ssh-rsa AAAA…".</string>
     <string name="quick_commands_title">Schnellbefehle</string>
     <string name="quick_commands_hint">Sie erscheinen als Chips über der Terminal-Tastatur und werden mit Zeilenumbruch gesendet.</string>
     <string name="custom_keys_title">Eigene Tasten</string>
