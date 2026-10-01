@@ -92,18 +92,23 @@ fun HomeScreen(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onAddServer,
-                icon = {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = stringResource(R.string.home_add_server)
-                    )
-                },
-                text = { Text(stringResource(R.string.home_new_server)) },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
+            // L'empty state mostra già un pulsante centrale per aggiungere il primo server.
+            val showEmptyStateAddButton =
+                !uiState.isLoading && uiState.servers.isEmpty() && uiState.searchQuery.isBlank()
+            if (!showEmptyStateAddButton) {
+                ExtendedFloatingActionButton(
+                    onClick = onAddServer,
+                    icon = {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(R.string.home_add_server)
+                        )
+                    },
+                    text = { Text(stringResource(R.string.home_new_server)) },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     ) { paddingValues ->
         Box(
