@@ -79,6 +79,7 @@ fun NavGraph(
             HomeScreen(
                 onAddServer = { navController.navigate(Screen.AddServer.route) },
                 onEditServer = { id -> navController.navigate(Screen.EditServer.createRoute(id)) },
+                onCloneServer = { id -> navController.navigate(Screen.CloneServer.createRoute(id)) },
                 onConnect = { id -> navController.navigate(Screen.Terminal.createRoute(id)) },
                 onNavigateCredentials = { navController.navigate(Screen.Credentials.route) },
                 onNavigateSettings = { navController.navigate(Screen.Settings.route) }
@@ -99,6 +100,17 @@ fun NavGraph(
         ) { backStack ->
             EditServerScreen(
                 serverId = backStack.arguments?.getLong("serverId"),
+                onBack = { navController.popBackStack() },
+                onNavigateToAddCredential = { navController.navigate(Screen.AddCredential.route) }
+            )
+        }
+
+        composable(
+            route = Screen.CloneServer.route,
+            arguments = listOf(navArgument("cloneOf") { type = NavType.LongType })
+        ) {
+            EditServerScreen(
+                serverId = null,
                 onBack = { navController.popBackStack() },
                 onNavigateToAddCredential = { navController.navigate(Screen.AddCredential.route) }
             )

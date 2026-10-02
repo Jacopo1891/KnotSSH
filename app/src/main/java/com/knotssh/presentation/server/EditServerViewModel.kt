@@ -1,5 +1,6 @@
 package com.knotssh.presentation.server
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import com.knotssh.domain.model.*import com.knotssh.domain.repository.Credential
 import com.knotssh.domain.repository.FolderRepository
 import com.knotssh.domain.repository.ServerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,6 +46,7 @@ sealed class TestResult {
 
 @HiltViewModel
 class EditServerViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val serverRepository: ServerRepository,
     private val credentialRepository: CredentialRepository,
     private val folderRepository: FolderRepository,
@@ -52,6 +55,9 @@ class EditServerViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val serverId: Long? = savedStateHandle.get<Long>("serverId")?.takeIf { it > 0 }
+
+    /** Set when the form opens as a copy: the source is read, but a new row will be inserted. */
+    private val cloneOfId: Long? = savedStateHandle.get<Long>("cloneOf")?.takeIf { it > 0 }
     private val _state = MutableStateFlow(EditServerUiState())
     val state: StateFlow<EditServerUiState> = _state.asStateFlow()
 
@@ -85,12 +91,14 @@ class EditServerViewModel @Inject constructor(
                 }
             }
         }
-        serverId?.let { id ->
+        (serverId ?: cloneOfId)?.let { id ->
             viewModelScope.launch {
                 serverRepository.getServerById(id)?.let { server ->
+                    val alias =
+                        if (serverId != null) server.alias else freeCopyAlias(server.alias)
                     _state.update {
                         it.copy(
-                            alias = server.alias,
+                            alias = alias,
                             hostname = server.hostname,
                             port = server.port.toString(),
                             selectedCredentialId = server.credentialId,
@@ -103,6 +111,14 @@ class EditServerViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun freeCopyAlias(source: String): String {
+        val base = context.getString(R.string.server_copy_alias, source)
+        if (!serverRepository.aliasExists(base, 0L)) return base
+        var index = 2
+        while (serverRepository.aliasExists("$base $index", 0L)) index++
+        return "$base $index"
     }
 
     fun onAliasChanged(v: String) = _state.update { it.copy(alias = v, aliasError = null) }
@@ -141,6 +157,11 @@ class EditServerViewModel @Inject constructor(
         if (hasError) return
 
         viewModelScope.launch {
+            // Checked here rather than while typing: one query on save beats one per keystroke.
+            if (serverRepository.aliasExists(s.alias.trim(), serverId ?: 0L)) {
+                _state.update { it.copy(aliasError = R.string.error_alias_taken) }
+                return@launch
+            }
             _state.update { it.copy(isLoading = true) }
             val server = Server(
                 id = serverId ?: 0L,

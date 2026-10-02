@@ -56,6 +56,7 @@ import java.util.*
 fun HomeScreen(
     onAddServer: () -> Unit,
     onEditServer: (Long) -> Unit,
+    onCloneServer: (Long) -> Unit,
     onConnect: (Long) -> Unit,
     onNavigateCredentials: () -> Unit,
     onNavigateSettings: () -> Unit,
@@ -230,6 +231,7 @@ fun HomeScreen(
                         state = uiState,
                         onConnect = onConnect,
                         onEdit = onEditServer,
+                        onClone = onCloneServer,
                         onDelete = { serverToDelete = it },
                         onToggleFavorite = { s -> viewModel.toggleFavorite(s.id, s.isFavorite) },
                         onToggleFolder = viewModel::toggleFolder,
@@ -417,6 +419,7 @@ private fun ServerList(
     state: HomeUiState,
     onConnect: (Long) -> Unit,
     onEdit: (Long) -> Unit,
+    onClone: (Long) -> Unit,
     onDelete: (Server) -> Unit,
     onToggleFavorite: (Server) -> Unit,
     onToggleFolder: (Folder) -> Unit,
@@ -459,6 +462,7 @@ private fun ServerList(
                     state = state,
                     onConnect = onConnect,
                     onEdit = onEdit,
+                    onClone = onClone,
                     onDelete = onDelete,
                     onToggleFavorite = onToggleFavorite,
                     onMoveToFolder = onMoveToFolder,
@@ -511,6 +515,7 @@ private fun ServerList(
                     state = state,
                     onConnect = onConnect,
                     onEdit = onEdit,
+                    onClone = onClone,
                     onDelete = onDelete,
                     onToggleFavorite = onToggleFavorite,
                     onMoveToFolder = onMoveToFolder,
@@ -550,6 +555,7 @@ private fun LazyItemScope.ServerRow(
     state: HomeUiState,
     onConnect: (Long) -> Unit,
     onEdit: (Long) -> Unit,
+    onClone: (Long) -> Unit,
     onDelete: (Server) -> Unit,
     onToggleFavorite: (Server) -> Unit,
     onMoveToFolder: (Server) -> Unit,
@@ -599,6 +605,7 @@ private fun LazyItemScope.ServerRow(
             onDismiss = { showContextMenu = false },
             onConnect = { showContextMenu = false; onConnect(server.id) },
             onEdit = { showContextMenu = false; onEdit(server.id) },
+            onClone = { showContextMenu = false; onClone(server.id) },
             onDelete = { showContextMenu = false; onDelete(server) },
             onToggleFavorite = { showContextMenu = false; onToggleFavorite(server) },
             onMoveToFolder = { showContextMenu = false; onMoveToFolder(server) },
@@ -1080,6 +1087,7 @@ private fun ServerContextMenu(
     onDismiss: () -> Unit,
     onConnect: () -> Unit,
     onEdit: () -> Unit,
+    onClone: () -> Unit,
     onDelete: () -> Unit,
     onToggleFavorite: () -> Unit,
     onMoveToFolder: () -> Unit,
@@ -1095,6 +1103,11 @@ private fun ServerContextMenu(
             text = { Text(stringResource(R.string.action_edit)) },
             leadingIcon = { Icon(Icons.Default.Edit, null) },
             onClick = onEdit
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.action_duplicate)) },
+            leadingIcon = { Icon(Icons.Default.ContentCopy, null) },
+            onClick = onClone
         )
         DropdownMenuItem(
             text = {

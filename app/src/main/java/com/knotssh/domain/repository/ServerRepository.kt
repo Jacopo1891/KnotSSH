@@ -14,4 +14,7 @@ interface ServerRepository {
     suspend fun toggleFavorite(id: Long, isFavorite: Boolean)
     suspend fun setFolder(id: Long, folderId: Long?)
     suspend fun applyOrder(serverIds: List<Long>)
+
+    /** Aliases identify a server in backups and notifications, so they have to stay unique. */
+    suspend fun aliasExists(alias: String, excludingId: Long): Boolean
 }

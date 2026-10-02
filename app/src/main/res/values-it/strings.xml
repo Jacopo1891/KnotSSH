@@ -56,6 +56,7 @@
     <string name="action_remove">Rimuovi</string>
     <string name="action_cancel">Annulla</string>
     <string name="action_close">Chiudi</string>
+    <string name="action_duplicate">Duplica</string>
     <string name="action_connect">Connetti</string>
     <string name="action_show">Mostra</string>
     <string name="action_hide">Nascondi</string>
@@ -476,5 +477,7 @@
     <string name="home_folder_empty_drag">Cartella vuota. Tieni premuto un server e trascinalo qui, oppure usa l\'icona con l\'elenco.</string>
     <string name="home_no_folder_empty">Trascina qui un server per toglierlo dalla sua cartella.</string>
     <string name="server_folder_label">Cartella</string>
+    <string name="server_copy_alias">%1$s (copia)</string>
+    <string name="error_alias_taken">Un altro server usa già questo nome</string>
 
 </resources>

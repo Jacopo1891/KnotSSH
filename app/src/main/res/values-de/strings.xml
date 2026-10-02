@@ -46,6 +46,7 @@
     <string name="action_remove">Entfernen</string>
     <string name="action_cancel">Abbrechen</string>
     <string name="action_close">Schließen</string>
+    <string name="action_duplicate">Duplizieren</string>
     <string name="action_connect">Verbinden</string>
     <string name="action_show">Anzeigen</string>
     <string name="action_hide">Verbergen</string>
@@ -466,5 +467,7 @@
     <string name="home_folder_empty_drag">Leerer Ordner. Einen Server gedrückt halten und hierher ziehen oder das Listensymbol verwenden.</string>
     <string name="home_no_folder_empty">Einen Server hierher ziehen, um ihn aus seinem Ordner zu nehmen.</string>
     <string name="server_folder_label">Ordner</string>
+    <string name="server_copy_alias">%1$s (Kopie)</string>
+    <string name="error_alias_taken">Ein anderer Server verwendet diesen Namen bereits</string>
 
 </resources>

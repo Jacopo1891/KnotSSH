@@ -56,6 +56,7 @@
     <string name="action_remove">Retirer</string>
     <string name="action_cancel">Annuler</string>
     <string name="action_close">Fermer</string>
+    <string name="action_duplicate">Dupliquer</string>
     <string name="action_connect">Se connecter</string>
     <string name="action_show">Afficher</string>
     <string name="action_hide">Masquer</string>
@@ -476,5 +477,7 @@
     <string name="home_folder_empty_drag">Dossier vide. Appuyez longuement sur un serveur et faites-le glisser ici, ou utilisez l\'icône de liste.</string>
     <string name="home_no_folder_empty">Faites glisser un serveur ici pour le sortir de son dossier.</string>
     <string name="server_folder_label">Dossier</string>
+    <string name="server_copy_alias">%1$s (copie)</string>
+    <string name="error_alias_taken">Un autre serveur porte déjà ce nom</string>
 
 </resources>

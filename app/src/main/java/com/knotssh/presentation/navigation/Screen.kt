@@ -11,6 +11,9 @@ sealed class Screen(val route: String) {
     data object EditServer : Screen("server/edit/{serverId}") {
         fun createRoute(serverId: Long) = "server/edit/$serverId"
     }
+    data object CloneServer : Screen("server/clone/{cloneOf}") {
+        fun createRoute(serverId: Long) = "server/clone/$serverId"
+    }
 
     // Credential flow
     data object AddCredential : Screen("credential/add")

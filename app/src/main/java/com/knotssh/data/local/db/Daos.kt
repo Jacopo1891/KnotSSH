@@ -37,6 +37,12 @@ interface ServerDao {
 
     @Query("UPDATE servers SET sortOrder = :sortOrder WHERE id = :id")
     suspend fun setSortOrder(id: Long, sortOrder: Int)
+
+    @Query(
+        "SELECT EXISTS(SELECT 1 FROM servers " +
+            "WHERE alias = :alias COLLATE NOCASE AND id != :excludingId)"
+    )
+    suspend fun aliasExists(alias: String, excludingId: Long): Boolean
 }
 
 @Dao

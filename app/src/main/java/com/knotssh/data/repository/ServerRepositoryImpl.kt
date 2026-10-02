@@ -43,6 +43,9 @@ class ServerRepositoryImpl @Inject constructor(
         serverIds.forEachIndexed { index, id -> dao.setSortOrder(id, index) }
     }
 
+    override suspend fun aliasExists(alias: String, excludingId: Long): Boolean =
+        dao.aliasExists(alias.trim(), excludingId)
+
     private fun ServerEntity.toDomain() = Server(
         id = id, alias = alias, hostname = hostname, port = port,
         credentialId = credentialId, lastConnectedMs = lastConnectedMs,
