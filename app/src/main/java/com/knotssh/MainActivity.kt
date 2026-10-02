@@ -8,9 +8,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.knotssh.data.local.preferences.AppPreferences
@@ -20,6 +22,8 @@ import com.knotssh.data.local.preferences.ThemeMode
 import com.knotssh.presentation.navigation.NavGraph
 import com.knotssh.presentation.security.BiometricGate
 import com.knotssh.presentation.theme.KnotSshTheme
+import com.knotssh.presentation.update.UpdateDialogHost
+import com.knotssh.presentation.update.UpdateViewModel
 import com.knotssh.ssh.SessionRegistry
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -94,6 +98,11 @@ class MainActivity : AppCompatActivity() {
                             terminalRequest = terminalRequest,
                             onTerminalRequestHandled = { pendingTerminal.value = null }
                         )
+
+                        // Behind the biometric gate, so no prompt appears over a locked app.
+                        val updateViewModel: UpdateViewModel = hiltViewModel()
+                        LaunchedEffect(Unit) { updateViewModel.checkOnStartup() }
+                        UpdateDialogHost(updateViewModel)
                     }
                 }
             }

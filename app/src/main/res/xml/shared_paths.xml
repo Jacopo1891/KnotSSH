@@ -2,4 +2,6 @@
 <paths>
     <!-- Only the generated diagnostic reports are ever shared out of the app. -->
     <cache-path name="reports" path="reports/" />
+    <!-- Handed to the package installer, which needs read access to the downloaded APK. -->
+    <cache-path name="updates" path="updates/" />
 </paths>

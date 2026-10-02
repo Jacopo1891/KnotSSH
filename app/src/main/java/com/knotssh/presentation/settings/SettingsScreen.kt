@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.SettingsBackupRestore
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.ui.res.pluralStringResource
@@ -21,6 +22,8 @@ import com.knotssh.data.local.preferences.BellMode
 import com.knotssh.data.local.preferences.HostKeyPolicy
 import com.knotssh.data.local.preferences.TerminalFont
 import com.knotssh.data.local.preferences.ThemeMode
+import com.knotssh.presentation.update.UpdateDialogHost
+import com.knotssh.presentation.update.UpdateViewModel
 
 @Composable
 fun SettingsScreen(
@@ -34,7 +37,8 @@ fun SettingsScreen(
     onOpenBackup: () -> Unit,
     onOpenFaq: () -> Unit,
     onOpenAbout: () -> Unit,
-    viewModel: SettingsViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel(),
+    updateViewModel: UpdateViewModel = hiltViewModel()
 ) {
     val appearance by viewModel.appearance.collectAsStateWithLifecycle()
     val terminal by viewModel.terminal.collectAsStateWithLifecycle()
@@ -43,6 +47,8 @@ fun SettingsScreen(
     val knownHosts by viewModel.knownHostList.collectAsStateWithLifecycle()
     val customKeys by viewModel.customKeyList.collectAsStateWithLifecycle()
     val quickCommands by viewModel.quickCommandList.collectAsStateWithLifecycle()
+
+    UpdateDialogHost(updateViewModel)
 
     SettingsScaffold(title = stringResource(R.string.settings_title), onBack = onBack) {
         item {
@@ -177,6 +183,14 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_faq),
                 summary = stringResource(R.string.settings_faq_summary),
                 onClick = onOpenFaq
+            )
+        }
+        item {
+            SettingsCategoryRow(
+                icon = Icons.Default.SystemUpdate,
+                title = stringResource(R.string.update_check_now),
+                summary = stringResource(R.string.update_check_now_desc),
+                onClick = updateViewModel::checkNow
             )
         }
         item {

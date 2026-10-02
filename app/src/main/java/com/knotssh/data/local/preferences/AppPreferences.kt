@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.knotssh.data.backup.BackupSettings
@@ -166,6 +167,9 @@ class AppPreferences @Inject constructor(
         val DIAGNOSTICS_VERBOSE = booleanPreferencesKey("diagnostics_verbose")
         val SERVER_SORT_MODE = stringPreferencesKey("server_sort_mode")
         val FOLDERS_ENABLED = booleanPreferencesKey("folders_enabled")
+
+        val AUTO_UPDATE_CHECK = booleanPreferencesKey("auto_update_check")
+        val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")
     }
 
     /** DataStore surfaces read errors through the flow; fall back to defaults instead of crashing collectors. */
@@ -248,6 +252,18 @@ class AppPreferences @Inject constructor(
     val foldersEnabled: Flow<Boolean> = prefs
         .map { it[Keys.FOLDERS_ENABLED] ?: true }
         .distinctUntilChanged()
+
+    val autoUpdateCheck: Flow<Boolean> = prefs
+        .map { it[Keys.AUTO_UPDATE_CHECK] ?: true }
+        .distinctUntilChanged()
+
+    /** Epoch millis of the last successful release check, used to throttle the startup one. */
+    val lastUpdateCheck: Flow<Long> = prefs
+        .map { it[Keys.LAST_UPDATE_CHECK] ?: 0L }
+        .distinctUntilChanged()
+
+    suspend fun setAutoUpdateCheck(value: Boolean) = put(Keys.AUTO_UPDATE_CHECK, value)
+    suspend fun setLastUpdateCheck(value: Long) = put(Keys.LAST_UPDATE_CHECK, value)
 
     suspend fun setThemeMode(value: ThemeMode) = put(Keys.THEME_MODE, value.name)
     suspend fun setDynamicColor(value: Boolean) = put(Keys.DYNAMIC_COLOR, value)

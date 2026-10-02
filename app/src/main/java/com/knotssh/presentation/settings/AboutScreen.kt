@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -54,15 +55,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.knotssh.BuildConfig
 import com.knotssh.R
+import com.knotssh.presentation.update.UpdateDialogHost
+import com.knotssh.presentation.update.UpdateViewModel
 
 @Composable
 fun AboutScreen(
     onBack: () -> Unit,
-    viewModel: DiagnosticsViewModel = hiltViewModel()
+    viewModel: DiagnosticsViewModel = hiltViewModel(),
+    updateViewModel: UpdateViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val entries by viewModel.entries.collectAsStateWithLifecycle()
     val verbose by viewModel.verbose.collectAsStateWithLifecycle()
+    val autoUpdate by updateViewModel.autoCheckEnabled.collectAsStateWithLifecycle(initialValue = true)
 
     var reportPreview by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
@@ -83,6 +88,8 @@ fun AboutScreen(
     reportPreview?.let { report ->
         ReportPreviewDialog(report = report, onDismiss = { reportPreview = null })
     }
+
+    UpdateDialogHost(updateViewModel)
 
     if (showLicenses) {
         LicensesDialog(
@@ -109,6 +116,22 @@ fun AboutScreen(
 
     SettingsScaffold(title = stringResource(R.string.settings_about), onBack = onBack) {
         item { AppHeader() }
+        item {
+            SettingsCategoryRow(
+                icon = Icons.Default.SystemUpdate,
+                title = stringResource(R.string.update_check_now),
+                summary = stringResource(R.string.update_check_now_desc),
+                onClick = updateViewModel::checkNow
+            )
+        }
+        item {
+            SwitchRow(
+                title = stringResource(R.string.update_auto),
+                description = stringResource(R.string.update_auto_desc),
+                checked = autoUpdate,
+                onCheckedChange = updateViewModel::setAutoCheckEnabled
+            )
+        }
         item {
             SettingsCategoryRow(
                 icon = Icons.Default.Update,
