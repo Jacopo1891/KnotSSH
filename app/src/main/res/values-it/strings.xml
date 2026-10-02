@@ -429,6 +429,8 @@
     <string name="about_version">Versione %1$s (build %2$d)</string>
     <string name="about_section_support">Supporto</string>
     <string name="about_updates">Aggiornamenti e codice sorgente</string>
+    <string name="about_licenses">Licenze open source</string>
+    <string name="about_licenses_desc">Le librerie su cui è costruita KnotSSH</string>
     <string name="about_report">Invia una segnalazione</string>
     <string name="about_report_desc">Apre una nuova issue su GitHub, il log è già negli appunti</string>
     <string name="about_report_subject">KnotSSH %1$s — segnalazione di un problema</string>

@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +66,7 @@ fun AboutScreen(
 
     var reportPreview by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
+    var showLicenses by remember { mutableStateOf(false) }
 
     val exportLog = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument(REPORT_MIME)
@@ -79,6 +82,17 @@ fun AboutScreen(
 
     reportPreview?.let { report ->
         ReportPreviewDialog(report = report, onDismiss = { reportPreview = null })
+    }
+
+    if (showLicenses) {
+        LicensesDialog(
+            onOpen = { url ->
+                if (!context.openUrl(url)) {
+                    message = context.getString(R.string.about_no_browser_app)
+                }
+            },
+            onDismiss = { showLicenses = false }
+        )
     }
 
     message?.let { text ->
@@ -105,6 +119,15 @@ fun AboutScreen(
                         message = context.getString(R.string.about_no_browser_app)
                     }
                 }
+            )
+        }
+
+        item {
+            SettingsCategoryRow(
+                icon = Icons.Default.Description,
+                title = stringResource(R.string.about_licenses),
+                summary = stringResource(R.string.about_licenses_desc),
+                onClick = { showLicenses = true }
             )
         }
 
@@ -267,7 +290,58 @@ private fun ReportPreviewDialog(report: String, onDismiss: () -> Unit) {
 private const val GITHUB_URL = "https://github.com/Jacopo1891/KnotSSH"
 private const val GITHUB_RELEASES_URL = "$GITHUB_URL/releases"
 private const val GITHUB_LABEL = "github.com/Jacopo1891/KnotSSH"
+private const val APACHE_URL = "https://www.apache.org/licenses/LICENSE-2.0"
 private const val REPORT_MIME = "text/plain"
+
+private class ThirdParty(val name: String, val license: String, val url: String)
+
+/** BSD and MIT require the notice to travel with the binary, not just with the repository. */
+private val THIRD_PARTY = listOf(
+    ThirdParty(
+        "JSch (mwiede fork)",
+        "Revised BSD",
+        "https://github.com/mwiede/jsch/blob/master/LICENSE.txt"
+    ),
+    ThirdParty(
+        "argon2kt",
+        "MIT",
+        "https://github.com/lambdapioneer/argon2kt/blob/master/LICENSE"
+    ),
+    ThirdParty("AndroidX · Jetpack Compose", "Apache 2.0", APACHE_URL),
+    ThirdParty("Hilt · Dagger", "Apache 2.0", APACHE_URL),
+    ThirdParty("Kotlin · kotlinx.serialization", "Apache 2.0", APACHE_URL)
+)
+
+@Composable
+private fun LicensesDialog(onOpen: (String) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.about_licenses)) },
+        text = {
+            LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
+                items(THIRD_PARTY.size) { index ->
+                    val entry = THIRD_PARTY[index]
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onOpen(entry.url) }
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Text(entry.name, style = MaterialTheme.typography.bodyMedium)
+                        Text(
+                            text = entry.license,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
+        }
+    )
+}
 
 private fun reportFileName() = "knotssh-report-${System.currentTimeMillis()}.txt"
 
