@@ -43,7 +43,7 @@
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Mantiene attiva una sessione SSH interattiva avviata dall'utente" />
+                android:value="Keeps a user-initiated interactive SSH session alive while the app is in the background" />
         </service>
 
         <!-- Below API 33 AppCompat has to persist the per-app locale itself. -->

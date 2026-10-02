@@ -7,16 +7,70 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// Release identity is derived from annotated git tags shaped `vMAJOR.MINOR.PATCH`.
+val gitDescribe: String = runCatching {
+    providers.exec {
+        commandLine("git", "describe", "--tags", "--match", "v*", "--dirty", "--always")
+        isIgnoreExitValue = true
+    }.standardOutput.asText.get().trim()
+}.getOrDefault("")
+
+val describedVersion = Regex("""^v(\d+)\.(\d+)\.(\d+)(?:-(\d+)-g[0-9a-f]+)?(-dirty)?$""")
+    .matchEntire(gitDescribe)
+
+val semVer = describedVersion?.let {
+    Triple(it.groupValues[1].toInt(), it.groupValues[2].toInt(), it.groupValues[3].toInt())
+}
+
+// Both groups are empty only when HEAD is exactly a tag and the tree is clean.
+val isTaggedRelease = describedVersion != null &&
+    describedVersion.groupValues[4].isEmpty() &&
+    describedVersion.groupValues[5].isEmpty()
+
+// Play never accepts a re-used versionCode: bump this to re-upload the same tag.
+val buildNumber = providers.gradleProperty("KNOTSSH_BUILD_NUMBER").orNull?.toInt() ?: 0
+
+val appVersionCode = semVer?.let { (major, minor, patch) ->
+    major * 1_000_000 + minor * 10_000 + patch * 100 + buildNumber
+} ?: 1
+
+val appVersionName = when {
+    semVer == null -> "0.0.0-dev"
+    isTaggedRelease -> "${semVer.first}.${semVer.second}.${semVer.third}"
+    else -> gitDescribe.removePrefix("v")
+}
+
+val releaseVersionError = when {
+    semVer == null ->
+        "no v<MAJOR>.<MINOR>.<PATCH> tag is reachable from HEAD " +
+            "(git describe: '${gitDescribe.ifEmpty { "unavailable" }}')"
+    !isTaggedRelease -> "HEAD is not a clean release tag (git describe: '$gitDescribe')"
+    else -> null
+}
+
+// Fails before any task runs, instead of after a full release build.
+gradle.taskGraph.whenReady {
+    val buildsReleaseArtifact = allTasks.any {
+        it.name == "assembleRelease" || it.name == "bundleRelease"
+    }
+    if (buildsReleaseArtifact) {
+        require(releaseVersionError == null) {
+            "Refusing to build a release artifact: $releaseVersionError. " +
+                "Tag the commit first, e.g. git tag -a v1.0.0 -m \"KnotSSH 1.0.0\"."
+        }
+    }
+}
+
 android {
     namespace = "com.knotssh"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.knotssh"
         minSdk = 31
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        targetSdk = 36
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
