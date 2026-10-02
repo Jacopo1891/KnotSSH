@@ -1,10 +1,13 @@
 package com.knotssh.presentation.settings
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.core.content.FileProvider
+import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -24,7 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -49,7 +52,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.knotssh.BuildConfig
 import com.knotssh.R
-import java.io.File
 
 @Composable
 fun AboutScreen(
@@ -93,39 +95,41 @@ fun AboutScreen(
 
     SettingsScaffold(title = stringResource(R.string.settings_about), onBack = onBack) {
         item { AppHeader() }
-
-        item { SettingsSection(stringResource(R.string.about_section_support)) }
         item {
             SettingsCategoryRow(
-                icon = Icons.Default.MailOutline,
-                title = stringResource(R.string.about_contact),
-                summary = stringResource(R.string.about_contact_desc, SUPPORT_EMAIL),
+                icon = Icons.Default.Update,
+                title = stringResource(R.string.about_updates),
+                summary = GITHUB_LABEL,
                 onClick = {
-                    val sent = context.sendSupportMail(
-                        subject = context.getString(
-                            R.string.about_mail_subject,
-                            BuildConfig.VERSION_NAME
-                        ),
-                        body = context.getString(R.string.about_mail_body)
-                    )
-                    if (!sent) message = context.getString(R.string.about_no_mail_app)
+                    if (!context.openUrl(GITHUB_RELEASES_URL)) {
+                        message = context.getString(R.string.about_no_browser_app)
+                    }
                 }
             )
         }
+
+        item { SettingsSection(stringResource(R.string.about_section_support)) }
         item {
             SettingsCategoryRow(
                 icon = Icons.AutoMirrored.Filled.Send,
                 title = stringResource(R.string.about_report),
                 summary = stringResource(R.string.about_report_desc),
                 onClick = {
-                    val sent = context.shareReport(
-                        subject = context.getString(
+                    context.copyReport(viewModel.report())
+                    val url = newIssueUrl(
+                        title = context.getString(
                             R.string.about_report_subject,
                             BuildConfig.VERSION_NAME
                         ),
-                        report = viewModel.report()
+                        body = context.getString(
+                            R.string.about_report_issue_body,
+                            Build.MODEL,
+                            Build.VERSION.RELEASE
+                        )
                     )
-                    if (!sent) message = context.getString(R.string.about_no_mail_app)
+                    if (!context.openUrl(url)) {
+                        message = context.getString(R.string.about_no_browser_app)
+                    }
                 }
             )
         }
@@ -260,47 +264,25 @@ private fun ReportPreviewDialog(report: String, onDismiss: () -> Unit) {
     )
 }
 
-private const val SUPPORT_EMAIL = "info@suitslabs.dev"
+private const val GITHUB_URL = "https://github.com/Jacopo1891/KnotSSH"
+private const val GITHUB_RELEASES_URL = "$GITHUB_URL/releases"
+private const val GITHUB_LABEL = "github.com/Jacopo1891/KnotSSH"
 private const val REPORT_MIME = "text/plain"
 
 private fun reportFileName() = "knotssh-report-${System.currentTimeMillis()}.txt"
 
-private fun Context.sendSupportMail(subject: String, body: String): Boolean {
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:$SUPPORT_EMAIL")
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(SUPPORT_EMAIL))
-        putExtra(Intent.EXTRA_SUBJECT, subject)
-        putExtra(Intent.EXTRA_TEXT, body)
-    }
-    return launchChooser(intent, subject)
-}
-
-/**
- * Writes the report to the shared cache directory and attaches it, so the user never has to find
- * and pick the file by hand.
- */
-private fun Context.shareReport(subject: String, report: String): Boolean {
-    val uri = runCatching {
-        val dir = File(cacheDir, "reports").apply { mkdirs() }
-        dir.listFiles()?.forEach { it.delete() }
-        val file = File(dir, reportFileName()).apply { writeText(report) }
-        FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
-    }.getOrNull() ?: return false
-
-    val intent = Intent(Intent.ACTION_SEND).apply {
-        type = REPORT_MIME
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(SUPPORT_EMAIL))
-        putExtra(Intent.EXTRA_SUBJECT, subject)
-        putExtra(Intent.EXTRA_TEXT, getString(R.string.about_report_mail_body))
-        putExtra(Intent.EXTRA_STREAM, uri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    return launchChooser(intent, subject)
-}
-
-private fun Context.launchChooser(intent: Intent, title: String): Boolean = try {
-    startActivity(Intent.createChooser(intent, title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+private fun Context.openUrl(url: String): Boolean = try {
+    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     true
 } catch (_: ActivityNotFoundException) {
     false
 }
+
+/** GitHub has no URL parameter for attachments, so the log reaches the issue via the clipboard. */
+private fun Context.copyReport(report: String) {
+    ContextCompat.getSystemService(this, ClipboardManager::class.java)
+        ?.setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), report))
+}
+
+private fun newIssueUrl(title: String, body: String): String =
+    "$GITHUB_URL/issues/new?title=${Uri.encode(title)}&body=${Uri.encode(body)}"
