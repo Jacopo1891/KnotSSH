@@ -249,7 +249,10 @@ class SshSession(
                 if (failure == null) return@launch
 
                 // A host key problem is never retried: retrying would only re-expose credentials.
+                // Neither is a rejected secret: it cannot fix itself, and hammering the server
+                // trips fail2ban or locks the account.
                 val retryable = failure !is HostKeyException &&
+                        failure !is AuthFailedException &&
                         failure !is AuthCancelledException &&
                         connectionSettings.autoReconnect &&
                         !closedByUser &&

@@ -192,6 +192,7 @@
     <string name="ssh_credential_not_found">Compte associé introuvable</string>
     <string name="ssh_connection_error">Erreur de connexion</string>
     <string name="ssh_auth_cancelled">Connexion annulée : aucun identifiant saisi.</string>
+    <string name="ssh_auth_failed">Le serveur a refusé les identifiants de %1$s. Vérifiez le mot de passe ou la clé, puis réessayez.</string>
     <string name="ssh_connecting_to">Connexion à %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connexion terminée : %1$s</string>
     <string name="ssh_session_closed">Session fermée (code %1$d)</string>

@@ -182,6 +182,7 @@
     <string name="ssh_credential_not_found">Zugehöriger Zugang nicht gefunden</string>
     <string name="ssh_connection_error">Verbindungsfehler</string>
     <string name="ssh_auth_cancelled">Verbindung abgebrochen: keine Zugangsdaten eingegeben.</string>
+    <string name="ssh_auth_failed">Der Server hat die Zugangsdaten für %1$s abgelehnt. Prüfe Passwort oder Schlüssel und versuche es erneut.</string>
     <string name="ssh_connecting_to">Verbinde mit %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Verbindung beendet: %1$s</string>
     <string name="ssh_session_closed">Sitzung geschlossen (Code %1$d)</string>

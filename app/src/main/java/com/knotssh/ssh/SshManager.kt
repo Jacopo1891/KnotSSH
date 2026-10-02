@@ -31,6 +31,25 @@ import javax.inject.Inject
 /** Raised when the remote host could not be authenticated. Never retried automatically. */
 class HostKeyException(val rejection: HostKeyRejection, message: String) : Exception(message)
 
+/**
+ * Raised when the server rejected our credentials. Never retried automatically: the secret will
+ * not become correct on its own, and repeated failures trip fail2ban or lock the account out.
+ */
+class AuthFailedException(message: String) : Exception(message)
+
+/** JSch reports authentication failures only through the exception text. */
+private fun isAuthFailure(e: Throwable): Boolean {
+    val message = e.message?.lowercase() ?: return false
+    return AUTH_FAILURE_MARKERS.any { it in message }
+}
+
+private val AUTH_FAILURE_MARKERS = listOf(
+    "auth fail",
+    "auth cancel",
+    "userauth fail",
+    "too many authentication failures"
+)
+
 class SshConnection(
     val input: InputStream,
     private val output: OutputStream,
@@ -190,6 +209,11 @@ class SshManager @Inject constructor(
         } catch (e: Exception) {
             releaseWakeLock()
             gate.rejection?.let { throw HostKeyException(it, describe(context, it, server)) }
+            if (isAuthFailure(e)) {
+                throw AuthFailedException(
+                    context.getString(R.string.ssh_auth_failed, credential.username)
+                )
+            }
             throw e
         }
 

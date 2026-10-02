@@ -202,6 +202,7 @@
     <string name="ssh_credential_not_found">Associated credential not found</string>
     <string name="ssh_connection_error">Connection error</string>
     <string name="ssh_auth_cancelled">Connection cancelled: no credential entered.</string>
+    <string name="ssh_auth_failed">The server rejected the credentials for %1$s. Check the password or key, then try again.</string>
     <string name="ssh_connecting_to">Connecting to %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connection terminated: %1$s</string>
     <string name="ssh_session_closed">Session closed (exit code %1$d)</string>

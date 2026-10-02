@@ -192,6 +192,7 @@
     <string name="ssh_credential_not_found">Credenziale associata non trovata</string>
     <string name="ssh_connection_error">Errore di connessione</string>
     <string name="ssh_auth_cancelled">Connessione annullata: nessuna credenziale inserita.</string>
+    <string name="ssh_auth_failed">Il server ha rifiutato le credenziali di %1$s. Controlla la password o la chiave, poi riprova.</string>
     <string name="ssh_connecting_to">Connessione a %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connessione terminata: %1$s</string>
     <string name="ssh_session_closed">Sessione chiusa (codice %1$d)</string>
