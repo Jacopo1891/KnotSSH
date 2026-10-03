@@ -339,8 +339,10 @@
     <string name="connection_auto_reconnect_desc">Retry when the session drops for network reasons</string>
     <string name="connection_reconnect_attempts">Reconnection attempts</string>
     <string name="connection_multi_session">Multiple sessions</string>
-    <string name="connection_multi_session_desc">Keep up to %1$d connections open at once and switch between them from their notifications. Each one uses a thread and its own scrollback.</string>
+    <string name="connection_multi_session_desc">How many connections you can keep open at once, switching between them from their notifications. Each one uses a thread and its own scrollback.</string>
     <string name="connection_background_sessions">Background sessions</string>
+    <string name="connection_sessions_costly">Every open session holds a socket, two threads and its own scrollback. On a modest device, many at once mean more memory and battery, and Android is likelier to reclaim the app.</string>
+    <string name="connection_sessions_unprotected">Without background sessions the persistent notification is gone, and that is what keeps the app alive: leaving the app will close the connections. Turn it on below.</string>
     <string name="connection_background_sessions_desc">Lets you suspend a session and come back from the persistent notification</string>
     <string name="connection_wake_lock" translatable="false">Wake lock</string>
     <string name="connection_wake_lock_desc">Prevents the CPU from sleeping during a session</string>

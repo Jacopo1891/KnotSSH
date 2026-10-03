@@ -310,8 +310,10 @@
     <string name="connection_auto_reconnect_desc">Reintenta cuando la sesión cae por motivos de red</string>
     <string name="connection_reconnect_attempts">Intentos de reconexión</string>
     <string name="connection_multi_session">Sesiones múltiples</string>
-    <string name="connection_multi_session_desc">Mantén hasta %1$d conexiones abiertas a la vez y cambia entre ellas desde sus notificaciones. Cada una ocupa un hilo y su propio historial.</string>
+    <string name="connection_multi_session_desc">Cuántas conexiones puedes mantener abiertas a la vez, cambiando entre ellas desde sus notificaciones. Cada una ocupa un hilo y su propio historial.</string>
     <string name="connection_background_sessions">Sesiones en segundo plano</string>
+    <string name="connection_sessions_costly">Cada sesión abierta ocupa un socket, dos hilos y su propio historial. En un dispositivo modesto, muchas a la vez suponen más memoria y batería, y Android tiende más a cerrar la aplicación.</string>
+    <string name="connection_sessions_unprotected">Sin las sesiones en segundo plano no hay notificación persistente, y es esa la que mantiene viva la aplicación: al salir se cerrarán las conexiones. Actívalas más abajo.</string>
     <string name="connection_background_sessions_desc">Permite suspender una sesión y volver a ella desde la notificación persistente</string>
     <string name="connection_wake_lock_desc">Impide que la CPU se suspenda durante la sesión</string>
     <string name="connection_wake_lock_duration">Duración máxima del wake lock</string>

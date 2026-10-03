@@ -300,8 +300,10 @@
     <string name="connection_auto_reconnect_desc">Erneut versuchen, wenn die Sitzung aus Netzgründen abbricht</string>
     <string name="connection_reconnect_attempts">Verbindungsversuche</string>
     <string name="connection_multi_session">Mehrere Sitzungen</string>
-    <string name="connection_multi_session_desc">Halte bis zu %1$d Verbindungen gleichzeitig offen und wechsle über ihre Benachrichtigungen zwischen ihnen. Jede belegt einen Thread und ihren eigenen Verlauf.</string>
+    <string name="connection_multi_session_desc">Wie viele Verbindungen du gleichzeitig offen halten kannst, mit Wechsel über ihre Benachrichtigungen. Jede belegt einen Thread und ihren eigenen Verlauf.</string>
     <string name="connection_background_sessions">Hintergrundsitzungen</string>
+    <string name="connection_sessions_costly">Jede offene Sitzung belegt einen Socket, zwei Threads und ihren eigenen Verlauf. Auf einem einfachen Gerät kosten viele gleichzeitig Speicher und Akku, und Android beendet die App eher.</string>
+    <string name="connection_sessions_unprotected">Ohne Hintergrundsitzungen fehlt die dauerhafte Benachrichtigung, und genau sie hält die App am Leben: Beim Verlassen werden die Verbindungen geschlossen. Unten einschalten.</string>
     <string name="connection_background_sessions_desc">Erlaubt es, eine Sitzung zu parken und über die dauerhafte Benachrichtigung zurückzukehren</string>
     <string name="connection_wake_lock_desc">Verhindert, dass die CPU während der Sitzung schlafen geht</string>
     <string name="connection_wake_lock_duration">Maximale Wake-Lock-Dauer</string>

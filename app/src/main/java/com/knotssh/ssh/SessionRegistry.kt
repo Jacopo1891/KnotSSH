@@ -110,10 +110,7 @@ class SessionRegistry @Inject constructor(
             .map { SessionSummary(it.serverId, it.label, it.title.value) }
     }
 
-    /**
-     * Clamped here rather than trusted from storage: a value saved before the free ceiling
-     * existed would otherwise keep granting more sessions than the tier allows.
-     */
+    /** Clamped here rather than trusted from storage, which may hold a value from another build. */
     suspend fun sessionLimit(): Int =
-        appPreferences.connection.first().maxSessions.coerceIn(1, Defaults.FREE_MAX_SESSIONS)
+        appPreferences.connection.first().maxSessions.coerceIn(1, Defaults.MAX_SESSIONS_LIMIT)
 }

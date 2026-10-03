@@ -1,9 +1,20 @@
 package com.knotssh.presentation.settings
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.knotssh.R
@@ -95,17 +106,42 @@ fun ConnectionSettingsScreen(
 
         item { SettingsSection(stringResource(R.string.section_background)) }
         item {
-            SwitchRow(
+            SliderRow(
                 title = stringResource(R.string.connection_multi_session),
-                description = stringResource(
-                    R.string.connection_multi_session_desc,
-                    Defaults.FREE_MAX_SESSIONS
-                ),
-                checked = connection.maxSessions > 1,
-                onCheckedChange = { enabled ->
-                    viewModel.setMaxSessions(if (enabled) Defaults.FREE_MAX_SESSIONS else 1)
-                }
+                description = stringResource(R.string.connection_multi_session_desc),
+                value = connection.maxSessions,
+                range = 1..Defaults.MAX_SESSIONS_LIMIT,
+                onValueChange = viewModel::setMaxSessions
             )
+        }
+        item {
+            // The persistent notification is what keeps the process alive, so an unprotected
+            // setup is the more urgent warning of the two.
+            val warning = when {
+                connection.maxSessions > 1 && !connection.foregroundNotification ->
+                    R.string.connection_sessions_unprotected
+                connection.maxSessions > Defaults.MAX_SESSIONS_ADVISED ->
+                    R.string.connection_sessions_costly
+                else -> null
+            }
+            warning?.let {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.WarningAmber,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+                    Text(
+                        text = stringResource(it),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            }
         }
         item {
             SwitchRow(
