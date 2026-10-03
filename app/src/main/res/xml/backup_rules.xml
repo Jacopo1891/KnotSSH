@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Only the already-encrypted sync container travels. The database is sealed to this device by
+     the Android Keystore, so a restored copy elsewhere would be undecryptable ciphertext. -->
 <full-backup-content>
-    <exclude domain="database" path="." />
-    <exclude domain="sharedpref" path="." />
-    <exclude domain="file" path="." />
-    <exclude domain="root" path="." />
+    <include domain="file" path="cloud/" />
 </full-backup-content>

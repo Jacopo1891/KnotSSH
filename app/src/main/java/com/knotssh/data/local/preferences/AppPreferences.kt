@@ -47,6 +47,17 @@ enum class BellMode { OFF, VIBRATE, SOUND }
 /** How the server list is ordered inside each folder. */
 enum class ServerSortMode { LAST_USED, NAME, ADDED, MANUAL }
 
+data class SyncSettings(
+    val enabled: Boolean = false,
+    val targetUri: String? = null,
+    val encryptedPassphrase: String? = null,
+    val lastSyncMs: Long = 0L,
+    val remoteStampMs: Long = 0L,
+    val lastError: String? = null
+) {
+    val isConfigured: Boolean get() = targetUri != null && encryptedPassphrase != null
+}
+
 data class AppearanceSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColor: Boolean = true
@@ -168,6 +179,13 @@ class AppPreferences @Inject constructor(
         val SERVER_SORT_MODE = stringPreferencesKey("server_sort_mode")
         val FOLDERS_ENABLED = booleanPreferencesKey("folders_enabled")
 
+        val SYNC_ENABLED = booleanPreferencesKey("sync_enabled")
+        val SYNC_TARGET_URI = stringPreferencesKey("sync_target_uri")
+        val SYNC_PASSPHRASE = stringPreferencesKey("sync_passphrase")
+        val SYNC_LAST_MS = longPreferencesKey("sync_last_ms")
+        val SYNC_REMOTE_STAMP = longPreferencesKey("sync_remote_stamp")
+        val SYNC_LAST_ERROR = stringPreferencesKey("sync_last_error")
+
         val AUTO_UPDATE_CHECK = booleanPreferencesKey("auto_update_check")
         val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")
     }
@@ -253,6 +271,17 @@ class AppPreferences @Inject constructor(
         .map { it[Keys.FOLDERS_ENABLED] ?: true }
         .distinctUntilChanged()
 
+    val sync: Flow<SyncSettings> = prefs.map { p ->
+        SyncSettings(
+            enabled = p[Keys.SYNC_ENABLED] ?: false,
+            targetUri = p[Keys.SYNC_TARGET_URI],
+            encryptedPassphrase = p[Keys.SYNC_PASSPHRASE],
+            lastSyncMs = p[Keys.SYNC_LAST_MS] ?: 0L,
+            remoteStampMs = p[Keys.SYNC_REMOTE_STAMP] ?: 0L,
+            lastError = p[Keys.SYNC_LAST_ERROR]
+        )
+    }.distinctUntilChanged()
+
     val autoUpdateCheck: Flow<Boolean> = prefs
         .map { it[Keys.AUTO_UPDATE_CHECK] ?: true }
         .distinctUntilChanged()
@@ -322,6 +351,24 @@ class AppPreferences @Inject constructor(
     suspend fun setServerSortMode(value: ServerSortMode) = put(Keys.SERVER_SORT_MODE, value.name)
 
     suspend fun setFoldersEnabled(value: Boolean) = put(Keys.FOLDERS_ENABLED, value)
+
+    suspend fun setSyncEnabled(value: Boolean) = put(Keys.SYNC_ENABLED, value)
+
+    suspend fun setSyncTarget(uri: String?, encryptedPassphrase: String?) {
+        context.dataStore.edit { p ->
+            if (uri == null) p.remove(Keys.SYNC_TARGET_URI) else p[Keys.SYNC_TARGET_URI] = uri
+            if (encryptedPassphrase == null) p.remove(Keys.SYNC_PASSPHRASE)
+            else p[Keys.SYNC_PASSPHRASE] = encryptedPassphrase
+        }
+    }
+
+    suspend fun setSyncOutcome(lastSyncMs: Long, remoteStampMs: Long, error: String?) {
+        context.dataStore.edit { p ->
+            p[Keys.SYNC_LAST_MS] = lastSyncMs
+            p[Keys.SYNC_REMOTE_STAMP] = remoteStampMs
+            if (error == null) p.remove(Keys.SYNC_LAST_ERROR) else p[Keys.SYNC_LAST_ERROR] = error
+        }
+    }
 
     suspend fun resetToDefaults() {
         context.dataStore.edit { it.clear() }

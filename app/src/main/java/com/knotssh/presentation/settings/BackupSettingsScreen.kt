@@ -48,20 +48,49 @@ import java.util.Locale
 fun BackupSettingsScreen(
     onBack: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
-    backupViewModel: BackupViewModel = hiltViewModel()
+    backupViewModel: BackupViewModel = hiltViewModel(),
+    syncViewModel: SyncViewModel = hiltViewModel()
 ) {
-    val driveSync by viewModel.googleDriveSync.collectAsStateWithLifecycle()
     val busy by backupViewModel.busy.collectAsStateWithLifecycle()
     val error by backupViewModel.error.collectAsStateWithLifecycle()
     val exported by backupViewModel.exported.collectAsStateWithLifecycle()
     val passwordRequired by backupViewModel.passwordRequired.collectAsStateWithLifecycle()
     val pendingImport by backupViewModel.pendingImport.collectAsStateWithLifecycle()
     val outcome by backupViewModel.outcome.collectAsStateWithLifecycle()
+    val syncSettings by syncViewModel.settings.collectAsStateWithLifecycle()
+    val syncStatus by syncViewModel.status.collectAsStateWithLifecycle()
+    val systemBackupUri = remember { syncViewModel.systemBackupUri() }
 
     var showResetConfirm by remember { mutableStateOf(false) }
     var showExportOptions by remember { mutableStateOf(false) }
+    var showSyncSetup by remember { mutableStateOf(false) }
+    var syncPassphrase by remember { mutableStateOf("") }
     var exportPassword by remember { mutableStateOf("") }
     var exportIncludesSettings by remember { mutableStateOf(true) }
+
+    val createSyncFile = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument(BACKUP_MIME)
+    ) { uri ->
+        if (uri != null && syncPassphrase.isNotEmpty()) {
+            syncViewModel.configure(uri, syncPassphrase)
+        }
+        syncPassphrase = ""
+    }
+
+    if (showSyncSetup) {
+        SyncSetupDialog(
+            passphrase = syncPassphrase,
+            onPassphraseChange = { syncPassphrase = it },
+            onConfirm = {
+                showSyncSetup = false
+                createSyncFile.launch(SYNC_FILE_NAME)
+            },
+            onDismiss = {
+                showSyncSetup = false
+                syncPassphrase = ""
+            }
+        )
+    }
 
     val createFile = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument(BACKUP_MIME)
@@ -188,15 +217,84 @@ fun BackupSettingsScreen(
             }
         }
 
-        item { SettingsSection(stringResource(R.string.section_backup)) }
+        item { SettingsSection(stringResource(R.string.section_sync)) }
         item {
-            SwitchRow(
-                title = stringResource(R.string.backup_drive_sync),
-                description = stringResource(R.string.backup_drive_sync_desc),
-                checked = driveSync,
-                enabled = false,
-                onCheckedChange = viewModel::setGoogleDriveSync
+            Text(
+                text = stringResource(R.string.sync_how_it_works),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+        if (syncSettings.isConfigured && syncSettings.enabled) {
+            item {
+                SyncStatusRow(
+                    lastSyncMs = syncSettings.lastSyncMs,
+                    lastError = syncSettings.lastError,
+                    location = syncStatus.location,
+                    pending = syncStatus.pendingChanges,
+                    running = syncStatus.running
+                )
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = syncViewModel::syncNow,
+                        enabled = !syncStatus.running,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.sync_now))
+                    }
+                    OutlinedButton(
+                        onClick = syncViewModel::restoreNow,
+                        enabled = !syncStatus.running,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.sync_pull))
+                    }
+                }
+            }
+            item {
+                TextButton(
+                    onClick = syncViewModel::disable,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.sync_disable),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        } else {
+            item {
+                OutlinedButton(
+                    onClick = { showSyncSetup = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.sync_setup_button))
+                }
+            }
+            val systemBackup = systemBackupUri
+            if (systemBackup != null) {
+                item {
+                    OutlinedButton(
+                        onClick = { backupViewModel.beginImport(systemBackup) },
+                        enabled = !busy,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.sync_restore_system))
+                    }
+                }
+                item {
+                    Text(
+                        text = stringResource(R.string.sync_restore_system_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
 
         item { SettingsSection(stringResource(R.string.section_restore)) }
@@ -430,10 +528,107 @@ private fun CheckboxRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit, la
     }
 }
 
+@Composable
+private fun SyncSetupDialog(
+    passphrase: String,
+    onPassphraseChange: (String) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    var visible by remember { mutableStateOf(false) }
+    val tooShort = passphrase.isNotEmpty() && passphrase.length < RECOMMENDED_PASSWORD_LENGTH
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.sync_setup_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = stringResource(R.string.sync_setup_where),
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = stringResource(R.string.sync_setup_passphrase_info),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                OutlinedTextField(
+                    value = passphrase,
+                    onValueChange = onPassphraseChange,
+                    label = { Text(stringResource(R.string.sync_passphrase_label)) },
+                    singleLine = true,
+                    visualTransformation = if (visible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { visible = !visible }) {
+                            Icon(
+                                imageVector = if (visible) Icons.Default.VisibilityOff
+                                else Icons.Default.Visibility,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    supportingText = if (tooShort) {
+                        { Text(stringResource(R.string.backup_password_weak)) }
+                    } else {
+                        null
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm, enabled = passphrase.isNotEmpty()) {
+                Text(stringResource(R.string.sync_choose_destination))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        }
+    )
+}
+
+@Composable
+private fun SyncStatusRow(
+    lastSyncMs: Long,
+    lastError: String?,
+    location: String?,
+    pending: Boolean,
+    running: Boolean
+) {
+    val stamp = remember(lastSyncMs) {
+        if (lastSyncMs == 0L) null
+        else SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(lastSyncMs))
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        location?.let {
+            Text(it, style = MaterialTheme.typography.bodyMedium)
+        }
+        val summary = when {
+            running -> stringResource(R.string.sync_state_running)
+            lastError != null -> stringResource(R.string.sync_state_error, lastError)
+            pending -> stringResource(R.string.sync_state_pending)
+            stamp != null -> stringResource(R.string.sync_state_done, stamp)
+            else -> stringResource(R.string.sync_state_never)
+        }
+        Text(
+            text = summary,
+            style = MaterialTheme.typography.bodySmall,
+            color = if (lastError != null) MaterialTheme.colorScheme.error
+            else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
 private fun suggestedFileName(): String {
     val stamp = SimpleDateFormat("yyyyMMdd-HHmm", Locale.US).format(Date())
     return "knotssh-$stamp.knotssh"
 }
 
 private const val BACKUP_MIME = "application/octet-stream"
+private const val SYNC_FILE_NAME = "knotssh-sync.knotssh"
 private const val RECOMMENDED_PASSWORD_LENGTH = 12
