@@ -25,8 +25,8 @@ class SyncViewModel @Inject constructor(
 
     val status: StateFlow<SyncStatus> = engine.status
 
-    fun configure(uri: Uri, passphrase: String) {
-        viewModelScope.launch { engine.configure(uri, passphrase) }
+    fun configure(uri: Uri, passphrase: String, onResult: (Result<Boolean>) -> Unit) {
+        viewModelScope.launch { onResult(engine.configure(uri, passphrase)) }
     }
 
     fun syncNow() {

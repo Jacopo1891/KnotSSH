@@ -395,7 +395,7 @@
 
     <string name="backup_drive_sync">Synchronisation Google Drive</string>
     <string name="section_sync">Synchronisation automatique</string>
-    <string name="sync_how_it_works">KnotSSH conserve une copie chiffrée des serveurs, des comptes et des hôtes connus dans un fichier que vous choisissez, et la réécrit seule à chaque modification. KnotSSH ne parle jamais à un service cloud : il se contente d\'écrire un fichier.\n\nPour le faire sortir de l\'appareil, deux voies. L\'écrire directement dans un service cloud proposé par le sélecteur de fichiers Android (Nextcloud, OneDrive, Dropbox). Ou l\'enregistrer dans un dossier ordinaire du téléphone et laisser une application de synchronisation l\'emporter : Syncthing entre vos appareils, FolderSync vers Google Drive, Dropbox ou WebDAV.\n\nGoogle Drive sur Android ne synchronise pas de dossiers locaux, et son entrée dans le sélecteur réécrit mal le même fichier de façon répétée : pour Drive, la seconde voie est la bonne. Surveillez l\'état ci-dessous, un échec d\'écriture est toujours signalé.</string>
+    <string name="sync_how_it_works">KnotSSH conserve une copie chiffrée des serveurs, des comptes et des hôtes connus dans un fichier que vous choisissez, et la réécrit seule à chaque modification. KnotSSH ne parle jamais à un service cloud : il se contente d\'écrire un fichier.\n\nPour le faire sortir de l\'appareil, deux voies. L\'écrire directement dans un service cloud proposé par le sélecteur de fichiers Android (Nextcloud, OneDrive, Dropbox). Ou l\'enregistrer dans un dossier ordinaire du téléphone et laisser une application de synchronisation l\'emporter : Syncthing entre vos appareils, FolderSync vers Google Drive, Dropbox ou WebDAV.\n\nGoogle Drive ne synchronise pas de dossiers locaux sur Android, mais vous pouvez le choisir directement dans le sélecteur. S\'agissant d\'un service distant, chaque enregistrement est un envoi et peut échouer : après chaque écriture, KnotSSH relit le fichier et le compare à ce qu\'il a envoyé, de sorte qu\'un problème apparaît aussitôt dans l\'état ci-dessous au lieu de rester invisible. Si cela se reproduit, enregistrez le fichier dans un dossier du téléphone et confiez-le à une application comme FolderSync pour l\'emmener vers Drive.</string>
     <string name="sync_setup_button">Configurer la synchronisation</string>
     <string name="sync_restore_system">Restaurer depuis la sauvegarde de l\'appareil</string>
     <string name="sync_restore_system_desc">Android a restauré une copie enregistrée par sa propre sauvegarde. Il demandera la phrase secrète utilisée lors de la configuration sur l\'autre appareil.</string>
@@ -404,6 +404,12 @@
     <string name="sync_setup_passphrase_info">Le fichier est chiffré avec cette phrase secrète, et avec elle seule : le fournisseur cloud ne peut pas le lire, nous non plus. Vous devrez la ressaisir sur chaque autre appareil. Si vous la perdez, la copie est irrécupérable.</string>
     <string name="sync_passphrase_label">Phrase secrète de synchronisation</string>
     <string name="sync_choose_destination">Choisir le fichier</string>
+    <string name="sync_use_existing">Utiliser un fichier existant</string>
+    <string name="sync_create_new">Créer un fichier</string>
+    <string name="sync_existing_hint">Vous avez déjà une copie venant d\'un autre appareil ? Choisissez « Utiliser un fichier existant » : son contenu est fusionné dans cet appareil avant toute écriture, votre sauvegarde n\'est donc jamais écrasée.</string>
+    <string name="sync_adopted">Copie existante restaurée. Elle est désormais tenue à jour automatiquement.</string>
+    <string name="sync_created">Synchronisation activée. La copie est tenue à jour automatiquement.</string>
+    <string name="sync_setup_failed">Impossible de lire ce fichier. Vérifiez que la phrase secrète est celle de l\'autre appareil et que le fichier est accessible. Rien n\'a été modifié.</string>
     <string name="sync_now">Synchroniser maintenant</string>
     <string name="sync_pull">Restaurer</string>
     <string name="sync_disable">Désactiver la synchronisation</string>

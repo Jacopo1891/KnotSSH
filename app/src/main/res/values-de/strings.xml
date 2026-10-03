@@ -385,7 +385,7 @@
 
     <string name="backup_drive_sync">Google-Drive-Synchronisierung</string>
     <string name="section_sync">Automatische Synchronisierung</string>
-    <string name="sync_how_it_works">KnotSSH hält eine verschlüsselte Kopie von Servern, Zugängen und bekannten Hosts in einer Datei deiner Wahl und schreibt sie bei jeder Änderung selbständig neu. KnotSSH spricht nie mit einem Cloud-Dienst: Es schreibt lediglich eine Datei.\n\nUm sie vom Gerät zu bekommen, gibt es zwei Wege. Sie direkt in einen Cloud-Dienst schreiben, der in der Android-Dateiauswahl erscheint (Nextcloud, OneDrive, Dropbox). Oder sie in einem gewöhnlichen Ordner speichern und eine Synchronisierungs-App übernehmen lassen: Syncthing zwischen deinen Geräten, FolderSync in Richtung Google Drive, Dropbox oder WebDAV.\n\nGoogle Drive synchronisiert unter Android keine lokalen Ordner, und sein Eintrag in der Dateiauswahl ist beim wiederholten Überschreiben derselben Datei unzuverlässig: Für Drive ist der zweite Weg der tragfähige. Behalte den Status unten im Blick, ein fehlgeschlagener Schreibvorgang wird immer gemeldet.</string>
+    <string name="sync_how_it_works">KnotSSH hält eine verschlüsselte Kopie von Servern, Zugängen und bekannten Hosts in einer Datei deiner Wahl und schreibt sie bei jeder Änderung selbständig neu. KnotSSH spricht nie mit einem Cloud-Dienst: Es schreibt lediglich eine Datei.\n\nUm sie vom Gerät zu bekommen, gibt es zwei Wege. Sie direkt in einen Cloud-Dienst schreiben, der in der Android-Dateiauswahl erscheint (Nextcloud, OneDrive, Dropbox). Oder sie in einem gewöhnlichen Ordner speichern und eine Synchronisierungs-App übernehmen lassen: Syncthing zwischen deinen Geräten, FolderSync in Richtung Google Drive, Dropbox oder WebDAV.\n\nGoogle Drive synchronisiert unter Android keine lokalen Ordner, du kannst es aber direkt in der Dateiauswahl wählen. Da es ein entfernter Dienst ist, ist jedes Speichern ein Upload und kann fehlschlagen: Nach jedem Schreibvorgang liest KnotSSH die Datei zurück und vergleicht sie mit dem Gesendeten, sodass ein Problem sofort im Status unten auftaucht, statt verborgen zu bleiben. Wiederholt es sich, speichere die Datei in einem Ordner des Telefons und lass sie von einer App wie FolderSync zu Drive bringen.</string>
     <string name="sync_setup_button">Synchronisierung einrichten</string>
     <string name="sync_restore_system">Aus der Gerätesicherung wiederherstellen</string>
     <string name="sync_restore_system_desc">Android hat eine von seiner eigenen Sicherung gespeicherte Kopie wiederhergestellt. Es fragt nach der Passphrase, die du beim Einrichten auf dem anderen Gerät verwendet hast.</string>
@@ -394,6 +394,12 @@
     <string name="sync_setup_passphrase_info">Die Datei wird mit dieser Passphrase verschlüsselt, und nur mit ihr: Der Cloud-Anbieter kann sie nicht lesen, wir ebenso wenig. Auf jedem weiteren Gerät musst du sie erneut eingeben. Geht sie verloren, ist die Kopie unwiederbringlich.</string>
     <string name="sync_passphrase_label">Synchronisierungs-Passphrase</string>
     <string name="sync_choose_destination">Datei wählen</string>
+    <string name="sync_use_existing">Vorhandene Datei verwenden</string>
+    <string name="sync_create_new">Neue Datei anlegen</string>
+    <string name="sync_existing_hint">Schon eine Kopie von einem anderen Gerät? Wähle „Vorhandene Datei verwenden“: Ihr Inhalt wird in dieses Gerät eingefügt, bevor irgendetwas geschrieben wird — deine Sicherung wird nie überschrieben.</string>
+    <string name="sync_adopted">Vorhandene Kopie wiederhergestellt. Sie wird ab jetzt automatisch aktuell gehalten.</string>
+    <string name="sync_created">Synchronisierung aktiv. Die Kopie wird automatisch aktuell gehalten.</string>
+    <string name="sync_setup_failed">Diese Datei konnte nicht gelesen werden. Prüfe, ob die Passphrase die des anderen Geräts ist und die Datei erreichbar ist. Es wurde nichts geändert.</string>
     <string name="sync_now">Jetzt synchronisieren</string>
     <string name="sync_pull">Wiederherstellen</string>
     <string name="sync_disable">Synchronisierung ausschalten</string>

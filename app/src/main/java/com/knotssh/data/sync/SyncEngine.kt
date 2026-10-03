@@ -104,11 +104,43 @@ class SyncEngine @Inject constructor(
         }
     }
 
-    suspend fun configure(uri: Uri, passphrase: String) {
+    /**
+     * Points the app at [uri] and makes it the destination from now on.
+     *
+     * Anything already there is merged **before** the first upload: adopting a copy made on
+     * another device must not let this one overwrite it with its own, possibly empty, state.
+     * A passphrase that cannot open the existing file aborts without touching anything.
+     *
+     * Returns `true` when an existing copy was adopted.
+     */
+    suspend fun configure(uri: Uri, passphrase: String): Result<Boolean> {
         persistPermission(uri)
+        val target = DocumentSyncTarget(context, uri)
+
+        val existing = try {
+            target.read()
+        } catch (e: Exception) {
+            diagnostics.error("sync", "cannot read the chosen destination", e)
+            return Result.failure(e)
+        }
+
+        var adopted = false
+        if (existing != null) {
+            try {
+                val payload = BackupCodec.decode(existing, passphrase.toCharArray())
+                backupManager.import(payload, restoreSettings = false)
+                adopted = true
+            } catch (e: Exception) {
+                diagnostics.error("sync", "cannot open the existing copy", e)
+                return Result.failure(e)
+            }
+        }
+
         preferences.setSyncTarget(uri.toString(), crypto.encrypt(passphrase))
         preferences.setSyncEnabled(true)
+        preferences.setSyncOutcome(0L, 0L, null)
         syncNow()
+        return Result.success(adopted)
     }
 
     suspend fun disable() {

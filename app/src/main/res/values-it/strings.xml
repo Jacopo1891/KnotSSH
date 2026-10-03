@@ -395,7 +395,7 @@
 
     <string name="backup_drive_sync">Sincronizzazione Google Drive</string>
     <string name="section_sync">Sincronizzazione automatica</string>
-    <string name="sync_how_it_works">KnotSSH tiene una copia cifrata di server, utenze e host conosciuti in un file che scegli tu, e la riscrive da sola a ogni modifica. KnotSSH non parla mai con nessun servizio cloud: si limita a scrivere un file.\n\nPer farlo uscire dal dispositivo hai due strade. Scriverlo direttamente in un servizio cloud che compare nel selettore di file di Android (Nextcloud, OneDrive, Dropbox). Oppure salvarlo in una normale cartella del telefono e lasciare che sia un\'app di sincronizzazione a portarlo: Syncthing tra i tuoi dispositivi, FolderSync verso Google Drive, Dropbox o WebDAV.\n\nGoogle Drive su Android non sincronizza cartelle locali, e la sua voce nel selettore è inaffidabile nel riscrivere più volte lo stesso file: per Drive la seconda strada è quella solida. Tieni d\'occhio lo stato qui sotto, una scrittura fallita viene sempre segnalata.</string>
+    <string name="sync_how_it_works">KnotSSH tiene una copia cifrata di server, utenze e host conosciuti in un file che scegli tu, e la riscrive da sola a ogni modifica. KnotSSH non parla mai con nessun servizio cloud: si limita a scrivere un file.\n\nPer farlo uscire dal dispositivo hai due strade. Scriverlo direttamente in un servizio cloud che compare nel selettore di file di Android (Nextcloud, OneDrive, Dropbox). Oppure salvarlo in una normale cartella del telefono e lasciare che sia un\'app di sincronizzazione a portarlo: Syncthing tra i tuoi dispositivi, FolderSync verso Google Drive, Dropbox o WebDAV.\n\nGoogle Drive su Android non sincronizza cartelle locali, ma puoi sceglierlo direttamente nel selettore. Essendo un servizio remoto, ogni salvataggio è un caricamento e può non riuscire: dopo ogni scrittura KnotSSH rilegge il file e lo confronta con quanto ha scritto, quindi un problema compare subito nello stato qui sotto invece di restare nascosto. Se dovesse ripetersi, salva il file in una cartella del telefono e usa un\'app come FolderSync per portarlo su Drive.</string>
     <string name="sync_setup_button">Configura la sincronizzazione</string>
     <string name="sync_restore_system">Ripristina dal backup del dispositivo</string>
     <string name="sync_restore_system_desc">Android ha ripristinato una copia salvata dal suo backup. Chiederà la passphrase che avevi usato configurando la sincronizzazione sull\'altro dispositivo.</string>
@@ -404,6 +404,12 @@
     <string name="sync_setup_passphrase_info">Il file è cifrato con questa passphrase, e solo con quella: il servizio cloud non può leggerlo, e nemmeno noi. Dovrai digitarla di nuovo su ogni altro dispositivo. Se la perdi, la copia è irrecuperabile.</string>
     <string name="sync_passphrase_label">Passphrase di sincronizzazione</string>
     <string name="sync_choose_destination">Scegli il file</string>
+    <string name="sync_use_existing">Usa un file esistente</string>
+    <string name="sync_create_new">Crea un file nuovo</string>
+    <string name="sync_existing_hint">Hai già una copia fatta da un altro dispositivo? Scegli "Usa un file esistente": il suo contenuto viene prima unito a questo dispositivo e solo dopo si scrive, così il tuo backup non viene mai sovrascritto.</string>
+    <string name="sync_adopted">Copia esistente ripristinata. Da ora viene tenuta aggiornata automaticamente.</string>
+    <string name="sync_created">Sincronizzazione attiva. La copia viene tenuta aggiornata automaticamente.</string>
+    <string name="sync_setup_failed">Non è stato possibile leggere quel file. Controlla che la passphrase sia quella usata sull\'altro dispositivo e che il file sia raggiungibile. Non è stato modificato nulla.</string>
     <string name="sync_now">Sincronizza adesso</string>
     <string name="sync_pull">Ripristina</string>
     <string name="sync_disable">Disattiva la sincronizzazione</string>

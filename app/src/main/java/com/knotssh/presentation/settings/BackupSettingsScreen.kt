@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,6 +66,18 @@ fun BackupSettingsScreen(
     var showExportOptions by remember { mutableStateOf(false) }
     var showSyncSetup by remember { mutableStateOf(false) }
     var syncPassphrase by remember { mutableStateOf("") }
+    var syncMessage by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    val onSyncConfigured: (Result<Boolean>) -> Unit = { result ->
+        syncMessage = result.fold(
+            onSuccess = { adopted ->
+                context.getString(
+                    if (adopted) R.string.sync_adopted else R.string.sync_created
+                )
+            },
+            onFailure = { context.getString(R.string.sync_setup_failed) }
+        )
+    }
     var exportPassword by remember { mutableStateOf("") }
     var exportIncludesSettings by remember { mutableStateOf(true) }
 
@@ -72,7 +85,16 @@ fun BackupSettingsScreen(
         ActivityResultContracts.CreateDocument(BACKUP_MIME)
     ) { uri ->
         if (uri != null && syncPassphrase.isNotEmpty()) {
-            syncViewModel.configure(uri, syncPassphrase)
+            syncViewModel.configure(uri, syncPassphrase, onSyncConfigured)
+        }
+        syncPassphrase = ""
+    }
+
+    val openSyncFile = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null && syncPassphrase.isNotEmpty()) {
+            syncViewModel.configure(uri, syncPassphrase, onSyncConfigured)
         }
         syncPassphrase = ""
     }
@@ -81,13 +103,29 @@ fun BackupSettingsScreen(
         SyncSetupDialog(
             passphrase = syncPassphrase,
             onPassphraseChange = { syncPassphrase = it },
-            onConfirm = {
+            onCreateNew = {
                 showSyncSetup = false
                 createSyncFile.launch(SYNC_FILE_NAME)
+            },
+            onUseExisting = {
+                showSyncSetup = false
+                openSyncFile.launch(arrayOf(BACKUP_MIME, "*/*"))
             },
             onDismiss = {
                 showSyncSetup = false
                 syncPassphrase = ""
+            }
+        )
+    }
+
+    syncMessage?.let { text ->
+        AlertDialog(
+            onDismissRequest = { syncMessage = null },
+            text = { Text(text) },
+            confirmButton = {
+                TextButton(onClick = { syncMessage = null }) {
+                    Text(stringResource(R.string.action_close))
+                }
             }
         )
     }
@@ -532,7 +570,8 @@ private fun CheckboxRow(checked: Boolean, onCheckedChange: (Boolean) -> Unit, la
 private fun SyncSetupDialog(
     passphrase: String,
     onPassphraseChange: (String) -> Unit,
-    onConfirm: () -> Unit,
+    onCreateNew: () -> Unit,
+    onUseExisting: () -> Unit,
     onDismiss: () -> Unit
 ) {
     var visible by remember { mutableStateOf(false) }
@@ -579,15 +618,22 @@ private fun SyncSetupDialog(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+                Text(
+                    text = stringResource(R.string.sync_existing_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         },
         confirmButton = {
-            TextButton(onClick = onConfirm, enabled = passphrase.isNotEmpty()) {
-                Text(stringResource(R.string.sync_choose_destination))
+            TextButton(onClick = onUseExisting, enabled = passphrase.isNotEmpty()) {
+                Text(stringResource(R.string.sync_use_existing))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            TextButton(onClick = onCreateNew, enabled = passphrase.isNotEmpty()) {
+                Text(stringResource(R.string.sync_create_new))
+            }
         }
     )
 }
