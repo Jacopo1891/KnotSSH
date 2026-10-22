@@ -32,9 +32,28 @@ KnotSSH keeps everything on the device. There is no account to create, no backen
 - **Port forwarding**, local (`-L`) and remote (`-R`).
 - **Server organisation** with folders and favourites.
 - **Quick commands** and custom terminal keys.
-- **Encrypted backup** to a portable `.knotssh` container, with the key derived from a password using Argon2id.
+- **Encrypted import & export** of servers, credentials, SSH keys, known hosts, folders, and settings to a portable `.knotssh` container protected with **Argon2id** and **AES-256-GCM**.
+- **Automatic encrypted sync & Android Auto Backup** to keep your configuration backed up across devices without exposing secrets in the clear.
 - **Biometric unlock**.
 - **Localised** in English, Italian, French, Spanish and German.
+
+## Security & Encryption
+
+KnotSSH is designed so that secrets never leave your control in plaintext:
+
+- **On-device storage (Android Keystore + AES-256-GCM)**: Passwords, SSH private keys, and passphrases stored in the local database are encrypted using **AES-256-GCM** (12-byte random IV, 128-bit authentication tag) with a 256-bit master key held inside the **Android Keystore** (using **StrongBox** hardware security module when supported by the device, with **TEE** fallback). Because the hardware-backed key cannot be extracted from the device, a raw copy of the database is undecryptable elsewhere.
+- **Portable `.knotssh` backups (Argon2id + AES-256-GCM)**: When exporting keys and servers or configuring automatic sync, KnotSSH compresses the payload with GZIP and encrypts it with **AES-256-GCM** using a 256-bit key derived from your password via **Argon2id** (`47,104 KiB` memory cost, `2` iterations, `1` parallelism, 16-byte random salt — aligned with OWASP's memory-hard recommendations against GPU/ASIC cracking).
+- **Tamper-proof container header (GCM AAD)**: The 47-byte `.knotssh` header (magic bytes, version, Argon2id cost parameters, salt, and GCM nonce) is passed as **Additional Authenticated Data (AAD)** to AES-GCM. Any attempt to downgrade the KDF parameters or alter the header invalidates the authentication tag before decryption can succeed.
+- **Non-destructive import**: Importing a `.knotssh` container never overwrites existing entries; identical records are skipped and conflicting names are preserved with a suffix.
+
+## Automatic Sync, Google Backup & Google Drive
+
+From _Settings → Backup & Sync_, KnotSSH can automatically keep an encrypted `.knotssh` copy of your servers, credentials, SSH keys, and known hosts up to date:
+
+1. **Google / Android System Backup**: Because local credentials are sealed to the device's hardware Keystore, KnotSSH excludes the raw database from Android Auto Backup and includes **only** the Argon2id + AES-256-GCM encrypted sync container (`cloud/knotssh-sync.knotssh`). On a new device, Android restores the encrypted container and KnotSSH unlocks it with your sync passphrase—so Google never sees your keys in the clear.
+2. **Continuous File Sync**: KnotSSH writes directly to any folder or cloud provider in the Android file picker, batching changes and flushing automatically when the app goes to the background. Picking an existing sync file merges its contents first before writing back.
+
+> **Note on Google Drive**: You can pick Google Drive directly from the Android file picker, and KnotSSH verifies every write byte-for-byte to catch failed uploads. However, since Drive on Android does not sync local folders and uploads on the fly, unstable connections may cause writes to fail—if that happens, save the `.knotssh` file in a local folder and let an app like **FolderSync** or **Syncthing** handle background uploads.
 
 ## Requirements
 
@@ -83,7 +102,7 @@ Put them in `~/.gradle/gradle.properties`, or pass them as `-P` flags or `ORG_GR
 
 ## Tech stack
 
-Kotlin · Jetpack Compose · Material 3 · Hilt · Room · ataStore otlin Coroutines · kotlinx.serialization
+Kotlin · Jetpack Compose · Material 3 · Hilt · Room · DataStore · Kotlin Coroutines · kotlinx.serialization
 
 ## Contributing
 
