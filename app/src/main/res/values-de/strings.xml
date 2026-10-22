@@ -523,4 +523,8 @@
     <string name="server_copy_alias">%1$s (Kopie)</string>
     <string name="error_alias_taken">Ein anderer Server verwendet diesen Namen bereits</string>
 
+    <string name="welcome_version">Version %1$s</string>
+    <string name="welcome_github_profile">GitHub-Profil</string>
+    <string name="welcome_continue">Weiter</string>
+
 </resources>

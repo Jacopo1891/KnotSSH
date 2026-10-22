@@ -569,4 +569,12 @@
     <string name="server_copy_alias">%1$s (copy)</string>
     <string name="error_alias_taken">Another server already uses this name</string>
 
+    <!-- Post-update welcome dialog -->
+    <string name="welcome_version">Version %1$s</string>
+    <string name="welcome_support_title" translatable="false">Support KnotSSH</string>
+    <string name="welcome_github_profile">GitHub profile</string>
+    <string name="welcome_buy_coffee" translatable="false">Buy Me a Coffee</string>
+    <string name="welcome_star_repo" translatable="false">Star the Repo</string>
+    <string name="welcome_continue">Continue</string>
+
 </resources>
