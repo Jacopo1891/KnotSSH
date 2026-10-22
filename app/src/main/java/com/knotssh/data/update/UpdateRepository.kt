@@ -52,7 +52,7 @@ class UpdateRepository @Inject constructor(
     private val json = Json { ignoreUnknownKeys = true }
 
     /** Builds published from source carry no comparable version, so they never self-update. */
-    val isReleaseBuild: Boolean = SEMVER.matches(BuildConfig.VERSION_NAME)
+    val isReleaseBuild: Boolean = !BuildConfig.DEBUG && SEMVER.matches(BuildConfig.VERSION_NAME)
 
     val currentVersion: String = BuildConfig.VERSION_NAME
 

@@ -66,7 +66,7 @@ cd KnotSSH
 ./gradlew assembleDebug
 ```
 
-The debug APK is written to `app/build/outputs/apk/debug/`.
+The debug APK is written to `app/build/outputs/apk/debug/`. It uses the application ID `com.knotssh.debug` (**KnotSSH Dev**) so it can be installed alongside a signed release build on the same device.
 
 ### Release builds
 
