@@ -299,9 +299,11 @@ class HomeViewModel @Inject constructor(
 
     private fun Server.matches(query: String, credentials: Map<Long, Credential>): Boolean {
         if (query.isBlank()) return true
+        val credential = credentials[credentialId]
         return alias.contains(query, ignoreCase = true) ||
             hostname.contains(query, ignoreCase = true) ||
-            credentials[credentialId]?.username?.contains(query, ignoreCase = true) == true
+            credential?.alias?.contains(query, ignoreCase = true) == true ||
+            credential?.username?.contains(query, ignoreCase = true) == true
     }
 
     private fun List<Server>.ordered(mode: ServerSortMode): List<Server> = when (mode) {
