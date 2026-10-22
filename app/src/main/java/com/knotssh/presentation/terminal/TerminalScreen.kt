@@ -184,6 +184,11 @@ fun TerminalScreen(
 
     // First press only arms the gesture, so a stray back never drops a live session.
     fun onBackPressed() {
+        if (status is TerminalStatus.Disconnected || status is TerminalStatus.Ended) {
+            viewModel.terminate()
+            onBack()
+            return
+        }
         val now = System.currentTimeMillis()
         if (now - backArmedAt < BACK_CONFIRM_WINDOW_MS) {
             showLeaveDialog = true

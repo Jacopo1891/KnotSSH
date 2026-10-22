@@ -24,6 +24,7 @@ import com.knotssh.presentation.security.BiometricGate
 import com.knotssh.presentation.theme.KnotSshTheme
 import com.knotssh.presentation.update.UpdateDialogHost
 import com.knotssh.presentation.update.UpdateViewModel
+import com.knotssh.presentation.update.WelcomeDialogHost
 import com.knotssh.ssh.SessionRegistry
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                         )
 
                         // Behind the biometric gate, so no prompt appears over a locked app.
+                        WelcomeDialogHost(appPreferences)
                         val updateViewModel: UpdateViewModel = hiltViewModel()
                         LaunchedEffect(Unit) { updateViewModel.checkOnStartup() }
                         UpdateDialogHost(updateViewModel)

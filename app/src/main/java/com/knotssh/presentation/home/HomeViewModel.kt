@@ -82,7 +82,7 @@ class HomeViewModel @Inject constructor(
     private val credentialRepository: CredentialRepository,
     private val folderRepository: FolderRepository,
     private val preferences: AppPreferences,
-    sessionRegistry: SessionRegistry
+    private val sessionRegistry: SessionRegistry
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -173,6 +173,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun deleteServer(serverId: Long) {
+        sessionRegistry.close(serverId)
         viewModelScope.launch { serverRepository.deleteServer(serverId) }
     }
 
@@ -298,9 +299,11 @@ class HomeViewModel @Inject constructor(
 
     private fun Server.matches(query: String, credentials: Map<Long, Credential>): Boolean {
         if (query.isBlank()) return true
+        val credential = credentials[credentialId]
         return alias.contains(query, ignoreCase = true) ||
             hostname.contains(query, ignoreCase = true) ||
-            credentials[credentialId]?.username?.contains(query, ignoreCase = true) == true
+            credential?.alias?.contains(query, ignoreCase = true) == true ||
+            credential?.username?.contains(query, ignoreCase = true) == true
     }
 
     private fun List<Server>.ordered(mode: ServerSortMode): List<Server> = when (mode) {

@@ -979,7 +979,7 @@ private fun ServerCard(
                     if (credential != null) {
                         ServerChip(
                             icon = Icons.Default.Person,
-                            text = credential.username
+                            text = credential.alias.ifBlank { credential.username }
                         )
                     } else {
                         ServerChip(

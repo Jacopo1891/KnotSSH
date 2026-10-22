@@ -183,6 +183,11 @@
     <string name="ssh_connection_error">Verbindungsfehler</string>
     <string name="ssh_auth_cancelled">Verbindung abgebrochen: keine Zugangsdaten eingegeben.</string>
     <string name="ssh_auth_failed">Der Server hat die Zugangsdaten für %1$s abgelehnt. Prüfe Passwort oder Schlüssel und versuche es erneut.</string>
+    <string name="ssh_connection_refused">Verbindung von %1$s:%2$d abgelehnt. Prüfe Adresse und Port sowie ob der SSH-Server läuft.</string>
+    <string name="ssh_connection_timeout">Zeitüberschreitung bei der Verbindung mit %1$s:%2$d. Prüfe Adresse, Port oder Firewall.</string>
+    <string name="ssh_unknown_hostname">Host %1$s konnte nicht aufgelöst werden. Prüfe den Hostnamen oder deine Netzwerkverbindung.</string>
+    <string name="ssh_network_unreachable">Host %1$s:%2$d ist nicht erreichbar. Prüfe deine Netzwerkverbindung oder das VPN.</string>
+    <string name="ssh_connection_reset">Verbindung wurde von %1$s:%2$d unerwartet geschlossen.</string>
     <string name="ssh_connecting_to">Verbinde mit %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Verbindung beendet: %1$s</string>
     <string name="ssh_session_closed">Sitzung geschlossen (Code %1$d)</string>
@@ -517,5 +522,9 @@
     <string name="server_folder_label">Ordner</string>
     <string name="server_copy_alias">%1$s (Kopie)</string>
     <string name="error_alias_taken">Ein anderer Server verwendet diesen Namen bereits</string>
+
+    <string name="welcome_version">Version %1$s</string>
+    <string name="welcome_github_profile">GitHub-Profil</string>
+    <string name="welcome_continue">Weiter</string>
 
 </resources>

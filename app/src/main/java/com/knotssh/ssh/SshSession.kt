@@ -182,7 +182,17 @@ class SshSession(
     }
 
     val isLive: Boolean
-        get() = _status.value.let { it is TerminalStatus.Connected || it is TerminalStatus.Connecting || it is TerminalStatus.Reconnecting }
+        get() = _status.value.let {
+            it is TerminalStatus.Connected ||
+                it is TerminalStatus.Connecting ||
+                it is TerminalStatus.Reconnecting
+        }
+
+    /** True only once the handshake has succeeded (or while auto-reconnecting a dropped session). */
+    val isActive: Boolean
+        get() = _status.value.let {
+            it is TerminalStatus.Connected || it is TerminalStatus.Reconnecting
+        }
 
     private fun observeScrollbackSetting() {
         scope.launch {
@@ -222,16 +232,16 @@ class SshSession(
     fun reconnect() {
         closedByUser = false
         consecutiveQuickDrops = 0
-        connect()
+        connect(reconnecting = false)
     }
 
-    private fun connect() {
+    private fun connect(reconnecting: Boolean = false) {
         readerJob?.cancel()
         connectJob?.cancel()
         connectJob = scope.launch {
             val connectionSettings = appPreferences.connection.first()
             val security = appPreferences.security.first()
-            var attempt = 0
+            var attempt = if (reconnecting) 1 else 0
 
             while (true) {
                 _status.value =
@@ -248,10 +258,11 @@ class SshSession(
                 val failure = attemptConnect(connectionSettings, security)
                 if (failure == null) return@launch
 
-                // A host key problem is never retried: retrying would only re-expose credentials.
-                // Neither is a rejected secret: it cannot fix itself, and hammering the server
-                // trips fail2ban or locks the account.
-                val retryable = failure !is HostKeyException &&
+                // Initial connection failures (e.g. wrong port, unreachable host, wrong password)
+                // fail immediately; auto-reconnect is only for sessions that were already live
+                // and dropped for network reasons.
+                val retryable = reconnecting &&
+                        failure !is HostKeyException &&
                         failure !is AuthFailedException &&
                         failure !is AuthCancelledException &&
                         connectionSettings.autoReconnect &&
@@ -260,6 +271,7 @@ class SshSession(
 
                 if (!retryable) {
                     _status.value = TerminalStatus.Disconnected(failure.message)
+                    if (reconnecting) onFinished(serverId)
                     return@launch
                 }
                 attempt++
@@ -410,7 +422,7 @@ class SshSession(
 
         _status.value = TerminalStatus.Disconnected(detail)
         if (settings.autoReconnect && consecutiveQuickDrops <= settings.autoReconnectAttempts) {
-            connect()
+            connect(reconnecting = true)
         } else {
             onFinished(serverId)
         }
@@ -623,8 +635,8 @@ class SshSession(
         readerJob = null
         sshManager.disconnect()
         connection = null
-        // A remote logout already reported its exit status; don't downgrade it to a plain drop.
-        if (_status.value !is TerminalStatus.Ended) {
+        // A remote logout or prior failure already recorded its status; don't overwrite it.
+        if (_status.value !is TerminalStatus.Ended && _status.value !is TerminalStatus.Disconnected) {
             _status.value = TerminalStatus.Disconnected(null)
         }
         scope.cancel()

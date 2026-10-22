@@ -188,6 +188,7 @@ class AppPreferences @Inject constructor(
 
         val AUTO_UPDATE_CHECK = booleanPreferencesKey("auto_update_check")
         val LAST_UPDATE_CHECK = longPreferencesKey("last_update_check")
+        val LAST_SEEN_VERSION = stringPreferencesKey("welcome_seen_version")
     }
 
     /** DataStore surfaces read errors through the flow; fall back to defaults instead of crashing collectors. */
@@ -291,8 +292,14 @@ class AppPreferences @Inject constructor(
         .map { it[Keys.LAST_UPDATE_CHECK] ?: 0L }
         .distinctUntilChanged()
 
+    /** Version name for which the post-update welcome dialog was already shown. */
+    val lastSeenVersion: Flow<String> = prefs
+        .map { it[Keys.LAST_SEEN_VERSION].orEmpty() }
+        .distinctUntilChanged()
+
     suspend fun setAutoUpdateCheck(value: Boolean) = put(Keys.AUTO_UPDATE_CHECK, value)
     suspend fun setLastUpdateCheck(value: Long) = put(Keys.LAST_UPDATE_CHECK, value)
+    suspend fun setLastSeenVersion(value: String) = put(Keys.LAST_SEEN_VERSION, value)
 
     suspend fun setThemeMode(value: ThemeMode) = put(Keys.THEME_MODE, value.name)
     suspend fun setDynamicColor(value: Boolean) = put(Keys.DYNAMIC_COLOR, value)

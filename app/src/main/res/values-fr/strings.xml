@@ -193,6 +193,11 @@
     <string name="ssh_connection_error">Erreur de connexion</string>
     <string name="ssh_auth_cancelled">Connexion annulée : aucun identifiant saisi.</string>
     <string name="ssh_auth_failed">Le serveur a refusé les identifiants de %1$s. Vérifiez le mot de passe ou la clé, puis réessayez.</string>
+    <string name="ssh_connection_refused">Connexion refusée par %1$s:%2$d. Vérifiez que l\'adresse et le port sont corrects et que le serveur SSH est actif.</string>
+    <string name="ssh_connection_timeout">Délai d\'attente dépassé lors de la connexion à %1$s:%2$d. Vérifiez l\'adresse, le port ou le pare-feu.</string>
+    <string name="ssh_unknown_hostname">Impossible de résoudre l\'hôte %1$s. Vérifiez le nom d\'hôte ou votre connexion réseau.</string>
+    <string name="ssh_network_unreachable">L\'hôte %1$s:%2$d est injoignable. Vérifiez votre connexion réseau ou votre VPN.</string>
+    <string name="ssh_connection_reset">Connexion fermée de manière inattendue par %1$s:%2$d.</string>
     <string name="ssh_connecting_to">Connexion à %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connexion terminée : %1$s</string>
     <string name="ssh_session_closed">Session fermée (code %1$d)</string>
@@ -527,5 +532,9 @@
     <string name="server_folder_label">Dossier</string>
     <string name="server_copy_alias">%1$s (copie)</string>
     <string name="error_alias_taken">Un autre serveur porte déjà ce nom</string>
+
+    <string name="welcome_version">Version %1$s</string>
+    <string name="welcome_github_profile">Profil GitHub</string>
+    <string name="welcome_continue">Continuer</string>
 
 </resources>
