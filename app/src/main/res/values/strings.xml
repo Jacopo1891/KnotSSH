@@ -203,6 +203,11 @@
     <string name="ssh_connection_error">Connection error</string>
     <string name="ssh_auth_cancelled">Connection cancelled: no credential entered.</string>
     <string name="ssh_auth_failed">The server rejected the credentials for %1$s. Check the password or key, then try again.</string>
+    <string name="ssh_connection_refused" tools:ignore="PluralsCandidate">Connection refused by %1$s:%2$d. Check that the address and port are correct and the SSH server is running.</string>
+    <string name="ssh_connection_timeout" tools:ignore="PluralsCandidate">Connection to %1$s:%2$d timed out. Check the address, port, or firewall.</string>
+    <string name="ssh_unknown_hostname">Could not resolve host %1$s. Check the hostname or your network connection.</string>
+    <string name="ssh_network_unreachable" tools:ignore="PluralsCandidate">Host %1$s:%2$d is unreachable. Check your network connection or VPN.</string>
+    <string name="ssh_connection_reset" tools:ignore="PluralsCandidate">Connection closed unexpectedly by %1$s:%2$d.</string>
     <string name="ssh_connecting_to">Connecting to %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Connection terminated: %1$s</string>
     <string name="ssh_session_closed">Session closed (exit code %1$d)</string>

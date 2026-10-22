@@ -10,6 +10,7 @@ import com.knotssh.data.local.preferences.AppPreferences
 import com.knotssh.domain.model.*import com.knotssh.domain.repository.CredentialRepository
 import com.knotssh.domain.repository.FolderRepository
 import com.knotssh.domain.repository.ServerRepository
+import com.knotssh.ssh.SessionRegistry
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.*
@@ -50,6 +51,7 @@ class EditServerViewModel @Inject constructor(
     private val serverRepository: ServerRepository,
     private val credentialRepository: CredentialRepository,
     private val folderRepository: FolderRepository,
+    private val sessionRegistry: SessionRegistry,
     preferences: AppPreferences,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -174,8 +176,12 @@ class EditServerViewModel @Inject constructor(
                 portForwardRules = s.portForwardRules,
                 folderId = s.folderId
             )
-            if (serverId != null) serverRepository.updateServer(server)
-            else serverRepository.insertServer(server)
+            if (serverId != null) {
+                serverRepository.updateServer(server)
+                sessionRegistry.close(serverId)
+            } else {
+                serverRepository.insertServer(server)
+            }
             _state.update { it.copy(isLoading = false, isSaved = true) }
         }
     }

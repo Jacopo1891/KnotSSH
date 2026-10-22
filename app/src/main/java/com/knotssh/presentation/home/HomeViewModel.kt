@@ -82,7 +82,7 @@ class HomeViewModel @Inject constructor(
     private val credentialRepository: CredentialRepository,
     private val folderRepository: FolderRepository,
     private val preferences: AppPreferences,
-    sessionRegistry: SessionRegistry
+    private val sessionRegistry: SessionRegistry
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -173,6 +173,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun deleteServer(serverId: Long) {
+        sessionRegistry.close(serverId)
         viewModelScope.launch { serverRepository.deleteServer(serverId) }
     }
 

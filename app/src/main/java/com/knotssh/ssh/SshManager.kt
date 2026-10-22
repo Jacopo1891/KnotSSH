@@ -22,8 +22,13 @@ import com.knotssh.domain.repository.KnownHostRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.ConnectException
+import java.net.NoRouteToHostException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -214,7 +219,7 @@ class SshManager @Inject constructor(
                     context.getString(R.string.ssh_auth_failed, credential.username)
                 )
             }
-            throw e
+            throw describeConnectionFailure(context, e, server)
         }
 
         applyPortForwarding(context, session, server)
@@ -323,6 +328,51 @@ class SshManager @Inject constructor(
             rejection.actual
         )
         HostKeyRejection.UserDeclined -> context.getString(R.string.ssh_host_key_declined)
+    }
+
+    /** Translates raw JSch / java.net socket exceptions into localized user-facing messages. */
+    private fun describeConnectionFailure(
+        context: Context,
+        error: Exception,
+        server: Server
+    ): Exception {
+        val causes = generateSequence<Throwable>(error) { it.cause }.toList()
+        val combinedMessage = causes
+            .mapNotNull { it.message?.lowercase() }
+            .joinToString(" ")
+
+        val friendly = when {
+            causes.any { it is UnknownHostException } ||
+                "unknownhostexception" in combinedMessage ||
+                "unable to resolve host" in combinedMessage ->
+                context.getString(R.string.ssh_unknown_hostname, server.hostname)
+
+            "econnrefused" in combinedMessage ||
+                "connection refused" in combinedMessage ||
+                causes.any { it is ConnectException } ->
+                context.getString(R.string.ssh_connection_refused, server.hostname, server.port)
+
+            causes.any { it is SocketTimeoutException } ||
+                "etimedout" in combinedMessage ||
+                "timed out" in combinedMessage ||
+                "timeout:" in combinedMessage ->
+                context.getString(R.string.ssh_connection_timeout, server.hostname, server.port)
+
+            causes.any { it is NoRouteToHostException } ||
+                "ehostunreach" in combinedMessage ||
+                "enetunreach" in combinedMessage ||
+                "no route to host" in combinedMessage ||
+                "network is unreachable" in combinedMessage ->
+                context.getString(R.string.ssh_network_unreachable, server.hostname, server.port)
+
+            "econnreset" in combinedMessage ||
+                "connection reset" in combinedMessage ->
+                context.getString(R.string.ssh_connection_reset, server.hostname, server.port)
+
+            else -> null
+        }
+
+        return if (friendly != null) IOException(friendly, error) else error
     }
 
     private fun configureLogging(verbose: Boolean) {

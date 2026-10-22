@@ -193,6 +193,11 @@
     <string name="ssh_connection_error">Error de conexión</string>
     <string name="ssh_auth_cancelled">Conexión cancelada: no se ha introducido ninguna credencial.</string>
     <string name="ssh_auth_failed">El servidor ha rechazado las credenciales de %1$s. Comprueba la contraseña o la clave y vuelve a intentarlo.</string>
+    <string name="ssh_connection_refused">Conexión rechazada por %1$s:%2$d. Comprueba que la dirección y el puerto sean correctos y que el servidor SSH esté activo.</string>
+    <string name="ssh_connection_timeout">Tiempo de espera agotado al conectar con %1$s:%2$d. Comprueba la dirección, el puerto o el cortafuegos.</string>
+    <string name="ssh_unknown_hostname">No se pudo resolver el host %1$s. Comprueba el nombre de host o tu conexión de red.</string>
+    <string name="ssh_network_unreachable">El host %1$s:%2$d no está disponible. Comprueba tu conexión de red o VPN.</string>
+    <string name="ssh_connection_reset">La conexión fue cerrada inesperadamente por %1$s:%2$d.</string>
     <string name="ssh_connecting_to">Conectando a %1$s (%2$s:%3$d)…</string>
     <string name="ssh_connection_terminated">Conexión terminada: %1$s</string>
     <string name="ssh_session_closed">Sesión cerrada (código %1$d)</string>

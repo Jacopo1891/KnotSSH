@@ -112,7 +112,6 @@ class TerminalViewModel @Inject constructor(
             registry.open(serverId, registry.sessionLimit())
                 .onSuccess {
                     _session.value = it
-                    SshSessionService.sync(context)
                 }
                 .onFailure { error ->
                     _limitReached.value = (error as? SessionLimitReached)?.limit
@@ -125,7 +124,18 @@ class TerminalViewModel @Inject constructor(
     }
 
     fun reconnect() {
-        session?.reconnect()
+        val current = session
+        if (current != null && registry.find(serverId) === current) {
+            current.reconnect()
+        } else {
+            viewModelScope.launch {
+                registry.open(serverId, registry.sessionLimit())
+                    .onSuccess { _session.value = it }
+                    .onFailure { error ->
+                        _limitReached.value = (error as? SessionLimitReached)?.limit
+                    }
+            }
+        }
     }
 
     fun sendText(text: String) {
@@ -186,10 +196,17 @@ class TerminalViewModel @Inject constructor(
 
     /** Leaves the session running in the background and refreshes its notification. */
     fun detach() {
-        if (!backgroundSessionsEnabled.value) {
+        if (!backgroundSessionsEnabled.value || session?.isLive != true) {
             terminate()
             return
         }
         SshSessionService.sync(context)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (session?.isLive != true) {
+            registry.close(serverId)
+        }
     }
 }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -56,8 +57,12 @@ class SessionRegistry @Inject constructor(
     /** Returns the existing session for [serverId], or opens one if the limit allows it. */
     @Synchronized
     fun open(serverId: Long, limit: Int): Result<SshSession> {
-        sessions[serverId]?.let { return Result.success(it) }
-        if (sessions.size >= limit) return Result.failure(SessionLimitReached(limit))
+        sessions[serverId]?.let { existing ->
+            if (existing.isLive) return Result.success(existing)
+            close(serverId)
+        }
+        val liveCount = sessions.values.count { it.isLive }
+        if (liveCount >= limit) return Result.failure(SessionLimitReached(limit))
 
         val session = SshSession(
             serverId = serverId,
@@ -72,7 +77,7 @@ class SessionRegistry @Inject constructor(
         )
         sessions[serverId] = session
         publish()
-        observeLabel(session)
+        observeSession(session)
         return Result.success(session)
     }
 
@@ -97,16 +102,24 @@ class SessionRegistry @Inject constructor(
         scope.launch { close(serverId) }
     }
 
-    private fun observeLabel(session: SshSession) {
+    private fun observeSession(session: SshSession) {
         labelJobs[session.serverId] = scope.launch {
-            session.title.collect { publish() }
+            combine(session.title, session.status) { _, status -> status }
+                .collect { status ->
+                    publish()
+                    if (status is TerminalStatus.Connected &&
+                        appPreferences.connection.first().foregroundNotification
+                    ) {
+                        SshSessionService.sync(context)
+                    }
+                }
         }
     }
 
     @Synchronized
     private fun publish() {
         _active.value = sessions.values
-            .filter { it.isLive }
+            .filter { it.isActive }
             .map { SessionSummary(it.serverId, it.label, it.title.value) }
     }
 
