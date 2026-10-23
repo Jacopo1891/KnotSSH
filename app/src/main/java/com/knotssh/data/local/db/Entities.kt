@@ -21,7 +21,9 @@ data class ServerEntity(
     val portForwardRules: List<PortForwardRule> = emptyList(),
     /** `null` keeps the server in the "no folder" section. */
     val folderId: Long? = null,
-    val sortOrder: Int = 0
+    val sortOrder: Int = 0,
+    /** Key of a [com.knotssh.presentation.server.ServerIcon]; `null` means the generic server icon. */
+    val iconKey: String? = null
 )
 
 @Entity(tableName = "folders")

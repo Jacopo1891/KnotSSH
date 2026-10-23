@@ -30,7 +30,8 @@ KnotSSH keeps everything on the device. There is no account to create, no backen
 - **Authentication** by password or SSH key, with an optional _ask each time_ mode so secrets are never stored.
 - **Host key verification** against a known-hosts store, including import of an existing `known_hosts` file.
 - **Port forwarding**, local (`-L`) and remote (`-R`).
-- **Server organisation** with folders and favourites.
+- **Server organisation** with folders, favourites and a choice of icons (Linux distributions, self-hosting software, databases, cloud providers) to recognise each server at a glance.
+- **Material 3 design** with dynamic colour, a soft red KnotSSH palette or the classic Google blue, light, dark and pure-black AMOLED themes.
 - **Quick commands** and custom terminal keys.
 - **Encrypted import & export** of servers, credentials, SSH keys, known hosts, folders, and settings to a portable `.knotssh` container protected with **Argon2id** and **AES-256-GCM**.
 - **Automatic encrypted sync & Android Auto Backup** to keep your configuration backed up across devices without exposing secrets in the clear.
@@ -116,6 +117,7 @@ Bug reports and suggestions are welcome in the [issues](https://github.com/Jacop
 | -------------------------------------------------------------- | ----------- |
 | [JSch (mwiede fork)](https://github.com/mwiede/jsch)           | Revised BSD |
 | [argon2kt](https://github.com/lambdapioneer/argon2kt)          | MIT         |
+| [Simple Icons](https://simpleicons.org) (server icons)         | CC0 1.0     |
 | AndroidX, Jetpack Compose, Hilt, Kotlin, kotlinx.serialization | Apache 2.0  |
 
 ## License

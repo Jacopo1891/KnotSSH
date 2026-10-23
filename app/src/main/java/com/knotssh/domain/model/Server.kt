@@ -16,7 +16,8 @@ data class Server(
     val connectTimeoutSeconds: Int = 30,
     val portForwardRules: List<PortForwardRule> = emptyList(),
     val folderId: Long? = null,
-    val sortOrder: Int = 0
+    val sortOrder: Int = 0,
+    val iconKey: String? = null
 )
 
 @Serializable

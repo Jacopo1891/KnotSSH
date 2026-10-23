@@ -37,7 +37,7 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): KnotSshDatabase =
         Room.databaseBuilder(context, KnotSshDatabase::class.java, KnotSshDatabase.DATABASE_NAME)
-            .addMigrations(KnotSshDatabase.MIGRATION_4_5)
+            .addMigrations(KnotSshDatabase.MIGRATION_4_5, KnotSshDatabase.MIGRATION_5_6)
             .fallbackToDestructiveMigration()
             .build()
 

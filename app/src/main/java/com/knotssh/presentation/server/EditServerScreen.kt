@@ -33,12 +33,15 @@ fun EditServerScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var showAddRuleDialog by remember { mutableStateOf(false) }
+    var showIconPicker by remember { mutableStateOf(false) }
+    val selectedIcon = ServerIcon.fromKey(state.iconKey)
 
     LaunchedEffect(state.isSaved) {
         if (state.isSaved) onBack()
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
                 title = {
@@ -58,13 +61,17 @@ fun EditServerScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.save() }) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = stringResource(R.string.action_save)
-                        )
+                    Button(
+                        onClick = { viewModel.save() },
+                        enabled = !state.isLoading,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text(stringResource(R.string.action_save))
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             )
         }
     ) { padding ->
@@ -76,11 +83,37 @@ fun EditServerScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
+            // Icon header: the tile opens the picker
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Surface(
+                        onClick = { showIconPicker = true },
+                        shape = MaterialTheme.shapes.large,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier.size(88.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            ServerIconImage(
+                                icon = selectedIcon,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                size = 44.dp
+                            )
+                        }
+                    }
+                    TextButton(onClick = { showIconPicker = true }) {
+                        Text(stringResource(R.string.server_icon_change))
+                    }
+                }
+            }
+
             // General Info Card
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                    shape = RoundedCornerShape(16.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                    shape = MaterialTheme.shapes.large
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -180,8 +213,8 @@ fun EditServerScreen(
             // Credential Card
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                    shape = RoundedCornerShape(16.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                    shape = MaterialTheme.shapes.large
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -245,8 +278,8 @@ fun EditServerScreen(
             // Advanced Settings
             item {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                    shape = RoundedCornerShape(16.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                    shape = MaterialTheme.shapes.large
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -300,8 +333,8 @@ fun EditServerScreen(
 
             items(state.portForwardRules) { rule ->
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                    shape = RoundedCornerShape(12.dp)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                    shape = MaterialTheme.shapes.medium
                 ) {
                     Row(
                         modifier = Modifier
@@ -327,6 +360,17 @@ fun EditServerScreen(
                 }
             }
         }
+    }
+
+    if (showIconPicker) {
+        ServerIconPickerSheet(
+            selectedKey = state.iconKey,
+            onSelect = {
+                viewModel.onIconSelected(it)
+                showIconPicker = false
+            },
+            onDismiss = { showIconPicker = false }
+        )
     }
 
     if (showAddRuleDialog) {

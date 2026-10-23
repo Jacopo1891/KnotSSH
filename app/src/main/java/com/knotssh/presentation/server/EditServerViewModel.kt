@@ -29,6 +29,7 @@ data class EditServerUiState(
     val folders: List<Folder> = emptyList(),
     val foldersEnabled: Boolean = true,
     val folderId: Long? = null,
+    val iconKey: String? = null,
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     // Validation errors, as string resources so they follow the app language
@@ -107,7 +108,8 @@ class EditServerViewModel @Inject constructor(
                             keepAliveSeconds = server.keepAliveSeconds.toString(),
                             connectTimeoutSeconds = server.connectTimeoutSeconds.toString(),
                             portForwardRules = server.portForwardRules,
-                            folderId = server.folderId
+                            folderId = server.folderId,
+                            iconKey = server.iconKey
                         )
                     }
                 }
@@ -130,6 +132,7 @@ class EditServerViewModel @Inject constructor(
     fun onKeepAliveChanged(v: String) = _state.update { it.copy(keepAliveSeconds = v) }
     fun onTimeoutChanged(v: String) = _state.update { it.copy(connectTimeoutSeconds = v) }
     fun onFolderSelected(id: Long?) = _state.update { it.copy(folderId = id) }
+    fun onIconSelected(key: String?) = _state.update { it.copy(iconKey = key) }
 
     fun addPortForwardRule(rule: PortForwardRule) = _state.update {
         it.copy(portForwardRules = it.portForwardRules + rule)
@@ -174,7 +177,8 @@ class EditServerViewModel @Inject constructor(
                 keepAliveSeconds = s.keepAliveSeconds.toIntOrNull() ?: 30,
                 connectTimeoutSeconds = s.connectTimeoutSeconds.toIntOrNull() ?: 30,
                 portForwardRules = s.portForwardRules,
-                folderId = s.folderId
+                folderId = s.folderId,
+                iconKey = s.iconKey
             )
             if (serverId != null) {
                 serverRepository.updateServer(server)

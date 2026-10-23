@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Simple Icons (CC0 1.0). Brand names and logos belong to their respective owners. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M12 0L1.605 6V18L12 24 22.395 18V6L12 0ZM18 16.59C18 17.295 17.354 17.88 16.471 17.88 15.84 17.88 15.12 17.625 14.67 17.07L8.67 9.929V16.589C8.67 17.31 8.1 17.879 7.396 17.879H7.32C6.599 17.879 6.03 17.279 6.03 16.589V7.41C6.03 6.705 6.66 6.12 7.53 6.12 8.176 6.12 8.91 6.375 9.36 6.93L15.33 14.071V7.41C15.33 6.689 15.93 6.12 16.62 6.12H16.695C17.415 6.12 17.985 6.72 17.985 7.41V16.59H18Z" />
+</vector>

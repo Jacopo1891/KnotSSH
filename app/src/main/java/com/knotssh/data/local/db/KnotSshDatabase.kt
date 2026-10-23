@@ -15,7 +15,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         CustomKeyEntity::class,
         FolderEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -29,6 +29,13 @@ abstract class KnotSshDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "knotssh.db"
+
+        /** Per-server icon. Nullable, so every existing server keeps the generic one. */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `servers` ADD COLUMN `iconKey` TEXT")
+            }
+        }
 
         /** Folders and manual ordering. Written by hand so existing servers survive the upgrade. */
         val MIGRATION_4_5 = object : Migration(4, 5) {

@@ -56,11 +56,11 @@ fun LanguageSettingsScreen(onBack: () -> Unit) {
 private fun LanguageRow(label: String, selected: Boolean, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = MaterialTheme.shapes.medium,
+        shape = MaterialTheme.shapes.large,
         color = if (selected) {
             MaterialTheme.colorScheme.secondaryContainer
         } else {
-            MaterialTheme.colorScheme.surfaceContainer
+            MaterialTheme.colorScheme.surfaceContainerLow
         },
         modifier = Modifier.fillMaxWidth()
     ) {

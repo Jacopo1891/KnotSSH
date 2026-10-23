@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -25,8 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
@@ -42,11 +45,15 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.knotssh.R
+import com.knotssh.data.local.preferences.ServerListStyle
 import com.knotssh.data.local.preferences.ServerSortMode
 import com.knotssh.domain.model.Credential
 import com.knotssh.domain.model.Folder
 import com.knotssh.domain.model.Server
+import com.knotssh.presentation.components.SearchPill
 import com.knotssh.presentation.components.SwipeToDeleteContainer
+import com.knotssh.presentation.server.ServerIcon
+import com.knotssh.presentation.server.ServerIconImage
 import com.knotssh.presentation.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -58,12 +65,12 @@ fun HomeScreen(
     onEditServer: (Long) -> Unit,
     onCloneServer: (Long) -> Unit,
     onConnect: (Long) -> Unit,
-    onNavigateCredentials: () -> Unit,
     onNavigateSettings: () -> Unit,
+    bottomBar: @Composable () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var searchExpanded by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var serverToDelete by remember { mutableStateOf<Server?>(null) }
     var serverToMove by remember { mutableStateOf<Server?>(null) }
     var folderToFill by remember { mutableStateOf<Folder?>(null) }
@@ -175,21 +182,20 @@ fun HomeScreen(
     }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             HomeTopBar(
-                searchExpanded = searchExpanded,
-                searchQuery = uiState.searchQuery,
                 sortMode = uiState.sortMode,
                 foldersEnabled = uiState.foldersEnabled,
-                onSearchExpandToggle = { searchExpanded = !searchExpanded },
-                onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                scrollBehavior = scrollBehavior,
                 onSortModeSelected = viewModel::setSortMode,
                 onFoldersEnabledChange = viewModel::setFoldersEnabled,
                 onManageFolders = { showFolderManager = true },
-                onNavigateCredentials = onNavigateCredentials,
                 onNavigateSettings = onNavigateSettings
             )
         },
+        bottomBar = bottomBar,
         floatingActionButton = {
             // L'empty state mostra già un pulsante centrale per aggiungere il primo server.
             val showEmptyStateAddButton =
@@ -203,50 +209,58 @@ fun HomeScreen(
                             contentDescription = stringResource(R.string.home_add_server)
                         )
                     },
-                    text = { Text(stringResource(R.string.home_new_server)) },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    text = { Text(stringResource(R.string.home_new_server)) }
                 )
             }
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-                !uiState.hasVisibleServers -> {
-                    EmptyState(
-                        hasSearch = uiState.isSearching,
-                        onAddServer = onAddServer,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-                else -> {
-                    ServerList(
-                        state = uiState,
-                        onConnect = onConnect,
-                        onEdit = onEditServer,
-                        onClone = onCloneServer,
-                        onDelete = { serverToDelete = it },
-                        onToggleFavorite = { s -> viewModel.toggleFavorite(s.id, s.isFavorite) },
-                        onToggleFolder = viewModel::toggleFolder,
-                        onMoveToFolder = { serverToMove = it },
-                        onEnableReorder = { viewModel.setSortMode(ServerSortMode.MANUAL) },
-                        onEditFolderContents = { folderToFill = it },
-                        onRenameFolder = { folderToRename = it },
-                        onDeleteFolder = { folderToDelete = it },
-                        onServerDragStart = viewModel::beginServerDrag,
-                        onServerDragStep = viewModel::moveServerStep,
-                        onServerDragFinish = { committed ->
-                            if (committed) viewModel.endServerDrag() else viewModel.cancelServerDrag()
-                        },
-                        onFolderDragStep = viewModel::moveFolderStep
-                    )
+            if (uiState.totalServers > 0) {
+                SearchPill(
+                    query = uiState.searchQuery,
+                    onQueryChange = viewModel::onSearchQueryChanged,
+                    placeholder = stringResource(R.string.home_search_hint),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                when {
+                    uiState.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                    !uiState.hasVisibleServers -> {
+                        EmptyState(
+                            hasSearch = uiState.isSearching,
+                            onAddServer = onAddServer,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                    else -> {
+                        ServerList(
+                            state = uiState,
+                            onConnect = onConnect,
+                            onEdit = onEditServer,
+                            onClone = onCloneServer,
+                            onDelete = { serverToDelete = it },
+                            onToggleFavorite = { s -> viewModel.toggleFavorite(s.id, s.isFavorite) },
+                            onToggleFolder = viewModel::toggleFolder,
+                            onMoveToFolder = { serverToMove = it },
+                            onEnableReorder = { viewModel.setSortMode(ServerSortMode.MANUAL) },
+                            onEditFolderContents = { folderToFill = it },
+                            onRenameFolder = { folderToRename = it },
+                            onDeleteFolder = { folderToDelete = it },
+                            onServerDragStart = viewModel::beginServerDrag,
+                            onServerDragStep = viewModel::moveServerStep,
+                            onServerDragFinish = { committed ->
+                                if (committed) viewModel.endServerDrag() else viewModel.cancelServerDrag()
+                            },
+                            onFolderDragStep = viewModel::moveFolderStep
+                        )
+                    }
                 }
             }
         }
@@ -256,155 +270,101 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeTopBar(
-    searchExpanded: Boolean,
-    searchQuery: String,
     sortMode: ServerSortMode,
     foldersEnabled: Boolean,
-    onSearchExpandToggle: () -> Unit,
-    onSearchQueryChanged: (String) -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior,
     onSortModeSelected: (ServerSortMode) -> Unit,
     onFoldersEnabledChange: (Boolean) -> Unit,
     onManageFolders: () -> Unit,
-    onNavigateCredentials: () -> Unit,
     onNavigateSettings: () -> Unit
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
     var sortMenuExpanded by remember { mutableStateOf(false) }
 
-    Column {
-        TopAppBar(
-            title = {
-                AnimatedContent(
-                    targetState = searchExpanded,
-                    transitionSpec = { fadeIn() togetherWith fadeOut() },
-                    label = "title_anim"
-                ) { expanded ->
-                    if (expanded) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = onSearchQueryChanged,
-                            placeholder = { Text(stringResource(R.string.home_search_hint)) },
-                            singleLine = true,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 8.dp),
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                            keyboardActions = KeyboardActions(
-                                onSearch = {
-                                    keyboardController?.hide()
-                                    focusManager.clearFocus()
-                                }
-                            ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                    } else {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_launcher_monochrome),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                // The knot only fills the adaptive-icon safe zone, so the box
-                                // must be oversized for the glyph to read at title scale.
-                                modifier = Modifier.size(38.dp)
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(
-                                text = "KnotSSH",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
-            },
-            actions = {
-                IconButton(onClick = {
-                    onSearchExpandToggle()
-                    if (searchExpanded) onSearchQueryChanged("")
-                }) {
+    TopAppBar(
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_launcher_monochrome),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    // The knot only fills the adaptive-icon safe zone, so the box
+                    // must be oversized for the glyph to read at title scale.
+                    modifier = Modifier.size(38.dp)
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        },
+        actions = {
+            Box {
+                IconButton(onClick = { sortMenuExpanded = true }) {
                     Icon(
-                        imageVector = if (searchExpanded) Icons.Default.Close else Icons.Default.Search,
-                        contentDescription = if (searchExpanded) {
-                            stringResource(R.string.home_close_search)
-                        } else {
-                            stringResource(R.string.home_search)
-                        }
+                        Icons.AutoMirrored.Filled.Sort,
+                        contentDescription = stringResource(R.string.home_sort)
                     )
                 }
-                Box {
-                    IconButton(onClick = { sortMenuExpanded = true }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.Sort,
-                            contentDescription = stringResource(R.string.home_sort)
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = sortMenuExpanded,
-                        onDismissRequest = { sortMenuExpanded = false }
-                    ) {
-                        SORT_MODES.forEach { (mode, label) ->
-                            DropdownMenuItem(
-                                text = { Text(stringResource(label)) },
-                                leadingIcon = {
-                                    if (mode == sortMode) Icon(Icons.Default.Check, null)
-                                },
-                                onClick = {
-                                    sortMenuExpanded = false
-                                    onSortModeSelected(mode)
-                                }
-                            )
-                        }
-                        HorizontalDivider()
+                DropdownMenu(
+                    expanded = sortMenuExpanded,
+                    onDismissRequest = { sortMenuExpanded = false }
+                ) {
+                    SORT_MODES.forEach { (mode, label) ->
                         DropdownMenuItem(
-                            text = { Text(stringResource(R.string.home_use_folders)) },
+                            text = { Text(stringResource(label)) },
                             leadingIcon = {
-                                Icon(
-                                    if (foldersEnabled) Icons.Default.CheckBox
-                                    else Icons.Default.CheckBoxOutlineBlank,
-                                    contentDescription = null
-                                )
+                                if (mode == sortMode) Icon(Icons.Default.Check, null)
                             },
                             onClick = {
                                 sortMenuExpanded = false
-                                onFoldersEnabledChange(!foldersEnabled)
+                                onSortModeSelected(mode)
                             }
                         )
-                        if (foldersEnabled) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.home_manage_folders)) },
-                                leadingIcon = { Icon(Icons.Default.CreateNewFolder, null) },
-                                onClick = {
-                                    sortMenuExpanded = false
-                                    onManageFolders()
-                                }
+                    }
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.home_use_folders)) },
+                        leadingIcon = {
+                            Icon(
+                                if (foldersEnabled) Icons.Default.CheckBox
+                                else Icons.Default.CheckBoxOutlineBlank,
+                                contentDescription = null
                             )
+                        },
+                        onClick = {
+                            sortMenuExpanded = false
+                            onFoldersEnabledChange(!foldersEnabled)
                         }
+                    )
+                    if (foldersEnabled) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.home_manage_folders)) },
+                            leadingIcon = { Icon(Icons.Default.CreateNewFolder, null) },
+                            onClick = {
+                                sortMenuExpanded = false
+                                onManageFolders()
+                            }
+                        )
                     }
                 }
-                IconButton(onClick = onNavigateCredentials) {
-                    Icon(
-                        Icons.Default.Key,
-                        contentDescription = stringResource(R.string.credentials_title)
-                    )
-                }
-                IconButton(onClick = onNavigateSettings) {
-                    Icon(
-                        Icons.Default.Settings,
-                        contentDescription = stringResource(R.string.settings_title)
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background
-            )
-        )
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
-    }
+            }
+            IconButton(onClick = onNavigateSettings) {
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = stringResource(R.string.settings_title)
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        scrollBehavior = scrollBehavior
+    )
 }
 
 private val SORT_MODES = listOf(
@@ -436,15 +396,15 @@ private fun ServerList(
     val reorderable = state.isReorderable
 
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp)
     ) {
         if (reorderable) {
             item(key = "reorder_hint") {
                 Text(
                     text = stringResource(R.string.home_reorder_hint),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
         }
@@ -453,13 +413,15 @@ private fun ServerList(
             item(key = "header_favorites") {
                 SectionHeader(
                     title = stringResource(R.string.home_favorites),
-                    icon = Icons.Default.Star
+                    icon = Icons.Default.Star,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
-            items(state.favorites, key = { "fav_${it.id}" }) { server ->
+            itemsIndexed(state.favorites, key = { _, it -> "fav_${it.id}" }) { index, server ->
                 ServerRow(
                     server = server,
                     state = state,
+                    showDivider = index < state.favorites.lastIndex,
                     onConnect = onConnect,
                     onEdit = onEdit,
                     onClone = onClone,
@@ -481,7 +443,7 @@ private fun ServerList(
                     folder == null -> SectionHeader(
                         title = stringResource(R.string.home_no_folder),
                         icon = Icons.Default.Dns,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
                     )
                     else -> FolderHeader(
                         folder = folder,
@@ -509,10 +471,11 @@ private fun ServerList(
 
             // Keyed by server alone: a key that included the section would make Compose discard
             // and rebuild the row when it crosses a folder, killing the drag gesture mid-flight.
-            items(group.servers, key = { "srv_${it.id}" }) { server ->
+            itemsIndexed(group.servers, key = { _, it -> "srv_${it.id}" }) { index, server ->
                 ServerRow(
                     server = server,
                     state = state,
+                    showDivider = index < group.servers.lastIndex,
                     onConnect = onConnect,
                     onEdit = onEdit,
                     onClone = onClone,
@@ -545,7 +508,7 @@ private fun EmptyGroupHint(isFolder: Boolean, reorderable: Boolean) {
         ),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     )
 }
 
@@ -553,6 +516,7 @@ private fun EmptyGroupHint(isFolder: Boolean, reorderable: Boolean) {
 private fun LazyItemScope.ServerRow(
     server: Server,
     state: HomeUiState,
+    showDivider: Boolean,
     onConnect: (Long) -> Unit,
     onEdit: (Long) -> Unit,
     onClone: (Long) -> Unit,
@@ -575,18 +539,18 @@ private fun LazyItemScope.ServerRow(
         onPressWithoutMove = { showContextMenu = true }
     )
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (drag.isDragging) Modifier.zIndex(1f) else Modifier.animateItem())
             .liftWhileDragging(drag)
-            .onSizeChanged { rowHeight = it.height },
-        verticalAlignment = Alignment.CenterVertically
+            .onSizeChanged { rowHeight = it.height }
     ) {
         ServerSwipeCard(
             server = server,
             credential = state.credentials[server.credentialId],
             hasActiveSession = server.id in state.activeSessions,
+            style = state.listStyle,
             onConnect = { onConnect(server.id) },
             onEdit = { onEdit(server.id) },
             onDelete = { onDelete(server) },
@@ -595,6 +559,13 @@ private fun LazyItemScope.ServerRow(
             onLongPress = if (draggable) null else ({ showContextMenu = true }),
             gestureModifier = if (draggable) drag.modifier else Modifier
         )
+        if (showDivider) {
+            // Inset to the text column, like list dividers in Google's apps.
+            HorizontalDivider(
+                modifier = Modifier.padding(start = state.listStyle.dividerInset(), end = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+            )
+        }
     }
 
     if (showContextMenu) {
@@ -728,12 +699,12 @@ private fun LazyItemScope.FolderHeader(
 
     Surface(
         onClick = onToggle,
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
         modifier = Modifier
             .fillMaxWidth()
             .then(if (drag.isDragging) Modifier.zIndex(1f) else Modifier.animateItem())
-            .padding(top = 8.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
             .liftWhileDragging(drag)
             .onSizeChanged { headerHeight = it.height }
             .then(if (reorderable) drag.modifier else Modifier)
@@ -841,6 +812,7 @@ private fun ServerSwipeCard(
     server: Server,
     credential: Credential?,
     hasActiveSession: Boolean,
+    style: ServerListStyle,
     onConnect: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -848,233 +820,19 @@ private fun ServerSwipeCard(
     onLongPress: (() -> Unit)?,
     gestureModifier: Modifier
 ) {
-    SwipeToDeleteContainer(onDelete = { onDelete(); false }) {
-        ServerCard(
+    SwipeToDeleteContainer(onDelete = { onDelete(); false }, shape = RectangleShape) {
+        ServerListItem(
             server = server,
             credential = credential,
             hasActiveSession = hasActiveSession,
-            onConnect = onConnect,
-            onFixCredential = onEdit,
-            onLongPress = onLongPress,
+            style = style,
+            // With the credential gone, connecting would only fail: send the user to the editor.
+            onClick = if (credential == null) onEdit else onConnect,
+            onLongClick = onLongPress,
             onToggleFavorite = onToggleFavorite,
             modifier = Modifier
                 .fillMaxWidth()
                 .then(gestureModifier)
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun ServerCard(
-    server: Server,
-    credential: Credential?,
-    hasActiveSession: Boolean,
-    onConnect: () -> Unit,
-    onFixCredential: () -> Unit,
-    onLongPress: (() -> Unit)?,
-    onToggleFavorite: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    // The credential it referenced was deleted: connecting would only fail, so the card sends
-    // the user to the editor instead.
-    val orphaned = credential == null
-    val accentColor = if (orphaned) {
-        MaterialTheme.colorScheme.error
-    } else {
-        MaterialTheme.colorScheme.primary
-    }
-
-    Card(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(
-                onClick = if (orphaned) onFixCredential else onConnect,
-                onLongClick = onLongPress
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Accent indicator strip
-            Box(
-                modifier = Modifier
-                    .width(4.dp)
-                    .height(48.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(accentColor, accentColor.copy(alpha = 0.4f))
-                        )
-                    )
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Server icon
-            Box(contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Dns,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-                if (hasActiveSession) {
-                    // Sits outside the icon's clip so the ring reads against any background.
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 5.dp, y = (-5).dp)
-                            .size(18.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(13.dp)
-                                .clip(CircleShape)
-                                .background(SshGreen)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            // Info column
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = server.alias,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    ServerChip(
-                        icon = Icons.Default.Language,
-                        text = "${server.hostname}:${server.port}"
-                    )
-                    if (credential != null) {
-                        ServerChip(
-                            icon = Icons.Default.Person,
-                            text = credential.alias.ifBlank { credential.username }
-                        )
-                    } else {
-                        ServerChip(
-                            icon = Icons.Default.PersonOff,
-                            text = stringResource(R.string.home_no_credential),
-                            container = MaterialTheme.colorScheme.errorContainer,
-                            content = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
-                }
-                server.lastConnectedMs?.let { ms ->
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.home_last_connection, formatLastConnected(ms)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                if (server.portForwardRules.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = pluralStringResource(
-                            R.plurals.port_forward_rules,
-                            server.portForwardRules.size,
-                            server.portForwardRules.size
-                        ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                }
-            }
-
-            // Actions column
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                IconButton(onClick = onToggleFavorite, modifier = Modifier.size(36.dp)) {
-                    Icon(
-                        imageVector = if (server.isFavorite) Icons.Default.Star else Icons.Outlined.StarOutline,
-                        contentDescription = if (server.isFavorite) {
-                            stringResource(R.string.action_unfavorite)
-                        } else {
-                            stringResource(R.string.action_favorite)
-                        },
-                        tint = if (server.isFavorite) SshAmber else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                // Connect button
-                FilledIconButton(
-                    onClick = if (orphaned) onFixCredential else onConnect,
-                    modifier = Modifier.size(36.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = accentColor
-                    )
-                ) {
-                    Icon(
-                        imageVector = if (orphaned) Icons.Default.Edit else Icons.Default.Terminal,
-                        contentDescription = stringResource(
-                            if (orphaned) R.string.action_edit else R.string.action_connect
-                        ),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ServerChip(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    text: String,
-    container: Color = MaterialTheme.colorScheme.surfaceVariant,
-    content: Color = MaterialTheme.colorScheme.onSurfaceVariant
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(3.dp),
-        modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(container)
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(10.dp),
-            tint = content
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = content,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -1208,23 +966,6 @@ private fun EmptyState(
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.home_add_server))
             }
-        }
-    }
-}
-
-@Composable
-private fun formatLastConnected(ms: Long): String {
-    val diff = System.currentTimeMillis() - ms
-    return when {
-        diff < 60_000 -> stringResource(R.string.time_now)
-        diff < 3_600_000 -> stringResource(R.string.time_minutes_ago, diff / 60_000)
-        diff < 86_400_000 -> stringResource(R.string.time_hours_ago, diff / 3_600_000)
-        diff < 604_800_000 -> {
-            val days = (diff / 86_400_000).toInt()
-            pluralStringResource(R.plurals.days_ago, days, days)
-        }
-        else -> remember(ms) {
-            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(ms))
         }
     }
 }
