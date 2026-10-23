@@ -54,7 +54,8 @@ data class BackupServer(
     val portForwardRules: List<BackupPortForward> = emptyList(),
     /** Folders are referenced by name, for the same reason credentials are referenced by alias. */
     val folderName: String? = null,
-    val sortOrder: Int = 0
+    val sortOrder: Int = 0,
+    val iconKey: String? = null
 )
 
 @Serializable
@@ -92,6 +93,10 @@ data class BackupCustomKey(
 data class BackupSettings(
     val themeMode: String,
     val dynamicColor: Boolean,
+    // Added after the first release: files written before it must still import.
+    val palette: String = "KNOTSSH_RED",
+    val amoledBlack: Boolean = false,
+    val serverListStyle: String = "EXTENDED",
     val terminalFontSize: Int,
     val terminalFont: String,
     val terminalTheme: String,

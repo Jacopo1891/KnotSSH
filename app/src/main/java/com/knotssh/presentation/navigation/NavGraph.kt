@@ -1,11 +1,15 @@
 package com.knotssh.presentation.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -29,6 +33,15 @@ import com.knotssh.presentation.terminal.TerminalScreen
 
 private const val ANIM_DURATION = 300
 
+/** Material "fade through": used when switching between the bottom-bar destinations. */
+private val FadeThroughIn: EnterTransition =
+    fadeIn(tween(210, delayMillis = 90)) + scaleIn(tween(210, delayMillis = 90), initialScale = 0.92f)
+private val FadeThroughOut: ExitTransition = fadeOut(tween(90))
+
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.switchesTopLevel() =
+    MainDestination.isTopLevel(initialState.destination.route) &&
+        MainDestination.isTopLevel(targetState.destination.route)
+
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -47,32 +60,56 @@ fun NavGraph(
         }
     }
 
+    fun navigateTopLevel(destination: MainDestination) {
+        navController.navigate(destination.route) {
+            popUpTo(Screen.Home.route) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
         enterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Start,
-                tween(ANIM_DURATION)
-            ) + fadeIn(tween(ANIM_DURATION))
+            if (switchesTopLevel()) {
+                FadeThroughIn
+            } else {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    tween(ANIM_DURATION)
+                ) + fadeIn(tween(ANIM_DURATION))
+            }
         },
         exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Start,
-                tween(ANIM_DURATION)
-            ) + fadeOut(tween(ANIM_DURATION))
+            if (switchesTopLevel()) {
+                FadeThroughOut
+            } else {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start,
+                    tween(ANIM_DURATION)
+                ) + fadeOut(tween(ANIM_DURATION))
+            }
         },
         popEnterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.End,
-                tween(ANIM_DURATION)
-            ) + fadeIn(tween(ANIM_DURATION))
+            if (switchesTopLevel()) {
+                FadeThroughIn
+            } else {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    tween(ANIM_DURATION)
+                ) + fadeIn(tween(ANIM_DURATION))
+            }
         },
         popExitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.End,
-                tween(ANIM_DURATION)
-            ) + fadeOut(tween(ANIM_DURATION))
+            if (switchesTopLevel()) {
+                FadeThroughOut
+            } else {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End,
+                    tween(ANIM_DURATION)
+                ) + fadeOut(tween(ANIM_DURATION))
+            }
         }
     ) {
         composable(Screen.Home.route) {
@@ -81,8 +118,10 @@ fun NavGraph(
                 onEditServer = { id -> navController.navigate(Screen.EditServer.createRoute(id)) },
                 onCloneServer = { id -> navController.navigate(Screen.CloneServer.createRoute(id)) },
                 onConnect = { id -> navController.navigate(Screen.Terminal.createRoute(id)) },
-                onNavigateCredentials = { navController.navigate(Screen.Credentials.route) },
-                onNavigateSettings = { navController.navigate(Screen.Settings.route) }
+                onNavigateSettings = { navController.navigate(Screen.Settings.route) },
+                bottomBar = {
+                    MainNavigationBar(MainDestination.SERVERS, ::navigateTopLevel)
+                }
             )
         }
 
@@ -118,9 +157,12 @@ fun NavGraph(
 
         composable(Screen.Credentials.route) {
             CredentialsScreen(
-                onBack = { navController.popBackStack() },
                 onAddCredential = { navController.navigate(Screen.AddCredential.route) },
-                onEditCredential = { id -> navController.navigate(Screen.EditCredential.createRoute(id)) }
+                onEditCredential = { id -> navController.navigate(Screen.EditCredential.createRoute(id)) },
+                onNavigateSettings = { navController.navigate(Screen.Settings.route) },
+                bottomBar = {
+                    MainNavigationBar(MainDestination.ACCOUNTS, ::navigateTopLevel)
+                }
             )
         }
 

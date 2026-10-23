@@ -3,6 +3,7 @@ package com.knotssh.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.knotssh.data.local.preferences.AppPreferences
+import com.knotssh.data.local.preferences.ServerListStyle
 import com.knotssh.data.local.preferences.ServerSortMode
 import com.knotssh.domain.model.Credential
 import com.knotssh.domain.model.Folder
@@ -39,6 +40,7 @@ data class HomeUiState(
     val activeSessions: Set<Long> = emptySet(),
     val sortMode: ServerSortMode = ServerSortMode.LAST_USED,
     val foldersEnabled: Boolean = true,
+    val listStyle: ServerListStyle = ServerListStyle.EXTENDED,
     val draggingServerId: Long? = null,
     val totalServers: Int = 0,
     val isLoading: Boolean = true,
@@ -67,6 +69,14 @@ data class HomeUiState(
     val hasVisibleServers: Boolean get() = groups.any { it.servers.isNotEmpty() }
 }
 
+/** Everything the list layout depends on besides the data itself. */
+private data class ListConfig(
+    val sortMode: ServerSortMode,
+    val foldersEnabled: Boolean,
+    val folders: List<Folder>,
+    val style: ServerListStyle
+)
+
 /** Where the dragged server would land if the finger were lifted right now. */
 private data class DragPlacement(
     val serverId: Long,
@@ -91,9 +101,10 @@ class HomeViewModel @Inject constructor(
     private val listConfig = combine(
         preferences.serverSortMode,
         preferences.foldersEnabled,
-        folderRepository.getAll()
-    ) { mode, foldersEnabled, folders ->
-        Triple(mode, foldersEnabled, if (foldersEnabled) folders else emptyList())
+        folderRepository.getAll(),
+        preferences.appearance.map { it.serverListStyle }.distinctUntilChanged()
+    ) { mode, foldersEnabled, folders, style ->
+        ListConfig(mode, foldersEnabled, if (foldersEnabled) folders else emptyList(), style)
     }
 
     private val storedState: Flow<HomeUiState> = combine(
@@ -103,7 +114,7 @@ class HomeViewModel @Inject constructor(
         sessionRegistry.active,
         listConfig
     ) { servers, credentialList, query, sessions, config ->
-        val (sortMode, foldersEnabled, folders) = config
+        val (sortMode, foldersEnabled, folders, listStyle) = config
         val credentials = credentialList.associateBy { it.id }
         val matching = servers.filter { it.matches(query, credentials) }
         val knownFolderIds = folders.mapTo(mutableSetOf()) { it.id }
@@ -127,6 +138,7 @@ class HomeViewModel @Inject constructor(
             activeSessions = sessions.map { it.serverId }.toSet(),
             sortMode = sortMode,
             foldersEnabled = foldersEnabled,
+            listStyle = listStyle,
             totalServers = servers.size,
             isLoading = false,
             searchQuery = query

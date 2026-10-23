@@ -65,7 +65,8 @@ class BackupManager @Inject constructor(
                         BackupPortForward(it.type.name, it.localPort, it.remoteHost, it.remotePort)
                     },
                     folderName = server.folderId?.let(folderNameById::get),
-                    sortOrder = server.sortOrder
+                    sortOrder = server.sortOrder,
+                    iconKey = server.iconKey
                 )
             },
             folders = folders.map { BackupFolder(it.name, it.sortOrder) },
@@ -178,7 +179,8 @@ class BackupManager @Inject constructor(
                         )
                     },
                     folderId = incoming.folderName?.let(folderIdByName::get),
-                    sortOrder = incoming.sortOrder
+                    sortOrder = incoming.sortOrder,
+                    iconKey = incoming.iconKey
                 )
             )
             serversAdded++
@@ -323,6 +325,9 @@ class BackupManager @Inject constructor(
         return BackupSettings(
             themeMode = appearance.themeMode.name,
             dynamicColor = appearance.dynamicColor,
+            palette = appearance.palette.name,
+            amoledBlack = appearance.amoledBlack,
+            serverListStyle = appearance.serverListStyle.name,
             terminalFontSize = terminal.fontSize,
             terminalFont = terminal.font.name,
             terminalTheme = terminal.theme.name,

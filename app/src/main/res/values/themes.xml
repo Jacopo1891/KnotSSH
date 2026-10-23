@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme using Material Component's DayNight style -->
-    <style name="Theme.KnotSSH" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- Base application theme using Material 3's DayNight style -->
+    <style name="Theme.KnotSSH" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <!-- Without this the window is letterboxed away from the camera cutout in landscape,

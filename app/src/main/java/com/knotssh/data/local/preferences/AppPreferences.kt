@@ -25,6 +25,18 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
+/** Static colour set, used when dynamic colour is off or unavailable. */
+enum class AppPalette { KNOTSSH_RED, GOOGLE_BLUE }
+
+/** How each server is drawn in the Home list. */
+enum class ServerListStyle {
+    /** Icon, name, account and host, last connection. */
+    EXTENDED,
+
+    /** Denser rows without icons: name and host only. */
+    COMPACT
+}
+
 enum class TerminalFont { MONOSPACE, SANS_SERIF, SERIF }
 
 /**
@@ -60,7 +72,10 @@ data class SyncSettings(
 
 data class AppearanceSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val dynamicColor: Boolean = true
+    val dynamicColor: Boolean = true,
+    val palette: AppPalette = AppPalette.KNOTSSH_RED,
+    val amoledBlack: Boolean = false,
+    val serverListStyle: ServerListStyle = ServerListStyle.EXTENDED
 )
 
 data class TerminalSettings(
@@ -136,6 +151,9 @@ class AppPreferences @Inject constructor(
     private object Keys {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
+        val PALETTE = stringPreferencesKey("palette")
+        val AMOLED_BLACK = booleanPreferencesKey("amoled_black")
+        val SERVER_LIST_STYLE = stringPreferencesKey("server_list_style")
 
         val TERMINAL_FONT_SIZE = intPreferencesKey("terminal_font_size")
         val TERMINAL_FONT = stringPreferencesKey("terminal_font")
@@ -198,7 +216,10 @@ class AppPreferences @Inject constructor(
     val appearance: Flow<AppearanceSettings> = prefs.map { p ->
         AppearanceSettings(
             themeMode = p[Keys.THEME_MODE].toEnum(ThemeMode.SYSTEM),
-            dynamicColor = p[Keys.DYNAMIC_COLOR] ?: true
+            dynamicColor = p[Keys.DYNAMIC_COLOR] ?: true,
+            palette = p[Keys.PALETTE].toEnum(AppPalette.KNOTSSH_RED),
+            amoledBlack = p[Keys.AMOLED_BLACK] ?: false,
+            serverListStyle = p[Keys.SERVER_LIST_STYLE].toEnum(ServerListStyle.EXTENDED)
         )
     }.distinctUntilChanged()
 
@@ -303,6 +324,10 @@ class AppPreferences @Inject constructor(
 
     suspend fun setThemeMode(value: ThemeMode) = put(Keys.THEME_MODE, value.name)
     suspend fun setDynamicColor(value: Boolean) = put(Keys.DYNAMIC_COLOR, value)
+    suspend fun setPalette(value: AppPalette) = put(Keys.PALETTE, value.name)
+    suspend fun setAmoledBlack(value: Boolean) = put(Keys.AMOLED_BLACK, value)
+    suspend fun setServerListStyle(value: ServerListStyle) =
+        put(Keys.SERVER_LIST_STYLE, value.name)
 
     suspend fun setTerminalFontSize(value: Int) =
         put(Keys.TERMINAL_FONT_SIZE, value.coerceIn(Defaults.FONT_SIZE_MIN, Defaults.FONT_SIZE_MAX))
@@ -386,6 +411,9 @@ class AppPreferences @Inject constructor(
         context.dataStore.edit { p ->
             p[Keys.THEME_MODE] = s.themeMode
             p[Keys.DYNAMIC_COLOR] = s.dynamicColor
+            p[Keys.PALETTE] = s.palette
+            p[Keys.AMOLED_BLACK] = s.amoledBlack
+            p[Keys.SERVER_LIST_STYLE] = s.serverListStyle
             p[Keys.TERMINAL_FONT_SIZE] = s.terminalFontSize
             p[Keys.TERMINAL_FONT] = s.terminalFont
             p[Keys.TERMINAL_THEME] = s.terminalTheme

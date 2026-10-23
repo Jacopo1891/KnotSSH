@@ -16,13 +16,17 @@ KnotSSH keeps everything on the device. There is no account to create, no backen
 
 ## Screenshots
 
-| Your servers                                                                  | Add a server                                                                     | Reusable accounts                                                                  | Port forwarding                                                                            |
-| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| <img src="docs/screenshots/01-server-list.jpg" width="200" alt="Server list"> | <img src="docs/screenshots/02-new-server.jpg" width="200" alt="New server form"> | <img src="docs/screenshots/03-new-account.jpg" width="200" alt="New account form"> | <img src="docs/screenshots/04-port-forwarding.jpg" width="200" alt="Port forwarding rule"> |
+| Your servers                                                                  | Add a server                                                                     | Pick an icon                                                                  | Reusable accounts                                                                  |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| <img src="docs/screenshots/01-server-list.jpg" width="200" alt="Server list"> | <img src="docs/screenshots/02-new-server.jpg" width="200" alt="New server form"> | <img src="docs/screenshots/08-icon-picker.jpg" width="200" alt="Server icon picker"> | <img src="docs/screenshots/09-accounts.jpg" width="200" alt="Accounts list"> |
 
-| Connect                                                                                           | Sessions keep running                                                                                        | Security options                                                                 |
-| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| <img src="docs/screenshots/05-connect-password.jpg" width="200" alt="Password prompt on connect"> | <img src="docs/screenshots/06-background-sessions.jpg" width="200" alt="Notification with running sessions"> | <img src="docs/screenshots/07-security.jpg" width="200" alt="Security settings"> |
+| New account                                                                        | Port forwarding                                                                            | Connect                                                                                           | Sessions keep running                                                                                        |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| <img src="docs/screenshots/03-new-account.jpg" width="200" alt="New account form"> | <img src="docs/screenshots/04-port-forwarding.jpg" width="200" alt="Port forwarding rule"> | <img src="docs/screenshots/05-connect-password.jpg" width="200" alt="Password prompt on connect"> | <img src="docs/screenshots/06-background-sessions.jpg" width="200" alt="Notification with running sessions"> |
+
+| Appearance and list style                                                           | Security options                                                                 |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| <img src="docs/screenshots/10-appearance.jpg" width="200" alt="Appearance settings with list preview"> | <img src="docs/screenshots/07-security.jpg" width="200" alt="Security settings"> |
 
 ## Features
 
@@ -30,7 +34,8 @@ KnotSSH keeps everything on the device. There is no account to create, no backen
 - **Authentication** by password or SSH key, with an optional _ask each time_ mode so secrets are never stored.
 - **Host key verification** against a known-hosts store, including import of an existing `known_hosts` file.
 - **Port forwarding**, local (`-L`) and remote (`-R`).
-- **Server organisation** with folders and favourites.
+- **Server organisation** with folders, favourites and a choice of icons (Linux distributions, self-hosting software, databases, cloud providers) to recognise each server at a glance.
+- **Material 3 design** with dynamic colour, a soft red KnotSSH palette or the classic Google blue, light, dark and pure-black AMOLED themes.
 - **Quick commands** and custom terminal keys.
 - **Encrypted import & export** of servers, credentials, SSH keys, known hosts, folders, and settings to a portable `.knotssh` container protected with **Argon2id** and **AES-256-GCM**.
 - **Automatic encrypted sync & Android Auto Backup** to keep your configuration backed up across devices without exposing secrets in the clear.
@@ -116,6 +121,7 @@ Bug reports and suggestions are welcome in the [issues](https://github.com/Jacop
 | -------------------------------------------------------------- | ----------- |
 | [JSch (mwiede fork)](https://github.com/mwiede/jsch)           | Revised BSD |
 | [argon2kt](https://github.com/lambdapioneer/argon2kt)          | MIT         |
+| [Simple Icons](https://simpleicons.org) (server icons)         | CC0 1.0     |
 | AndroidX, Jetpack Compose, Hilt, Kotlin, kotlinx.serialization | Apache 2.0  |
 
 ## License

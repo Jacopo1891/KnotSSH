@@ -52,7 +52,7 @@ class ServerRepositoryImpl @Inject constructor(
         isFavorite = isFavorite, keepAliveSeconds = keepAliveSeconds,
         connectTimeoutSeconds = connectTimeoutSeconds,
         portForwardRules = portForwardRules,
-        folderId = folderId, sortOrder = sortOrder
+        folderId = folderId, sortOrder = sortOrder, iconKey = iconKey
     )
 
     private fun Server.toEntity() = ServerEntity(
@@ -61,6 +61,6 @@ class ServerRepositoryImpl @Inject constructor(
         isFavorite = isFavorite, keepAliveSeconds = keepAliveSeconds,
         connectTimeoutSeconds = connectTimeoutSeconds,
         portForwardRules = portForwardRules,
-        folderId = folderId, sortOrder = sortOrder
+        folderId = folderId, sortOrder = sortOrder, iconKey = iconKey
     )
 }

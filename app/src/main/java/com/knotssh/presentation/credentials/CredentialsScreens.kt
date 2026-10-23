@@ -1,10 +1,14 @@
 package com.knotssh.presentation.credentials
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -13,6 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -28,9 +34,10 @@ import com.knotssh.presentation.components.SwipeToDeleteContainer
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CredentialsScreen(
-    onBack: () -> Unit,
     onAddCredential: () -> Unit,
     onEditCredential: (Long) -> Unit,
+    onNavigateSettings: () -> Unit,
+    bottomBar: @Composable () -> Unit = {},
     viewModel: CredentialsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,67 +82,75 @@ fun CredentialsScreen(
         )
     }
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.credentials_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
+                actions = {
+                    IconButton(onClick = onNavigateSettings) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.action_back)
+                            Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.settings_title)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                scrollBehavior = scrollBehavior
             )
         },
+        bottomBar = bottomBar,
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = onAddCredential,
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.credential_new_title)
-                )
-            }
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text(stringResource(R.string.credential_new_title)) }
+            )
         }
     ) { padding ->
         if (uiState.credentials.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Text(
                     stringResource(R.string.credentials_empty),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(32.dp)
                 )
             }
         } else {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                    .padding(padding),
+                contentPadding = PaddingValues(bottom = 88.dp)
             ) {
-                items(uiState.credentials, key = { it.id }) { cred ->
-                    SwipeToDeleteContainer(onDelete = { credentialToDelete = cred; false }) {
-                        Card(
-                            onClick = { onEditCredential(cred.id) },
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxWidth()
+                itemsIndexed(uiState.credentials, key = { _, it -> it.id }) { index, cred ->
+                    Column(modifier = Modifier.animateItem()) {
+                        SwipeToDeleteContainer(
+                            onDelete = { credentialToDelete = cred; false },
+                            shape = RectangleShape
                         ) {
                             Row(
-                                modifier = Modifier.padding(16.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .clickable { onEditCredential(cred.id) }
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     imageVector = if (cred.authType == AuthType.PASSWORD) Icons.Default.VpnKey else Icons.Default.Key,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(28.dp)
                                 )
-                                Spacer(Modifier.width(16.dp))
+                                Spacer(Modifier.width(20.dp))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(cred.alias, style = MaterialTheme.typography.titleMedium)
                                     Text(
@@ -150,12 +165,22 @@ fun CredentialsScreen(
                                             } else {
                                                 ""
                                             },
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.tertiary
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                Icon(Icons.Default.ChevronRight, contentDescription = null)
+                                Icon(
+                                    Icons.Default.ChevronRight,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
+                        }
+                        if (index < uiState.credentials.lastIndex) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(start = 64.dp, end = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                            )
                         }
                     }
                 }
@@ -180,6 +205,7 @@ fun EditCredentialScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             TopAppBar(
                 title = {
@@ -199,13 +225,16 @@ fun EditCredentialScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.save() }) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = stringResource(R.string.action_save)
-                        )
+                    Button(
+                        onClick = { viewModel.save() },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text(stringResource(R.string.action_save))
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             )
         }
     ) { padding ->
@@ -213,6 +242,7 @@ fun EditCredentialScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {

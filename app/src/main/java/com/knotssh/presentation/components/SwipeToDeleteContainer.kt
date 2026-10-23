@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.knotssh.R
@@ -28,6 +29,7 @@ import com.knotssh.R
 fun SwipeToDeleteContainer(
     onDelete: () -> Boolean,
     modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(16.dp),
     content: @Composable RowScope.() -> Unit
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
@@ -52,7 +54,7 @@ fun SwipeToDeleteContainer(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(shape)
                     .background(color)
                     .padding(end = 24.dp),
                 contentAlignment = Alignment.CenterEnd

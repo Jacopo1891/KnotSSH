@@ -6,7 +6,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.knotssh.R
+import com.knotssh.data.local.preferences.AppPalette
 import com.knotssh.data.local.preferences.Defaults
+import com.knotssh.data.local.preferences.ServerListStyle
 import com.knotssh.data.local.preferences.TerminalFont
 import com.knotssh.data.local.preferences.ThemeMode
 import com.knotssh.terminal.TerminalTheme
@@ -45,6 +47,42 @@ fun AppearanceSettingsScreen(
                 onCheckedChange = viewModel::setDynamicColor
             )
         }
+        item {
+            ChoiceRow(
+                title = stringResource(R.string.appearance_palette),
+                description = stringResource(R.string.appearance_palette_desc),
+                options = listOf(
+                    AppPalette.KNOTSSH_RED to stringResource(R.string.palette_knotssh_red),
+                    AppPalette.GOOGLE_BLUE to stringResource(R.string.palette_google_blue)
+                ),
+                selected = appearance.palette,
+                enabled = !appearance.dynamicColor,
+                onSelected = viewModel::setPalette
+            )
+        }
+        item {
+            SwitchRow(
+                title = stringResource(R.string.appearance_amoled),
+                description = stringResource(R.string.appearance_amoled_desc),
+                checked = appearance.amoledBlack,
+                onCheckedChange = viewModel::setAmoledBlack
+            )
+        }
+
+        item { SettingsSection(stringResource(R.string.appearance_section_server_list)) }
+        item {
+            ChoiceRow(
+                title = stringResource(R.string.appearance_list_style),
+                description = stringResource(R.string.appearance_list_style_desc),
+                options = listOf(
+                    ServerListStyle.EXTENDED to stringResource(R.string.list_style_extended),
+                    ServerListStyle.COMPACT to stringResource(R.string.list_style_compact)
+                ),
+                selected = appearance.serverListStyle,
+                onSelected = viewModel::setServerListStyle
+            )
+        }
+        item { ServerListPreview(style = appearance.serverListStyle) }
 
         item { SettingsSection(stringResource(R.string.settings_terminal)) }
         item {

@@ -86,7 +86,12 @@ class MainActivity : AppCompatActivity() {
                 onDispose { }
             }
 
-            KnotSshTheme(darkTheme = isDark, dynamicColor = appearance.dynamicColor) {
+            KnotSshTheme(
+                darkTheme = isDark,
+                dynamicColor = appearance.dynamicColor,
+                palette = appearance.palette,
+                amoledBlack = appearance.amoledBlack
+            ) {
                 securitySettings?.let { settings ->
                     BiometricGate(
                         enabled = settings.biometricEnabled,

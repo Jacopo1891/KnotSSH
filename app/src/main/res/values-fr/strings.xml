@@ -259,6 +259,18 @@
 
     <string name="appearance_theme">Thème</string>
     <string name="appearance_dynamic_color_desc">Utiliser la palette Material You du système</string>
+    <string name="appearance_palette">Palette de couleurs</string>
+    <string name="appearance_palette_desc">Utilisée lorsque Dynamic Color est désactivé</string>
+    <string name="palette_knotssh_red">Rouge KnotSSH</string>
+    <string name="palette_google_blue">Bleu Google</string>
+    <string name="appearance_amoled">Noir pur (AMOLED)</string>
+    <string name="appearance_amoled_desc">Fonds noirs dans le thème sombre, plus économes pour la batterie des écrans OLED</string>
+    <string name="appearance_section_server_list">Liste des serveurs</string>
+    <string name="appearance_list_style">Style de la liste</string>
+    <string name="appearance_list_style_desc">Étendu affiche les icônes et la dernière connexion ; compact affiche plus de serveurs à l\'écran.</string>
+    <string name="list_style_extended">Étendu</string>
+    <string name="list_style_compact">Compact</string>
+    <string name="appearance_preview">Aperçu</string>
     <string name="appearance_terminal_theme">Thème du terminal</string>
     <string name="appearance_terminal_theme_desc">Fond, texte et palette ANSI</string>
     <string name="appearance_font">Police</string>
@@ -532,6 +544,28 @@
     <string name="server_folder_label">Dossier</string>
     <string name="server_copy_alias">%1$s (copie)</string>
     <string name="error_alias_taken">Un autre serveur porte déjà ce nom</string>
+
+    <string name="nav_servers">Serveurs</string>
+    <string name="nav_accounts">Comptes</string>
+
+    <string name="server_icon_label">Icône</string>
+    <string name="server_icon_change">Changer l\'icône</string>
+    <string name="server_icon_picker_title">Choisir une icône</string>
+    <string name="server_icon_group_generic">Génériques</string>
+    <string name="server_icon_group_linux">Distributions Linux</string>
+    <string name="server_icon_group_systems">Autres systèmes</string>
+    <string name="server_icon_group_selfhosted">Auto-hébergement</string>
+    <string name="server_icon_group_services">Services</string>
+    <string name="server_icon_group_cloud">Cloud</string>
+    <string name="server_icon_server">Serveur</string>
+    <string name="server_icon_storage">Stockage</string>
+    <string name="server_icon_computer">Ordinateur</string>
+    <string name="server_icon_router">Routeur</string>
+    <string name="server_icon_cloud_generic">Cloud</string>
+    <string name="server_icon_terminal">Terminal</string>
+    <string name="server_icon_vm">Machine virtuelle</string>
+    <string name="server_icon_search_hint">Rechercher une icône…</string>
+    <string name="server_icon_no_results">Aucune icône trouvée</string>
 
     <string name="welcome_version">Version %1$s</string>
     <string name="welcome_github_profile">Profil GitHub</string>

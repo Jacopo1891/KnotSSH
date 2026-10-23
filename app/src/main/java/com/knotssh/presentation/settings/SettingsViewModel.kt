@@ -2,12 +2,14 @@ package com.knotssh.presentation.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.knotssh.data.local.preferences.AppPalette
 import com.knotssh.data.local.preferences.AppPreferences
 import com.knotssh.data.local.preferences.AppearanceSettings
 import com.knotssh.data.local.preferences.BellMode
 import com.knotssh.data.local.preferences.ConnectionSettings
 import com.knotssh.data.local.preferences.HostKeyPolicy
 import com.knotssh.data.local.preferences.SecuritySettings
+import com.knotssh.data.local.preferences.ServerListStyle
 import com.knotssh.data.local.preferences.TerminalFont
 import com.knotssh.data.local.preferences.TerminalSettings
 import com.knotssh.data.local.preferences.ThemeMode
@@ -73,6 +75,9 @@ class SettingsViewModel @Inject constructor(
     // Appearance
     fun setThemeMode(value: ThemeMode) = update { prefs.setThemeMode(value) }
     fun setDynamicColor(value: Boolean) = update { prefs.setDynamicColor(value) }
+    fun setPalette(value: AppPalette) = update { prefs.setPalette(value) }
+    fun setAmoledBlack(value: Boolean) = update { prefs.setAmoledBlack(value) }
+    fun setServerListStyle(value: ServerListStyle) = update { prefs.setServerListStyle(value) }
 
     // Terminal
     fun setTerminalFontSize(value: Int) = update { prefs.setTerminalFontSize(value) }
