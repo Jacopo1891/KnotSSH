@@ -16,13 +16,17 @@ KnotSSH keeps everything on the device. There is no account to create, no backen
 
 ## Screenshots
 
-| Your servers                                                                  | Add a server                                                                     | Reusable accounts                                                                  | Port forwarding                                                                            |
-| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| <img src="docs/screenshots/01-server-list.jpg" width="200" alt="Server list"> | <img src="docs/screenshots/02-new-server.jpg" width="200" alt="New server form"> | <img src="docs/screenshots/03-new-account.jpg" width="200" alt="New account form"> | <img src="docs/screenshots/04-port-forwarding.jpg" width="200" alt="Port forwarding rule"> |
+| Your servers                                                                  | Add a server                                                                     | Pick an icon                                                                  | Reusable accounts                                                                  |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| <img src="docs/screenshots/01-server-list.jpg" width="200" alt="Server list"> | <img src="docs/screenshots/02-new-server.jpg" width="200" alt="New server form"> | <img src="docs/screenshots/08-icon-picker.jpg" width="200" alt="Server icon picker"> | <img src="docs/screenshots/09-accounts.jpg" width="200" alt="Accounts list"> |
 
-| Connect                                                                                           | Sessions keep running                                                                                        | Security options                                                                 |
-| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| <img src="docs/screenshots/05-connect-password.jpg" width="200" alt="Password prompt on connect"> | <img src="docs/screenshots/06-background-sessions.jpg" width="200" alt="Notification with running sessions"> | <img src="docs/screenshots/07-security.jpg" width="200" alt="Security settings"> |
+| New account                                                                        | Port forwarding                                                                            | Connect                                                                                           | Sessions keep running                                                                                        |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| <img src="docs/screenshots/03-new-account.jpg" width="200" alt="New account form"> | <img src="docs/screenshots/04-port-forwarding.jpg" width="200" alt="Port forwarding rule"> | <img src="docs/screenshots/05-connect-password.jpg" width="200" alt="Password prompt on connect"> | <img src="docs/screenshots/06-background-sessions.jpg" width="200" alt="Notification with running sessions"> |
+
+| Appearance and list style                                                           | Security options                                                                 |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| <img src="docs/screenshots/10-appearance.jpg" width="200" alt="Appearance settings with list preview"> | <img src="docs/screenshots/07-security.jpg" width="200" alt="Security settings"> |
 
 ## Features
 
