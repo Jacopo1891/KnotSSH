@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: "Tipo di rilascio"
+        description: "Release type"
         type: choice
         required: true
         default: patch
@@ -155,15 +155,15 @@ jobs:
           if [ -n "${PREV}" ]; then RANGE="${PREV}..${TAG}"; else RANGE="${TAG}"; fi
 
           {
-            echo "## Novità"
+            echo "## What's new"
             echo
             git log --no-merges --pretty='- %s' "${RANGE}"
             echo
-            echo "## Installazione"
+            echo "## Installation"
             echo
-            echo "Scarica \`${APK}\` e installalo sul dispositivo (serve consentire le origini sconosciute)."
+            echo "Download \`${APK}\` and install it on your device (you need to allow installation from unknown sources)."
             echo
-            echo "Verifica l'integrità del file prima di installarlo:"
+            echo "Verify the file's integrity before installing it:"
             echo
             echo '```'
             echo "sha256sum ${APK}"
